@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breaking Bad 3D: Albuquerque Road Navigator</title>
+  <script src="js/three.min.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800;900&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; color: #fff; }
+    #canvas-container { width: 100%; height: 100%; position: absolute; left: 0; top: 0; }
+    
+    /* HUD Overlays */
+    .hud-layer { position: absolute; pointer-events: none; z-index: 20; }
+    .interactive { pointer-events: auto; }
+    
+    /* Elements Badge */
+    .element-badge {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 38px;
+      height: 42px;
+      padding: 2px 4px;
+      background: #0f5132;
+      border: 2px solid #20c997;
+      color: #fff;
+      font-weight: bold;
+      line-height: 1;
+      font-family: 'Fira Code', monospace;
+    }
+    .element-badge .num { font-size: 8px; opacity: 0.8; }
+    .element-badge .sym { font-size: 16px; font-weight: 800; }
+
+    /* Top Navigation Bar */
+    #top-bar {
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .glass-panel {
+      background: rgba(14, 18, 28, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    /* Speedometer & Driving HUD */
+    #dashboard {
+      bottom: 24px;
+      left: 24px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .speed-number {
+      font-family: 'Fira Code', monospace;
+      font-size: 48px;
+      font-weight: 800;
+      color: #20c997;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(32, 201, 151, 0.4);
+    }
+
+    /* Road Sign Display */
+    #road-sign {
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 24px;
+      text-align: center;
+      border-color: #f59e0b;
+    }
+
+    /* Minimap Radar */
+    #minimap-container {
+      bottom: 24px;
+      right: 24px;
+      width: 220px;
+      height: 220px;
+      padding: 8px;
+      overflow: hidden;
+      border-color: #20c997;
+    }
+    #minimap-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      background: #090c14;
+    }
+
+    /* Teleport Quick Selector */
+    #teleport-panel {
+      top: 80px;
+      right: 24px;
+      width: 260px;
+      padding: 14px;
+      max-height: calc(100vh - 340px);
+      overflow-y: auto;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e5e7eb;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+    .btn-action:hover {
+      background: #20c997;
+      color: #000;
+      border-color: #20c997;
+      transform: translateX(4px);
+    }
+
+    /* Controls Help Modal */
+    #controls-hint {
+      top: 80px;
+      left: 24px;
+      padding: 14px 18px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Loading Screen */
+    #loader {
+      position: absolute;
+      inset: 0;
+      background: #0b0d14;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(32, 201, 151, 0.2);
+      border-top-color: #20c997;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Custom scrollbar */
+    #teleport-panel::-webkit-scrollbar { width: 4px; }
+    #teleport-panel::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- 3D WebGL Canvas -->
+  <div id="canvas-container"></div>
+
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="mt-4 flex items-center space-x-2">
+      <div class="element-badge"><span class="num">35</span><span class="sym">Br</span></div>
+      <div class="element-badge"><span class="num">56</span><span class="sym">Ba</span></div>
+      <div class="ml-2">
+        <h2 class="text-xl font-bold tracking-wider">LOADING ALBUQUERQUE 3D</h2>
+        <p id="loader-status" class="text-xs text-gray-400 font-mono">Initializing 1.44 km² City & Landmarks...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Navigation & Status -->
+  <div id="top-bar" class="hud-layer">
+    <div class="flex items-center space-x-3 glass-panel px-4 py-2 interactive">
+      <div class="flex space-x-1">
+        <div class="element-badge"><span class="num">35</span><span class="sym">Br</span></div>
+        <div class="element-badge"><span class="num">56</span><span class="sym">Ba</span></div>
+      </div>
+      <div>
+        <h1 class="text-sm font-black tracking-wider uppercase text-white">BREAKING BAD 3D ROAD NAVIGATOR</h1>
+        <div class="text-[11px] text-emerald-400 font-mono">Albuquerque, New Mexico &bull; Real-time Simulation</div>
+      </div>
+    </div>
+
+    <!-- Time of Day & Camera Toggle Buttons -->
+    <div class="flex items-center space-x-2 interactive">
+      <button onclick="toggleCameraView()" class="btn-action !w-auto !mb-0 glass-panel" title="Switch Camera View (Key C)">
+        📹 <span id="cam-view-name">Chase Cam</span>
+      </button>
+      <button onclick="toggleVehicleType()" class="btn-action !w-auto !mb-0 glass-panel" title="Switch Vehicle (Pontiac Aztek / Crystal Ship RV)">
+        🚗 <span id="vehicle-type-name">Pontiac Aztek</span>
+      </button>
+      <button onclick="cycleTimeOfDay()" class="btn-action !w-auto !mb-0 glass-panel" title="Change Lighting Mode">
+        ☀️ <span id="tod-name">Desert Noon</span>
+      </button>
+      <button onclick="toggleAudio()" class="btn-action !w-auto !mb-0 glass-panel" title="Toggle Engine Audio">
+        🔊 <span id="sound-status">Sound ON</span>
+      </button>
+      <a href="index.html" class="btn-action !w-auto !mb-0 glass-panel text-amber-400 hover:text-black">
+        &larr; Overview Page
+      </a>
+    </div>
+  </div>
+
+  <!-- Controls Help Panel -->
+  <div id="controls-hint" class="hud-layer glass-panel">
+    <div class="text-[11px] font-mono text-emerald-400 font-bold uppercase mb-1">🎮 DRIVING CONTROLS</div>
+    <div class="text-xs text-gray-300"><strong>W / Up:</strong> Accelerate</div>
+    <div class="text-xs text-gray-300"><strong>S / Down:</strong> Reverse / Brake</div>
+    <div class="text-xs text-gray-300"><strong>A / D:</strong> Steer Left / Right</div>
+    <div class="text-xs text-gray-300"><strong>Shift:</strong> Nitro Boost</div>
+    <div class="text-xs text-gray-300"><strong>Space:</strong> Handbrake</div>
+    <div class="text-xs text-gray-300"><strong>C:</strong> Change Camera View</div>
+    <div class="text-xs text-gray-300"><strong>H:</strong> Car Horn</div>
+    <div class="text-xs text-gray-300"><strong>R:</strong> Reset Vehicle</div>
+  </div>
+
+  <!-- Teleport Landmarks Panel -->
+  <div id="teleport-panel" class="hud-layer glass-panel interactive">
+    <div class="text-[11px] font-mono text-amber-400 font-bold uppercase mb-2">📍 WARP TO ROAD LOCATION</div>
+    <button class="btn-action" onclick="teleportTo('walt')">🏠 308 Negra Arroyo (Walt)</button>
+    <button class="btn-action" onclick="teleportTo('pollos')">🍗 Los Pollos Hermanos</button>
+    <button class="btn-action" onclick="teleportTo('saul')">⚖️ Saul Goodman Office</button>
+    <button class="btn-action" onclick="teleportTo('carwash')">🧼 A1A Carwash</button>
+    <button class="btn-action" onclick="teleportTo('superlab_ext')">🧺 Lavandería Brillante</button>
+    <button class="btn-action" onclick="teleportTo('superlab_int')">🧪 Inside Superlab (Vault)</button>
+    <button class="btn-action" onclick="teleportTo('tohajiilee')">🚐 To'hajiilee (Crystal Ship)</button>
+    <button class="btn-action" onclick="teleportTo('motel')">🏨 Crossroads Motel</button>
+    <button class="btn-action" onclick="teleportTo('junkyard')">🧲 Old Joe's Junkyard</button>
+    <button class="btn-action" onclick="teleportTo('jesse')">🏡 Jesse Pinkman's House</button>
+    <button class="btn-action" onclick="teleportTo('hank')">⛰️ Hank &amp; Marie Foothill</button>
+    <button class="btn-action" onclick="teleportTo('downtown')">🏙️ Downtown Route 66</button>
+  </div>
+
+  <!-- Dashboard Speedometer -->
+  <div id="dashboard" class="hud-layer glass-panel">
+    <div>
+      <div class="text-[10px] font-mono text-gray-400 uppercase tracking-widest">SPEED</div>
+      <div class="speed-number"><span id="speed-val">0</span> <span class="text-sm font-normal text-gray-400">MPH</span></div>
+    </div>
+    <div class="border-l border-gray-700 pl-4 space-y-1 text-xs font-mono">
+      <div>GEAR: <span id="gear-val" class="text-emerald-400 font-bold">D</span></div>
+      <div>HEADING: <span id="heading-val" class="text-cyan-400">EAST</span></div>
+      <div>POS: <span id="coord-val" class="text-gray-400 text-[11px]">-150, 300</span></div>
+    </div>
+  </div>
+
+  <!-- Current Road Sign HUD -->
+  <div id="road-sign" class="hud-layer glass-panel">
+    <div class="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider">CURRENT CORRIDOR</div>
+    <div id="current-road-name" class="text-base font-black text-white uppercase tracking-wide">NEGRA ARROYO WAY</div>
+  </div>
+
+  <!-- Minimap Radar -->
+  <div id="minimap-container" class="hud-layer glass-panel interactive">
+    <canvas id="minimap-canvas" width="200" height="200"></canvas>
+  </div>
+
+  <script>
+    // --- SCENE, CAMERA, RENDERER ---
+    let scene, camera, renderer, clock;
+    let cityMasterGroup = null;
+    let orbitControls = null;
+
+    // Vehicle state & physics
+    let car = null;
+    let vehicleType = 'aztek'; // 'aztek' or 'rv'
+    let carWheels = [];
+    let carHeadlights = [];
+    let carPos = new THREE.Vector3(-150, 275, 0.4);
+    let carRot = 0; // Yaw angle (radians)
+    let carSpeed = 0; // in meters/sec
+    let steering = 0;
+    let nitro = 1.0;
+    let isHandbrake = false;
+
+    // Camera modes: 'chase', 'cockpit', 'drone'
+    let cameraMode = 'chase';
+    let timeOfDay = 'noon'; // 'noon', 'sunset', 'night'
+
+    // Key input state
+    const keys = {
+      forward: false,
+      backward: false,
+      left: false,
+      right: false,
+      shift: false,
+      space: false
+    };
+
+    // Lights
+    let sunLight, skyLight, ambientLight;
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    let engineOsc = null;
+    let engineGain = null;
+    let soundEnabled = true;
+
+    // Landmark Locations Table
+    const LANDMARKS = [
+      { id: 'walt', name: "308 Negra Arroyo (Walt's House)", x: -150, y: 300, z: 0, road: "NEGRA ARROYO WAY", rot: 0 },
+      { id: 'pollos', name: "Los Pollos Hermanos", x: 140, y: 20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: Math.PI / 2 },
+      { id: 'saul', name: "Saul Goodman & Associates", x: -60, y: 20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: Math.PI / 2 },
+      { id: 'carwash', name: "A1A Carwash", x: 220, y: -20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: -Math.PI / 2 },
+      { id: 'superlab_ext', name: "Lavandería Brillante", x: 90, y: -220, z: 0, road: "SOUTH VALLEY WAY", rot: 0 },
+      { id: 'superlab_int', name: "Underground Secret Superlab", x: 90, y: -260, z: -6.5, road: "SUBTERRANEAN LAB VAULT", rot: 0 },
+      { id: 'tohajiilee', name: "To'hajiilee Cook Site (Crystal Ship)", x: -420, y: 390, z: 3.5, road: "TO'HAJIILEE ARROYO TRAIL", rot: 0.3 },
+      { id: 'motel', name: "Crossroads Motel ('Crystal Palace')", x: -100, y: -25, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: -Math.PI / 2 },
+      { id: 'junkyard', name: "Old Joe's Junkyard & Magnet", x: -180, y: -240, z: 0, road: "SOUTH VALLEY INDUSTRIAL", rot: 0 },
+      { id: 'jesse', name: "Jesse Pinkman's House", x: -260, y: 220, z: 0, road: "CANDELARIA ROAD", rot: 0 },
+      { id: 'hank', name: "Hank & Marie's Foothill House", x: 270, y: 240, z: 0, road: "SANDIA CREST PARKWAY", rot: -0.2 },
+      { id: 'downtown', name: "Downtown Albuquerque Skyline", x: -320, y: 0, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: Math.PI / 2 }
+    ];
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+      clock = new THREE.Clock();
+
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x90b4d4);
+      scene.fog = new THREE.FogExp2(0xc49a6c, 0.0018);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+      camera.position.set(-150, 260, 8);
+
+      // Renderer with WebGL2 support
+      const canvas = document.createElement('canvas');
+      let glContext = canvas.getContext('webgl2');
+      if (!glContext) {
+        glContext = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      }
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        context: glContext,
+        antialias: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      // Controls for Drone Mode
+      orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+      orbitControls.enableDamping = true;
+      orbitControls.dampingFactor = 0.05;
+      orbitControls.enabled = false;
+
+      // Lights
+      setupLighting();
+
+      // Build Vehicle
+      buildPlayerVehicle();
+
+      // Load Master City GLB
+      loadMasterCityModel();
+
+      // Event Listeners
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+
+      // Start loop
+      animate();
+    }
+
+    function setupLighting() {
+      // Sun Light
+      sunLight = new THREE.DirectionalLight(0xfff3e0, 2.5);
+      sunLight.position.set(200, -300, 400);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
+      sunLight.shadow.camera.near = 10;
+      sunLight.shadow.camera.far = 1000;
+      const d = 150;
+      sunLight.shadow.camera.left = -d;
+      sunLight.shadow.camera.right = d;
+      sunLight.shadow.camera.top = d;
+      sunLight.shadow.camera.bottom = -d;
+      scene.add(sunLight);
+
+      // Sky Fill Light
+      skyLight = new THREE.HemisphereLight(0xb4d4f4, 0x8d6e53, 1.2);
+      scene.add(skyLight);
+
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+    }
+
+    function buildPlayerVehicle() {
+      if (car) scene.remove(car);
+      car = new THREE.Group();
+
+      if (vehicleType === 'aztek') {
+        // Walter White's Fern Green Pontiac Aztek
+        // Body Lower Cladding
+        const lowerGeo = new THREE.BoxGeometry(1.85, 4.4, 0.45);
+        const lowerMat = new THREE.MeshStandardMaterial({ color: 0x222428, roughness: 0.8 });
+        const lowerMesh = new THREE.Mesh(lowerGeo, lowerMat);
+        lowerMesh.position.z = 0.55;
+        car.add(lowerMesh);
+
+        // Body Upper (Fern Green)
+        const bodyGeo = new THREE.BoxGeometry(1.82, 4.2, 0.45);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x486445, metalness: 0.4, roughness: 0.4 });
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        bodyMesh.position.set(0, -0.1, 0.95);
+        car.add(bodyMesh);
+
+        // Cabin
+        const cabGeo = new THREE.BoxGeometry(1.6, 2.5, 0.65);
+        const cabMesh = new THREE.Mesh(cabGeo, bodyMat);
+        cabMesh.position.set(0, -0.3, 1.45);
+        car.add(cabMesh);
+
+        // Windshield
+        const winGeo = new THREE.BoxGeometry(1.5, 0.1, 0.55);
+        const winMat = new THREE.MeshStandardMaterial({ color: 0x1a2e3b, roughness: 0.1, transparent: true, opacity: 0.7 });
+        const windshield = new THREE.Mesh(winGeo, winMat);
+        windshield.position.set(0, 0.9, 1.4);
+        windshield.rotation.x = 0.45;
+        car.add(windshield);
+      } else {
+        // Fleetwood Bounder "Crystal Ship" RV
+        const bodyGeo = new THREE.BoxGeometry(2.5, 9.2, 2.4);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe0dacf, roughness: 0.5 });
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        bodyMesh.position.z = 1.6;
+        car.add(bodyMesh);
+
+        // Orange racing stripe
+        const stripeGeo = new THREE.BoxGeometry(2.54, 8.8, 0.6);
+        const stripeMat = new THREE.MeshStandardMaterial({ color: 0xd95f19, roughness: 0.4 });
+        const stripeMesh = new THREE.Mesh(stripeGeo, stripeMat);
+        stripeMesh.position.z = 1.5;
+        car.add(stripeMesh);
+      }
+
+      // Wheels
+      carWheels = [];
+      const wheelGeo = new THREE.CylinderGeometry(0.36, 0.36, 0.24, 16);
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+      const offsets = [
+        [-0.92, 1.3], [0.92, 1.3],
+        [-0.92, -1.3], [0.92, -1.3]
+      ];
+      offsets.forEach(([wx, wy]) => {
+        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(wx, wy, 0.36);
+        car.add(wheel);
+        carWheels.push(wheel);
+      });
+
+      // Headlight Beams
+      const hl1 = new THREE.SpotLight(0xfffbe6, 4.0, 60, Math.PI / 5, 0.3);
+      hl1.position.set(-0.65, 2.2, 0.8);
+      hl1.target.position.set(-0.65, 25, 0);
+      car.add(hl1);
+      car.add(hl1.target);
+
+      const hl2 = new THREE.SpotLight(0xfffbe6, 4.0, 60, Math.PI / 5, 0.3);
+      hl2.position.set(0.65, 2.2, 0.8);
+      hl2.target.position.set(0.65, 25, 0);
+      car.add(hl2);
+      car.add(hl2.target);
+
+      carHeadlights = [hl1, hl2];
+      scene.add(car);
+    }
+
+    function loadMasterCityModel() {
+      const loader = new THREE.GLTFLoader();
+      const statusText = document.getElementById('loader-status');
+      
+      loader.load(
+        'game_export/breaking_bad_albuquerque_master.glb',
+        (gltf) => {
+          cityMasterGroup = gltf.scene;
+          
+          // Shadows and material refinement
+          cityMasterGroup.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+
+          scene.add(cityMasterGroup);
+          
+          // Hide loading screen
+          const loaderElem = document.getElementById('loader');
+          loaderElem.style.opacity = '0';
+          setTimeout(() => loaderElem.style.display = 'none', 500);
+
+          // Position car at Walter's House
+          teleportTo('walt');
+        },
+        (xhr) => {
+          if (xhr.lengthComputable) {
+            const pct = Math.round((xhr.loaded / xhr.total) * 100);
+            statusText.innerText = `Loading Albuquerque 3D World... ${pct}% (${(xhr.loaded / 1048576).toFixed(1)}MB / 3.5MB)`;
+          }
+        },
+        (error) => {
+          console.error("GLB load error:", error);
+          statusText.innerText = "Error loading GLB. Please check server status.";
+        }
+      );
+    }
+
+    function onKeyDown(e) {
+      initAudio();
+      switch(e.code) {
+        case 'KeyW': case 'ArrowUp': keys.forward = true; break;
+        case 'KeyS': case 'ArrowDown': keys.backward = true; break;
+        case 'KeyA': case 'ArrowLeft': keys.left = true; break;
+        case 'KeyD': case 'ArrowRight': keys.right = true; break;
+        case 'ShiftLeft': case 'ShiftRight': keys.shift = true; break;
+        case 'Space': keys.space = true; isHandbrake = true; break;
+        case 'KeyC': toggleCameraView(); break;
+        case 'KeyH': playCarHorn(); break;
+        case 'KeyR': resetCar(); break;
+      }
+    }
+
+    function onKeyUp(e) {
+      switch(e.code) {
+        case 'KeyW': case 'ArrowUp': keys.forward = false; break;
+        case 'KeyS': case 'ArrowDown': keys.backward = false; break;
+        case 'KeyA': case 'ArrowLeft': keys.left = false; break;
+        case 'KeyD': case 'ArrowRight': keys.right = false; break;
+        case 'ShiftLeft': case 'ShiftRight': keys.shift = false; break;
+        case 'Space': keys.space = false; isHandbrake = false; break;
+      }
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // --- DRIVING PHYSICS UPDATE ---
+    function updatePhysics(delta) {
+      if (!car) return;
+
+      const maxSpeed = keys.shift ? 40 : 25; // m/s (~90mph with turbo, 55mph normal)
+      const accel = keys.shift ? 18 : 12;
+      const friction = isHandbrake ? 15 : 4.0;
+      const steerSpeed = 2.4;
+
+      // Acceleration
+      if (keys.forward) {
+        carSpeed += accel * delta;
+        if (carSpeed > maxSpeed) carSpeed = maxSpeed;
+      } else if (keys.backward) {
+        carSpeed -= (accel * 0.7) * delta;
+        if (carSpeed < -maxSpeed * 0.4) carSpeed = -maxSpeed * 0.4;
+      } else {
+        // Natural coasting deceleration
+        if (carSpeed > 0) {
+          carSpeed -= friction * delta;
+          if (carSpeed < 0) carSpeed = 0;
+        } else if (carSpeed < 0) {
+          carSpeed += friction * delta;
+          if (carSpeed > 0) carSpeed = 0;
+        }
+      }
+
+      // Steering
+      if (Math.abs(carSpeed) > 0.1) {
+        const steerDir = carSpeed > 0 ? 1 : -1;
+        if (keys.left) carRot += steerSpeed * delta * steerDir * (Math.abs(carSpeed) / maxSpeed + 0.3);
+        if (keys.right) carRot -= steerSpeed * delta * steerDir * (Math.abs(carSpeed) / maxSpeed + 0.3);
+      }
+
+      // Move car along forward vector
+      const forwardX = -Math.sin(carRot);
+      const forwardY = Math.cos(carRot);
+      carPos.x += forwardX * carSpeed * delta;
+      carPos.y += forwardY * carSpeed * delta;
+
+      // World boundary clamping (-560 to 560)
+      carPos.x = Math.max(-560, Math.min(560, carPos.x));
+      carPos.y = Math.max(-560, Math.min(560, carPos.y));
+
+      // Update Car Mesh transform
+      car.position.set(carPos.x, carPos.y, carPos.z);
+      car.rotation.z = carRot;
+
+      // Animate wheels
+      carWheels.forEach(w => {
+        w.rotation.x += (carSpeed * delta) * 2.5;
+      });
+
+      // Update Dashboard HUD
+      const mph = Math.round(Math.abs(carSpeed) * 2.237);
+      document.getElementById('speed-val').innerText = mph;
+      document.getElementById('gear-val').innerText = carSpeed > 0.5 ? 'D' : (carSpeed < -0.5 ? 'R' : 'P');
+      document.getElementById('coord-val').innerText = `${Math.round(carPos.x)}, ${Math.round(carPos.y)}`;
+
+      // Update Heading Text
+      const deg = Math.round((carRot * 180 / Math.PI) % 360);
+      let heading = "NORTH";
+      if (deg > -45 && deg <= 45) heading = "NORTH";
+      else if (deg > 45 && deg <= 135) heading = "WEST";
+      else if (deg > 135 || deg <= -135) heading = "SOUTH";
+      else heading = "EAST";
+      document.getElementById('heading-val').innerText = heading;
+
+      // Detect Nearest Road / Landmark
+      detectCurrentLocation();
+
+      // Sound update
+      updateAudioPitch(mph);
+    }
+
+    function detectCurrentLocation() {
+      let nearestDist = 9999;
+      let currentLoc = "ALBUQUERQUE ROADWAY";
+
+      LANDMARKS.forEach(lm => {
+        const dist = Math.hypot(carPos.x - lm.x, carPos.y - lm.y);
+        if (dist < nearestDist) {
+          nearestDist = dist;
+          if (dist < 45) {
+            currentLoc = lm.name;
+          } else {
+            currentLoc = lm.road;
+          }
+        }
+      });
+      document.getElementById('current-road-name').innerText = currentLoc;
+    }
+
+    // --- CAMERA FOLLOW MODES ---
+    function updateCamera() {
+      if (!car) return;
+
+      if (cameraMode === 'chase') {
+        orbitControls.enabled = false;
+        // Follow car from behind and above
+        const dist = 14;
+        const height = 4.8;
+        const camX = carPos.x + Math.sin(carRot) * dist;
+        const camY = carPos.y - Math.cos(carRot) * dist;
+        const camZ = carPos.z + height;
+
+        camera.position.lerp(new THREE.Vector3(camX, camY, camZ), 0.12);
+        camera.lookAt(carPos.x, carPos.y, carPos.z + 1.2);
+      } else if (cameraMode === 'cockpit') {
+        orbitControls.enabled = false;
+        // First-person view inside cabin / hood
+        const hoodX = carPos.x - Math.sin(carRot) * 0.4;
+        const hoodY = carPos.y + Math.cos(carRot) * 0.4;
+        camera.position.set(hoodX, hoodY, carPos.z + 1.35);
+        const lookTarget = new THREE.Vector3(
+          carPos.x - Math.sin(carRot) * 30,
+          carPos.y + Math.cos(carRot) * 30,
+          carPos.z + 1.2
+        );
+        camera.lookAt(lookTarget);
+      } else if (cameraMode === 'drone') {
+        orbitControls.enabled = true;
+        orbitControls.target.set(carPos.x, carPos.y, carPos.z);
+        orbitControls.update();
+      }
+    }
+
+    function toggleCameraView() {
+      if (cameraMode === 'chase') cameraMode = 'cockpit';
+      else if (cameraMode === 'cockpit') cameraMode = 'drone';
+      else cameraMode = 'chase';
+
+      const labels = { chase: 'Chase Cam', cockpit: 'Cockpit View', drone: 'Free Drone Orbit' };
+      document.getElementById('cam-view-name').innerText = labels[cameraMode];
+    }
+
+    function toggleVehicleType() {
+      vehicleType = vehicleType === 'aztek' ? 'rv' : 'aztek';
+      document.getElementById('vehicle-type-name').innerText = vehicleType === 'aztek' ? 'Pontiac Aztek' : 'Bounder RV';
+      buildPlayerVehicle();
+    }
+
+    function cycleTimeOfDay() {
+      if (timeOfDay === 'noon') timeOfDay = 'sunset';
+      else if (timeOfDay === 'sunset') timeOfDay = 'night';
+      else timeOfDay = 'noon';
+
+      document.getElementById('tod-name').innerText = timeOfDay === 'noon' ? 'Desert Noon' : (timeOfDay === 'sunset' ? 'Mexico Sunset' : 'Night Mode');
+
+      if (timeOfDay === 'noon') {
+        scene.background = new THREE.Color(0x90b4d4);
+        scene.fog.color = new THREE.Color(0xc49a6c);
+        sunLight.color.setHex(0xfff3e0);
+        sunLight.intensity = 2.5;
+        skyLight.intensity = 1.2;
+        carHeadlights.forEach(hl => hl.intensity = 0.5);
+      } else if (timeOfDay === 'sunset') {
+        scene.background = new THREE.Color(0xd47230);
+        scene.fog.color = new THREE.Color(0xe08436);
+        sunLight.color.setHex(0xffaa44);
+        sunLight.intensity = 1.8;
+        skyLight.intensity = 0.9;
+        carHeadlights.forEach(hl => hl.intensity = 2.0);
+      } else if (timeOfDay === 'night') {
+        scene.background = new THREE.Color(0x0a0c14);
+        scene.fog.color = new THREE.Color(0x0e1320);
+        sunLight.color.setHex(0x334466);
+        sunLight.intensity = 0.3;
+        skyLight.intensity = 0.2;
+        carHeadlights.forEach(hl => hl.intensity = 5.0);
+      }
+    }
+
+    function teleportTo(landmarkId) {
+      const lm = LANDMARKS.find(l => l.id === landmarkId);
+      if (!lm) return;
+      carPos.set(lm.x, lm.y, lm.z + 0.4);
+      carRot = lm.rot;
+      carSpeed = 0;
+      if (car) {
+        car.position.copy(carPos);
+        car.rotation.z = carRot;
+      }
+      camera.position.set(lm.x + 12, lm.y - 12, lm.z + 6);
+      camera.lookAt(lm.x, lm.y, lm.z);
+    }
+
+    function resetCar() {
+      carSpeed = 0;
+      carPos.z = 0.4;
+      if (car) {
+        car.rotation.x = 0;
+        car.rotation.y = 0;
+      }
+    }
+
+    // --- SYNTHESIZED AUDIO (Web Audio API) ---
+    function initAudio() {
+      if (audioCtx || !soundEnabled) return;
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        engineOsc = audioCtx.createOscillator();
+        engineGain = audioCtx.createGain();
+        
+        engineOsc.type = 'sawtooth';
+        engineOsc.frequency.setValueAtTime(45, audioCtx.currentTime);
+        engineGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+
+        // Lowpass filter for deep engine rumble
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(180, audioCtx.currentTime);
+
+        engineOsc.connect(filter);
+        filter.connect(engineGain);
+        engineGain.connect(audioCtx.destination);
+        engineOsc.start();
+      } catch (e) {
+        console.warn("Web Audio not supported:", e);
+      }
+    }
+
+    function updateAudioPitch(mph) {
+      if (!engineOsc || !audioCtx) return;
+      const targetFreq = 45 + (mph * 2.8);
+      engineOsc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
+    }
+
+    function playCarHorn() {
+      if (!audioCtx) initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(392, audioCtx.currentTime); // G4
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.4);
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-status').innerText = soundEnabled ? 'Sound ON' : 'Sound OFF';
+      if (engineGain && audioCtx) {
+        engineGain.gain.setValueAtTime(soundEnabled ? 0.04 : 0.0, audioCtx.currentTime);
+      }
+    }
+
+    // --- MINIMAP RADAR DRAWING ---
+    function drawMinimap() {
+      const cvs = document.getElementById('minimap-canvas');
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+
+      ctx.fillStyle = '#0a0d17';
+      ctx.fillRect(0, 0, w, h);
+
+      // Coordinate mapping from (-600..600) to (0..200)
+      const mapX = (x) => ((x + 600) / 1200) * w;
+      const mapY = (y) => (1.0 - (y + 600) / 1200) * h;
+
+      // Draw Roads
+      ctx.strokeStyle = '#374151';
+      ctx.lineWidth = 3;
+      // Route 66
+      ctx.beginPath();
+      ctx.moveTo(mapX(-550), mapY(0));
+      ctx.lineTo(mapX(320), mapY(0));
+      ctx.stroke();
+
+      // North-South Avenues
+      [-350, -180, 0, 180, 280].forEach(rx => {
+        ctx.beginPath();
+        ctx.moveTo(mapX(rx), mapY(-400));
+        ctx.lineTo(mapX(rx), mapY(380));
+        ctx.stroke();
+      });
+
+      // Sandia Mountains region (East)
+      ctx.fillStyle = 'rgba(180, 83, 9, 0.2)';
+      ctx.fillRect(mapX(340), 0, w - mapX(340), h);
+
+      // Draw Landmarks as glowing dots
+      LANDMARKS.forEach(lm => {
+        const lx = mapX(lm.x);
+        const ly = mapY(lm.y);
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(lx, ly, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw Player Car as green radar blip with direction arrow
+      const px = mapX(carPos.x);
+      const py = mapY(carPos.y);
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(-carRot);
+
+      // Car triangle blip
+      ctx.fillStyle = '#10b981';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, -6);
+      ctx.lineTo(4, 5);
+      ctx.lineTo(-4, 5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // --- MAIN ANIMATION LOOP ---
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.1);
+
+      updatePhysics(delta);
+      updateCamera();
+      drawMinimap();
+
+      renderer.render(scene, camera);
+    }
+
+    // Launch
+    window.onload = init;
+  </script>
+</body>
+</html>

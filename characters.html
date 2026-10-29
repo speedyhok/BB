@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breaking Bad 3D: Character Studio & Walk Cycle Inspector</title>
+  <script src="js/three.min.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@300;400;600;700;900&display=swap');
+    * { box-sizing: border-box; }
+    body, html { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #07090e; font-family: 'Inter', sans-serif; color: #e2e8f0; }
+    .font-mono-code { font-family: 'Fira Code', monospace; }
+    
+    #canvas-container { position: absolute; inset: 0; z-index: 0; }
+    
+    .hud-layer { position: absolute; pointer-events: none; z-index: 20; }
+    .interactive { pointer-events: auto; }
+    
+    /* Elements Badge */
+    .element-badge {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 38px;
+      height: 42px;
+      padding: 2px 4px;
+      background: #0f5132;
+      border: 2px solid #20c997;
+      color: #fff;
+      font-weight: bold;
+      line-height: 1;
+      font-family: 'Fira Code', monospace;
+    }
+    .element-badge .num { font-size: 8px; opacity: 0.8; }
+    .element-badge .sym { font-size: 16px; font-weight: 800; }
+
+    .glass-panel {
+      background: rgba(13, 17, 28, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+    }
+    
+    .char-tab.active {
+      background: rgba(32, 201, 151, 0.18);
+      border-color: #20c997;
+      color: #20c997;
+      box-shadow: 0 0 15px rgba(32, 201, 151, 0.3);
+    }
+    
+    .pill-btn {
+      transition: all 0.15s ease;
+    }
+    .pill-btn:hover {
+      transform: translateY(-1px);
+    }
+    .pill-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Custom range slider */
+    input[type=range] {
+      accent-color: #20c997;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- TOP HEADER HUD -->
+  <header class="hud-layer top-0 left-0 right-0 p-4 sm:p-6 flex items-center justify-between">
+    <div class="interactive flex items-center space-x-3 glass-panel px-4 py-2.5 rounded-2xl border border-gray-800">
+      <div class="flex space-x-1">
+        <div class="element-badge rounded shadow"><span class="num">35</span><span class="sym">Br</span></div>
+        <div class="element-badge rounded shadow"><span class="num">56</span><span class="sym">Ba</span></div>
+      </div>
+      <div>
+        <h1 class="text-base sm:text-lg font-black tracking-wider text-white uppercase leading-none">CHARACTER STUDIO</h1>
+        <p class="text-[11px] text-emerald-400 font-mono-code font-semibold tracking-wider uppercase">Blender 4.0 Rigging &bull; Walk Cycle Inspector</p>
+      </div>
+    </div>
+
+    <!-- Navigation Shortcuts -->
+    <div class="interactive flex items-center space-x-2">
+      <a href="drive.html" class="glass-panel hover:bg-gray-800 px-3.5 py-2 rounded-xl text-xs font-mono-code text-gray-300 hover:text-white flex items-center space-x-2 transition border border-gray-700">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+        <span class="hidden sm:inline">Road Navigator</span>
+      </a>
+      <a href="index.html" class="glass-panel hover:bg-gray-800 px-3.5 py-2 rounded-xl text-xs font-mono-code text-gray-300 hover:text-white flex items-center space-x-2 transition border border-gray-700">
+        <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        <span class="hidden sm:inline">City Overview</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- CHARACTER SELECTION DOCK (TOP CENTER) -->
+  <div class="hud-layer top-20 sm:top-24 left-0 right-0 flex justify-center px-4">
+    <div class="interactive glass-panel p-1.5 rounded-2xl flex flex-wrap gap-1 border border-gray-800 max-w-2xl justify-center shadow-2xl">
+      <button onclick="selectCharacter('heisenberg')" id="tab-heisenberg" class="char-tab active pill-btn px-3 py-1.5 rounded-xl text-xs font-bold font-mono-code flex items-center space-x-1.5 border border-transparent text-gray-400 hover:text-white">
+        <span>🎩</span>
+        <span>Heisenberg</span>
+      </button>
+      <button onclick="selectCharacter('jesse_pinkman')" id="tab-jesse_pinkman" class="char-tab pill-btn px-3 py-1.5 rounded-xl text-xs font-bold font-mono-code flex items-center space-x-1.5 border border-transparent text-gray-400 hover:text-white">
+        <span>🟡</span>
+        <span>Jesse Pinkman</span>
+      </button>
+      <button onclick="selectCharacter('saul_goodman')" id="tab-saul_goodman" class="char-tab pill-btn px-3 py-1.5 rounded-xl text-xs font-bold font-mono-code flex items-center space-x-1.5 border border-transparent text-gray-400 hover:text-white">
+        <span>⚖️</span>
+        <span>Saul Goodman</span>
+      </button>
+      <button onclick="selectCharacter('gus_fring')" id="tab-gus_fring" class="char-tab pill-btn px-3 py-1.5 rounded-xl text-xs font-bold font-mono-code flex items-center space-x-1.5 border border-transparent text-gray-400 hover:text-white">
+        <span>🍗</span>
+        <span>Gus Fring</span>
+      </button>
+      <button onclick="selectCharacter('mike_ehrmantraut')" id="tab-mike_ehrmantraut" class="char-tab pill-btn px-3 py-1.5 rounded-xl text-xs font-bold font-mono-code flex items-center space-x-1.5 border border-transparent text-gray-400 hover:text-white">
+        <span>🕶️</span>
+        <span>Mike Ehrmantraut</span>
+      </button>
+      <button onclick="selectCharacter('breaking_bad_lineup')" id="tab-breaking_bad_lineup" class="char-tab pill-btn px-3 py-1.5 rounded-xl text-xs font-bold font-mono-code flex items-center space-x-1.5 border border-transparent text-amber-400 hover:text-amber-300">
+        <span>👥</span>
+        <span>Ensemble Lineup</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL: CHARACTER DOSSIER & BIO -->
+  <aside class="hud-layer left-4 sm:left-6 top-36 sm:top-40 bottom-24 w-80 max-w-[calc(100vw-2rem)] flex flex-col pointer-events-none">
+    <div class="interactive glass-panel p-5 rounded-2xl flex-1 flex flex-col overflow-y-auto border border-gray-800 text-sm pointer-events-auto shadow-2xl">
+      <div class="flex items-start justify-between pb-3 border-b border-gray-800">
+        <div>
+          <span id="char-badge" class="px-2 py-0.5 rounded text-[10px] font-mono-code font-bold uppercase bg-emerald-950 text-emerald-400 border border-emerald-500/30">Protagonist</span>
+          <h2 id="char-name" class="text-xl font-black text-white mt-1">Walter White</h2>
+          <p id="char-alias" class="text-xs text-emerald-400 font-mono-code font-semibold">"I am the danger."</p>
+        </div>
+        <div id="char-avatar" class="w-12 h-12 rounded-xl bg-gray-900 border border-gray-700 flex items-center justify-center text-2xl shadow-inner">
+          🎩
+        </div>
+      </div>
+
+      <!-- Costume Breakdown -->
+      <div class="py-3 border-b border-gray-800 space-y-2">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider font-mono-code">Iconic Wardrobe & Props</h3>
+        <ul id="char-wardrobe" class="text-xs text-gray-300 space-y-1">
+          <li class="flex items-center space-x-1.5"><span class="text-emerald-400">&bull;</span><span>Black felt Porkpie hat with ribbon band</span></li>
+          <li class="flex items-center space-x-1.5"><span class="text-emerald-400">&bull;</span><span>Dark rectangular wire sunglasses</span></li>
+          <li class="flex items-center space-x-1.5"><span class="text-emerald-400">&bull;</span><span>Sculpted goatee and mustache</span></li>
+          <li class="flex items-center space-x-1.5"><span class="text-emerald-400">&bull;</span><span>Black zip windbreaker jacket</span></li>
+          <li class="flex items-center space-x-1.5"><span class="text-emerald-400">&bull;</span><span>Clarks Wallabee suede moccasin shoes</span></li>
+          <li class="flex items-center space-x-1.5"><span class="text-cyan-400">&bull;</span><span>Glowing 99.1% pure Blue Sky crystal</span></li>
+        </ul>
+      </div>
+
+      <!-- Kinematics Breakdown -->
+      <div class="py-3 border-b border-gray-800 space-y-2">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider font-mono-code">Walk Kinematics Profile</h3>
+        <p id="char-gait-desc" class="text-xs text-gray-300 leading-relaxed">
+          Intimidating, measured stride with low vertical oscillation. Rigid spine, firm arm swing, and eyes locked forward with menacing authority.
+        </p>
+        <div class="grid grid-cols-2 gap-2 pt-1 font-mono-code text-[11px]">
+          <div class="bg-gray-900/80 p-2 rounded-lg border border-gray-800">
+            <span class="text-gray-500 block text-[9px] uppercase">Cadence</span>
+            <span id="stat-cadence" class="text-emerald-400 font-bold">1.0s / 30f</span>
+          </div>
+          <div class="bg-gray-900/80 p-2 rounded-lg border border-gray-800">
+            <span class="text-gray-500 block text-[9px] uppercase">Stride Length</span>
+            <span id="stat-stride" class="text-emerald-400 font-bold">0.72m</span>
+          </div>
+          <div class="bg-gray-900/80 p-2 rounded-lg border border-gray-800">
+            <span class="text-gray-500 block text-[9px] uppercase">Forward Lean</span>
+            <span id="stat-lean" class="text-emerald-400 font-bold">4.0&deg; (Rigid)</span>
+          </div>
+          <div class="bg-gray-900/80 p-2 rounded-lg border border-gray-800">
+            <span class="text-gray-500 block text-[9px] uppercase">Bounce Amp</span>
+            <span id="stat-bounce" class="text-emerald-400 font-bold">2.8 cm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Downloads -->
+      <div class="pt-3 mt-auto space-y-2">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider font-mono-code">Blender 4.0 Assets</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <a id="btn-download-blend" href="assets/characters/heisenberg.blend" download class="pill-btn flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white border border-gray-700">
+            <span>📦</span>
+            <span>.BLEND</span>
+          </a>
+          <a id="btn-download-glb" href="assets/characters/heisenberg.glb" download class="pill-btn flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-xs font-mono-code text-emerald-400 border border-emerald-500/40 font-bold">
+            <span>⚡</span>
+            <span>.GLB (Rigged)</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT PANEL: VIEWPORT & CAMERA CONTROLS -->
+  <div class="hud-layer right-4 sm:right-6 top-36 sm:top-40 w-52 flex flex-col space-y-3 pointer-events-none">
+    <!-- Camera View Presets -->
+    <div class="interactive glass-panel p-3 rounded-2xl border border-gray-800 space-y-2 pointer-events-auto shadow-2xl">
+      <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono-code block">Camera Angles</span>
+      <div class="grid grid-cols-2 gap-1.5">
+        <button onclick="setCameraPreset('full')" class="pill-btn text-xs font-mono-code py-1.5 px-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-200 border border-gray-700">Full Body</button>
+        <button onclick="setCameraPreset('portrait')" class="pill-btn text-xs font-mono-code py-1.5 px-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-200 border border-gray-700">Portrait</button>
+        <button onclick="setCameraPreset('profile')" class="pill-btn text-xs font-mono-code py-1.5 px-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-200 border border-gray-700">Profile</button>
+        <button onclick="setCameraPreset('feet')" class="pill-btn text-xs font-mono-code py-1.5 px-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-200 border border-gray-700">Footwork</button>
+      </div>
+    </div>
+
+    <!-- Visual Overlays -->
+    <div class="interactive glass-panel p-3 rounded-2xl border border-gray-800 space-y-2 pointer-events-auto shadow-2xl">
+      <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider font-mono-code block">Rig & Render Tools</span>
+      <button onclick="toggleSkeleton()" id="btn-skeleton" class="pill-btn w-full text-xs font-mono-code py-1.5 px-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 border border-gray-700 flex items-center justify-between">
+        <span>🦴 Skeleton Wire</span>
+        <span id="badge-skeleton" class="text-[10px] text-gray-500 font-bold">OFF</span>
+      </button>
+      <button onclick="toggleTurntable()" id="btn-turntable" class="pill-btn w-full text-xs font-mono-code py-1.5 px-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 border border-gray-700 flex items-center justify-between">
+        <span>🔄 Turntable</span>
+        <span id="badge-turntable" class="text-[10px] text-gray-500 font-bold">OFF</span>
+      </button>
+      <button onclick="toggleWireframe()" id="btn-wireframe" class="pill-btn w-full text-xs font-mono-code py-1.5 px-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 border border-gray-700 flex items-center justify-between">
+        <span>🕸️ Wireframe</span>
+        <span id="badge-wireframe" class="text-[10px] text-gray-500 font-bold">OFF</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR: ANIMATION CONTROLS DOCK -->
+  <footer class="hud-layer bottom-4 sm:bottom-6 left-0 right-0 flex justify-center px-4">
+    <div class="interactive glass-panel px-6 py-3.5 rounded-3xl flex flex-wrap items-center gap-4 sm:gap-6 border border-gray-800 shadow-2xl max-w-4xl">
+      <!-- Play/Pause -->
+      <button onclick="togglePlayPause()" id="btn-play" class="pill-btn w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black flex items-center justify-center font-bold text-sm shadow-lg shadow-emerald-500/25">
+        ⏸
+      </button>
+
+      <!-- Action Switcher -->
+      <div class="flex items-center space-x-1 bg-gray-900/80 p-1 rounded-xl border border-gray-800">
+        <button onclick="switchAnimation('Walk_Cycle')" id="btn-anim-walk" class="pill-btn px-3 py-1 rounded-lg text-xs font-bold font-mono-code bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+          Walk Cycle
+        </button>
+        <button onclick="switchAnimation('Idle')" id="btn-anim-idle" class="pill-btn px-3 py-1 rounded-lg text-xs font-bold font-mono-code text-gray-400 hover:text-white">
+          Idle Stance
+        </button>
+      </div>
+
+      <!-- Playback Speed Slider -->
+      <div class="flex items-center space-x-2 text-xs font-mono-code text-gray-300">
+        <span class="text-gray-500 text-[10px] uppercase">Speed:</span>
+        <input type="range" id="speed-slider" min="0.1" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)" class="w-24 sm:w-32 cursor-pointer">
+        <span id="speed-label" class="text-emerald-400 font-bold w-10">1.0x</span>
+      </div>
+
+      <!-- Time Scrubber / Frame Indicator -->
+      <div class="hidden sm:flex items-center space-x-2 text-xs font-mono-code text-gray-400 pl-2 border-l border-gray-800">
+        <span>Frame:</span>
+        <span id="frame-display" class="text-white font-bold">0 / 30</span>
+      </div>
+
+      <div class="text-[11px] font-mono-code text-gray-500 hidden md:block">
+        <span class="text-emerald-400">&bull;</span> Orbit: Drag | Zoom: Wheel
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // Character Database
+    const CHARACTERS = {
+      heisenberg: {
+        id: 'heisenberg',
+        name: 'Walter White / Heisenberg',
+        alias: '"I am the danger."',
+        badge: 'Protagonist',
+        avatar: '🎩',
+        glb: 'assets/characters/heisenberg.glb',
+        blend: 'assets/characters/heisenberg.blend',
+        wardrobe: [
+          'Black felt Porkpie hat with satin band',
+          'Dark rectangular wire sunglasses',
+          'Sculpted goatee and mustache',
+          'Black zip windbreaker jacket',
+          'Khaki chino slacks with brass buckle',
+          'Clarks Wallabee suede moccasin shoes',
+          'Glowing 99.1% pure Blue Sky crystal meth chunk'
+        ],
+        gaitDesc: 'Intimidating, measured stride with low vertical oscillation. Rigid spine, firm arm swing, and eyes locked forward with menacing authority.',
+        cadence: '1.0s / 30f',
+        stride: '0.72m',
+        lean: '4.0° (Rigid)',
+        bounce: '2.8 cm'
+      },
+      jesse_pinkman: {
+        id: 'jesse_pinkman',
+        name: 'Jesse Pinkman',
+        alias: '"Yeah science, bitch!"',
+        badge: 'Partner',
+        avatar: '🟡',
+        glb: 'assets/characters/jesse_pinkman.glb',
+        blend: 'assets/characters/jesse_pinkman.blend',
+        wardrobe: [
+          'Slouchy dark knit ribbed beanie',
+          'Oversized bright yellow streetwear hoodie',
+          'White drawstring cords & front kangaroo pouch',
+          'Baggy distressed dark denim jeans',
+          'Bunched ankle cuffs stacking over shoes',
+          'Chunky street skater sneakers (suede/white rubber)'
+        ],
+        gaitDesc: 'Pinkman street swagger: bouncing vertical rhythm, loose shoulders, relaxed elbows swaying with gait, and attitude-filled head bob.',
+        cadence: '1.0s / 30f',
+        stride: '0.80m',
+        lean: '8.0° (Slouch)',
+        bounce: '5.2 cm'
+      },
+      saul_goodman: {
+        id: 'saul_goodman',
+        name: 'Saul Goodman (Jimmy McGill)',
+        alias: '"Better Call Saul!"',
+        badge: 'Attorney',
+        avatar: '⚖️',
+        glb: 'assets/characters/saul_goodman.glb',
+        blend: 'assets/characters/saul_goodman.blend',
+        wardrobe: [
+          'Flamboyant mustard yellow double-breasted suit',
+          'Electric blue dress shirt collar & cuffs',
+          'Loud magenta patterned silk tie with gold clip',
+          'Bluetooth headset with glowing blue LED on ear',
+          'Slicked comb-over hairstyle',
+          'Polished brown Italian leather dress oxfords'
+        ],
+        gaitDesc: 'The Saul Hustle: Rapid, forward-pitched urgency as if rushing to court. Animated arm gestures, expressive hand movement, and active knees.',
+        cadence: '0.9s / 30f',
+        stride: '0.84m',
+        lean: '14.0° (Hustle)',
+        bounce: '3.8 cm'
+      },
+      gus_fring: {
+        id: 'gus_fring',
+        name: 'Gustavo "Gus" Fring',
+        alias: '"I hide in plain sight."',
+        badge: 'Kingpin',
+        avatar: '🍗',
+        glb: 'assets/characters/gus_fring.glb',
+        blend: 'assets/characters/gus_fring.blend',
+        wardrobe: [
+          'Crisp Los Pollos Hermanos yellow manager shirt',
+          'Skinny dark navy clip tie with silver clip',
+          'Official Los Pollos blue/white employee name badge',
+          'Gold wire-frame rectangular spectacles',
+          'Razor-pressed dark charcoal dress slacks',
+          'Ultra-polished black formal oxford shoes'
+        ],
+        gaitDesc: 'Surgical Cadence: Clockwork precision with zero wasted motion. Spine locked completely upright, arms held disciplined at sides, and chilling predatory calm.',
+        cadence: '1.0s / 30f',
+        stride: '0.62m',
+        lean: '0.0° (Surgical)',
+        bounce: '1.8 cm'
+      },
+      mike_ehrmantraut: {
+        id: 'mike_ehrmantraut',
+        name: 'Mike Ehrmantraut',
+        alias: '"No more half measures."',
+        badge: 'Fixer / Enforcer',
+        avatar: '🕶️',
+        glb: 'assets/characters/mike_ehrmantraut.glb',
+        blend: 'assets/characters/mike_ehrmantraut.blend',
+        wardrobe: [
+          'Bald head with heavy furrowed brow & weathered ears',
+          'Deadpan grim scowl',
+          'Charcoal tactical windbreaker with high storm collar',
+          'Dual utility chest flap pockets',
+          'Heavyweight tactical cargo pants with bulging side pockets',
+          'High-top tactical combat boots with lugged soles'
+        ],
+        gaitDesc: 'The Methodical Enforcer: Heavy, grounded footfalls, stoic center of gravity, tactical awareness, solid planted steps that radiate lethal experience.',
+        cadence: '1.0s / 30f',
+        stride: '0.68m',
+        lean: '7.0° (Patrol)',
+        bounce: '2.4 cm'
+      },
+      breaking_bad_lineup: {
+        id: 'breaking_bad_lineup',
+        name: 'Breaking Bad Ensemble Lineup',
+        alias: 'All 5 Characters Walking in Synchrony',
+        badge: 'Ensemble',
+        avatar: '👥',
+        glb: 'assets/characters/breaking_bad_lineup.glb',
+        blend: 'assets/characters/breaking_bad_lineup.blend',
+        wardrobe: [
+          'Heisenberg, Jesse, Saul, Gus, and Mike',
+          'Complete custom rigged biped armatures',
+          'Individualized personality walk cycles',
+          'Side-by-side comparative kinematics'
+        ],
+        gaitDesc: 'Full ensemble side-by-side lineup showcasing the contrast between Heisenberg menacing stride, Jesse bouncy swagger, Saul rushed hustle, Gus surgical calm, and Mike heavy patrol.',
+        cadence: 'Sync / 30f',
+        stride: 'Variable',
+        lean: 'Comparative',
+        bounce: 'Multi-layer'
+      }
+    };
+
+    let scene, camera, renderer, controls;
+    let currentModel = null;
+    let mixer = null;
+    let currentAction = null;
+    let animations = [];
+    let activeAnimName = 'Walk_Cycle';
+    let skeletonHelper = null;
+    let isPlaying = true;
+    let isTurntable = false;
+    let isWireframe = false;
+    let currentCharId = 'heisenberg';
+    let clock = new THREE.Clock();
+    let pedestalDisc, pedestalRing;
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+      
+      // Check URL param or localStorage for initial character
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqChar = urlParams.get('char');
+      const savedChar = localStorage.getItem('bb_selected_char');
+      if (reqChar && CHARACTERS[reqChar]) {
+        currentCharId = reqChar;
+      } else if (savedChar && CHARACTERS[savedChar]) {
+        currentCharId = savedChar;
+      }
+      document.querySelectorAll('.char-tab').forEach(tab => tab.classList.remove('active'));
+      const activeTab = document.getElementById(`tab-${currentCharId}`);
+      if (activeTab) activeTab.classList.add('active');
+
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x07090e);
+      scene.fog = new THREE.FogExp2(0x07090e, 0.04);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0.3, 1.35, -3.7);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      container.appendChild(renderer.domElement);
+
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.target.set(0, 0.72, 0);
+      controls.maxPolarAngle = Math.PI / 2 + 0.05; // don't go below ground
+      controls.minDistance = 0.8;
+      controls.maxDistance = 12.0;
+
+      // Studio Lighting Rig
+      setupLighting();
+
+      // Pedestal Turntable Ground
+      setupPedestal();
+
+      // Window Resize Listener
+      window.addEventListener('resize', onWindowResize);
+
+      // Load initial character
+      loadCharacter(currentCharId);
+
+      // Render Loop
+      animate();
+    }
+
+    function setupLighting() {
+      // Key Sun Light (in front at -Z)
+      const keyLight = new THREE.DirectionalLight(0xfff3db, 2.5);
+      keyLight.position.set(2.5, 4.5, -3.5);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 2048;
+      keyLight.shadow.mapSize.height = 2048;
+      keyLight.shadow.camera.near = 0.5;
+      keyLight.shadow.camera.far = 15;
+      keyLight.shadow.camera.left = -3;
+      keyLight.shadow.camera.right = 3;
+      keyLight.shadow.camera.top = 3;
+      keyLight.shadow.camera.bottom = -1;
+      keyLight.shadow.bias = -0.0005;
+      scene.add(keyLight);
+
+      // Fill Light (in front at -Z)
+      const fillLight = new THREE.DirectionalLight(0x8bc34a, 0.9);
+      fillLight.position.set(-2.5, 3.0, -2.5);
+      scene.add(fillLight);
+
+      // Rim / Back Light (behind at +Z)
+      const rimLight = new THREE.DirectionalLight(0x38bdf8, 2.2);
+      rimLight.position.set(0, 4, 3.5);
+      scene.add(rimLight);
+
+      // Ambient Soft Sky
+      const hemiLight = new THREE.HemisphereLight(0x223344, 0x111118, 1.0);
+      scene.add(hemiLight);
+    }
+
+    function setupPedestal() {
+      // Turntable Base Disc
+      const discGeo = new THREE.CylinderGeometry(1.6, 1.7, 0.06, 64);
+      const discMat = new THREE.MeshStandardMaterial({
+        color: 0x111622,
+        roughness: 0.8,
+        metalness: 0.2
+      });
+      pedestalDisc = new THREE.Mesh(discGeo, discMat);
+      pedestalDisc.position.y = -0.03;
+      pedestalDisc.receiveShadow = true;
+      scene.add(pedestalDisc);
+
+      // Albuquerque Meth Blue Neon Ring
+      const ringGeo = new THREE.RingGeometry(1.58, 1.62, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x20c997,
+        side: THREE.DoubleSide
+      });
+      pedestalRing = new THREE.Mesh(ringGeo, ringMat);
+      pedestalRing.rotation.x = -Math.PI / 2;
+      pedestalRing.position.y = 0.005;
+      scene.add(pedestalRing);
+
+      // Ground Shadow Plane
+      const planeGeo = new THREE.PlaneGeometry(30, 30);
+      const planeMat = new THREE.ShadowMaterial({ opacity: 0.45 });
+      const shadowPlane = new THREE.Mesh(planeGeo, planeMat);
+      shadowPlane.rotation.x = -Math.PI / 2;
+      shadowPlane.position.y = -0.04;
+      shadowPlane.receiveShadow = true;
+      scene.add(shadowPlane);
+    }
+
+    function loadCharacter(charId) {
+      const data = CHARACTERS[charId];
+      if (!data) return;
+
+      // Update UI panels
+      updateDossierUI(data);
+
+      // Remove existing model & skeleton helper
+      if (currentModel) {
+        scene.remove(currentModel);
+        currentModel = null;
+      }
+      if (skeletonHelper) {
+        scene.remove(skeletonHelper);
+        skeletonHelper = null;
+        document.getElementById('badge-skeleton').innerText = 'OFF';
+        document.getElementById('badge-skeleton').className = 'text-[10px] text-gray-500 font-bold';
+      }
+      mixer = null;
+
+      // Adjust pedestal for lineup vs individual
+      if (charId === 'breaking_bad_lineup') {
+        pedestalDisc.scale.set(3.2, 1, 1.8);
+        pedestalRing.scale.set(3.2, 1.8, 1);
+        camera.position.set(0, 1.6, -6.0);
+        controls.target.set(0, 1.0, 0);
+      } else {
+        pedestalDisc.scale.set(1, 1, 1);
+        pedestalRing.scale.set(1, 1, 1);
+        camera.position.set(0.3, 1.35, -3.7);
+        controls.target.set(0, 0.72, 0);
+      }
+
+      // Load GLB
+      const loader = new THREE.GLTFLoader();
+      loader.load(data.glb, (gltf) => {
+        currentModel = gltf.scene;
+        scene.add(currentModel);
+
+        // Configure shadows & materials
+        currentModel.traverse((node) => {
+          if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+            if (isWireframe && node.material) {
+              node.material.wireframe = true;
+            }
+          }
+        });
+
+        // Animations setup
+        animations = gltf.animations;
+        if (animations && animations.length > 0) {
+          mixer = new THREE.AnimationMixer(currentModel);
+          playSelectedAnimation();
+        }
+
+        console.log(`Loaded ${charId}: ${animations.length} animations`);
+      }, undefined, (err) => {
+        console.error('Error loading character:', err);
+      });
+    }
+
+    function playSelectedAnimation() {
+      if (!mixer || !animations || animations.length === 0) return;
+      
+      // Stop previous action
+      if (currentAction) {
+        currentAction.fadeOut(0.2);
+      }
+
+      // Find action matching activeAnimName
+      let clip = animations.find(a => a.name.toLowerCase().includes(activeAnimName.toLowerCase()));
+      if (!clip) clip = animations[0]; // fallback to first clip
+
+      currentAction = mixer.clipAction(clip);
+      currentAction.reset().fadeIn(0.2).play();
+      
+      const speed = parseFloat(document.getElementById('speed-slider').value);
+      currentAction.timeScale = isPlaying ? speed : 0;
+    }
+
+    function selectCharacter(charId) {
+      currentCharId = charId;
+      document.querySelectorAll('.char-tab').forEach(tab => tab.classList.remove('active'));
+      const activeTab = document.getElementById(`tab-${charId}`);
+      if (activeTab) activeTab.classList.add('active');
+      loadCharacter(charId);
+    }
+
+    function switchAnimation(animName) {
+      activeAnimName = animName;
+      if (animName === 'Walk_Cycle') {
+        document.getElementById('btn-anim-walk').className = 'pill-btn px-3 py-1 rounded-lg text-xs font-bold font-mono-code bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+        document.getElementById('btn-anim-idle').className = 'pill-btn px-3 py-1 rounded-lg text-xs font-bold font-mono-code text-gray-400 hover:text-white';
+      } else {
+        document.getElementById('btn-anim-idle').className = 'pill-btn px-3 py-1 rounded-lg text-xs font-bold font-mono-code bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+        document.getElementById('btn-anim-walk').className = 'pill-btn px-3 py-1 rounded-lg text-xs font-bold font-mono-code text-gray-400 hover:text-white';
+      }
+      playSelectedAnimation();
+    }
+
+    function togglePlayPause() {
+      isPlaying = !isPlaying;
+      const btn = document.getElementById('btn-play');
+      if (isPlaying) {
+        btn.innerText = '⏸';
+        btn.className = 'pill-btn w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black flex items-center justify-center font-bold text-sm shadow-lg shadow-emerald-500/25';
+        if (currentAction) currentAction.timeScale = parseFloat(document.getElementById('speed-slider').value);
+      } else {
+        btn.innerText = '▶';
+        btn.className = 'pill-btn w-10 h-10 rounded-full bg-amber-500 hover:bg-amber-400 text-black flex items-center justify-center font-bold text-sm shadow-lg shadow-amber-500/25';
+        if (currentAction) currentAction.timeScale = 0;
+      }
+    }
+
+    function updateSpeed(val) {
+      document.getElementById('speed-label').innerText = `${parseFloat(val).toFixed(1)}x`;
+      if (currentAction && isPlaying) {
+        currentAction.timeScale = parseFloat(val);
+      }
+    }
+
+    function setCameraPreset(preset) {
+      if (!currentModel) return;
+      const isLineup = currentCharId === 'breaking_bad_lineup';
+      
+      switch (preset) {
+        case 'full':
+          camera.position.set(0.5, 1.4, isLineup ? -6.0 : -3.2);
+          controls.target.set(0, 1.0, 0);
+          break;
+        case 'portrait':
+          camera.position.set(0.15, 1.68, -1.05);
+          controls.target.set(0, 1.65, 0);
+          break;
+        case 'profile':
+          camera.position.set(-2.8, 1.1, 0.0);
+          controls.target.set(0, 1.0, 0);
+          break;
+        case 'feet':
+          camera.position.set(0.3, 0.35, -1.4);
+          controls.target.set(0, 0.2, 0);
+          break;
+      }
+    }
+
+    function toggleSkeleton() {
+      if (!currentModel) return;
+      const badge = document.getElementById('badge-skeleton');
+      if (!skeletonHelper) {
+        skeletonHelper = new THREE.SkeletonHelper(currentModel);
+        skeletonHelper.material.linewidth = 2;
+        scene.add(skeletonHelper);
+        badge.innerText = 'ON';
+        badge.className = 'text-[10px] text-emerald-400 font-bold';
+      } else {
+        scene.remove(skeletonHelper);
+        skeletonHelper = null;
+        badge.innerText = 'OFF';
+        badge.className = 'text-[10px] text-gray-500 font-bold';
+      }
+    }
+
+    function toggleTurntable() {
+      isTurntable = !isTurntable;
+      const badge = document.getElementById('badge-turntable');
+      badge.innerText = isTurntable ? 'ON' : 'OFF';
+      badge.className = isTurntable ? 'text-[10px] text-emerald-400 font-bold' : 'text-[10px] text-gray-500 font-bold';
+    }
+
+    function toggleWireframe() {
+      isWireframe = !isWireframe;
+      const badge = document.getElementById('badge-wireframe');
+      badge.innerText = isWireframe ? 'ON' : 'OFF';
+      badge.className = isWireframe ? 'text-[10px] text-emerald-400 font-bold' : 'text-[10px] text-gray-500 font-bold';
+      if (currentModel) {
+        currentModel.traverse((node) => {
+          if (node.isMesh && node.material) {
+            node.material.wireframe = isWireframe;
+          }
+        });
+      }
+    }
+
+    function updateDossierUI(data) {
+      document.getElementById('char-name').innerText = data.name;
+      document.getElementById('char-alias').innerText = data.alias;
+      document.getElementById('char-badge').innerText = data.badge;
+      document.getElementById('char-avatar').innerText = data.avatar;
+      document.getElementById('char-gait-desc').innerText = data.gaitDesc;
+      document.getElementById('stat-cadence').innerText = data.cadence;
+      document.getElementById('stat-stride').innerText = data.stride;
+      document.getElementById('stat-lean').innerText = data.lean;
+      document.getElementById('stat-bounce').innerText = data.bounce;
+      document.getElementById('btn-download-blend').href = data.blend;
+      document.getElementById('btn-download-glb').href = data.glb;
+
+      const wardrobeUl = document.getElementById('char-wardrobe');
+      wardrobeUl.innerHTML = '';
+      data.wardrobe.forEach((item) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center space-x-1.5';
+        li.innerHTML = `<span class="text-emerald-400">&bull;</span><span>${item}</span>`;
+        wardrobeUl.appendChild(li);
+      });
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+      if (mixer) {
+        mixer.update(delta);
+        if (currentAction && currentAction.getClip()) {
+          const duration = currentAction.getClip().duration;
+          const currentSec = currentAction.time % duration;
+          const currentFrame = Math.floor((currentSec / duration) * 30);
+          document.getElementById('frame-display').innerText = `${currentFrame} / 30`;
+        }
+      }
+
+      if (isTurntable && currentModel) {
+        currentModel.rotation.y += 0.008;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
