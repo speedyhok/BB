@@ -102,6 +102,7 @@ def setup_studio(accent):
     area("Polish_Eye_Fill", (0.0, 2.5, 1.75), (1.0, 0.92, 0.80), 95, 1.4)
 
     scene.render.engine = "CYCLES"
+    scene.cycles.device = "CPU"
     scene.cycles.samples = 48
     scene.cycles.use_denoising = True
     scene.render.resolution_x, scene.render.resolution_y = 1200, 1500
@@ -127,17 +128,17 @@ def polish_character(key):
     polish = get_collection("Polish_Details")
     for obj in list(polish.objects): bpy.data.objects.remove(obj, do_unlink=True)
 
-    # Smooth hard primitive shading and soften mesh highlights without replacing source assets.
+    # Improve source shading but keep deformation modifiers untouched. The unified
+    # character mesh is joined from disconnected rigid parts, so beveling the entire
+    # joined mesh can add expensive/ugly edges around overlaps. Use smoothing and
+    # weighted normals only; add bevels to individual pieces in a future sculpt pass.
     for obj in bpy.data.objects:
         if obj.type == "MESH":
-            for poly in obj.data.polygons: poly.use_smooth = True
-            if obj.name.endswith("_Mesh"):
-                if not obj.modifiers.get("Polish_MicroBevel"):
-                    bevel = obj.modifiers.new("Polish_MicroBevel", "BEVEL")
-                    bevel.width, bevel.segments, bevel.limit_method = 0.008, 2, "ANGLE"
-                if not obj.modifiers.get("Polish_WeightedNormals"):
-                    normal = obj.modifiers.new("Polish_WeightedNormals", "WEIGHTED_NORMAL")
-                    normal.keep_sharp, normal.weight = True, 35
+            for poly in obj.data.polygons:
+                poly.use_smooth = True
+            if obj.name.endswith("_Mesh") and not obj.modifiers.get("Polish_WeightedNormals"):
+                normal = obj.modifiers.new("Polish_WeightedNormals", "WEIGHTED_NORMAL")
+                normal.keep_sharp, normal.weight = True, 35
 
     # Source heads are simple primitives; layered eyes and brows make the face read more clearly.
     skin = material("Polish_Skin_Detail", (0.62,0.39,0.29) if key=="gus_fring" else (0.78,0.59,0.48), 0.62)
