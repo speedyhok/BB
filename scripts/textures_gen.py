@@ -168,6 +168,120 @@ def generate_textures(output_dir):
     draw.text((280, 405), "'BECAUSE RESULTS MATTER! FREE CONSULTATION'", fill=(255, 255, 255, 255))
     saul.save(os.path.join(output_dir, "saul_goodman_billboard.png"))
 
+    # 9. Saul's Iconic US Constitution Wallpaper (1024x512)
+    const_img = Image.new("RGBA", (1024, 512), (238, 222, 180, 255)) # Aged parchment
+    draw = ImageDraw.Draw(const_img)
+    # Aged border & corner filigree
+    draw.rectangle([12, 12, 1012, 500], outline=(140, 105, 50, 255), width=8)
+    draw.rectangle([22, 22, 1002, 490], outline=(180, 140, 70, 255), width=3)
+    # Calligraphic "We the People"
+    draw.text((60, 40), "We the People", fill=(45, 28, 12, 255))
+    draw.text((60, 110), "of the United States, in Order to form a more perfect Union,", fill=(65, 45, 20, 255))
+    draw.text((60, 145), "establish Justice, insure domestic Tranquility, provide for the common defense,", fill=(65, 45, 20, 255))
+    draw.text((60, 180), "promote the general Welfare, and secure the Blessings of Liberty to ourselves", fill=(65, 45, 20, 255))
+    draw.text((60, 215), "and our Posterity, do ordain and establish this CONSTITUTION for the United States of America.", fill=(65, 45, 20, 255))
+    
+    # Articles text simulation lines
+    for ly in range(265, 450, 18):
+        draw.line([(60, ly), (960, ly)], fill=(100, 75, 40, 200), width=2)
+    # Gold Foil Presidential / Great Seal on Right
+    draw.ellipse([800, 50, 960, 210], fill=(215, 175, 55, 255), outline=(150, 110, 30, 255), width=6)
+    draw.ellipse([825, 75, 935, 185], fill=(240, 200, 70, 255), outline=(170, 125, 35, 255), width=3)
+    draw.text((845, 120), "CONSTITUTION", fill=(60, 40, 10, 255))
+    const_img.save(os.path.join(output_dir, "saul_constitution.png"))
+
+    # 10. Stack of Cash / $100 Bill Money Bricks (512x256)
+    money_img = Image.new("RGBA", (512, 256), (200, 225, 205, 255)) # Fed Reserve Green
+    draw = ImageDraw.Draw(money_img)
+    draw.rectangle([8, 8, 504, 248], outline=(25, 85, 40, 255), width=10)
+    draw.rectangle([20, 20, 492, 236], outline=(40, 120, 60, 255), width=4)
+    # Vignette portrait oval
+    draw.ellipse([190, 45, 322, 210], fill=(225, 240, 225, 255), outline=(25, 85, 40, 255), width=6)
+    draw.text((232, 115), "FRANKLIN", fill=(20, 65, 30, 255))
+    draw.text((35, 35), "100", fill=(25, 85, 40, 255))
+    draw.text((435, 35), "100", fill=(25, 85, 40, 255))
+    draw.text((35, 195), "100", fill=(25, 85, 40, 255))
+    draw.text((435, 195), "100", fill=(25, 85, 40, 255))
+    draw.text((120, 25), "UNITED STATES OF AMERICA", fill=(25, 85, 40, 255))
+    draw.text((150, 215), "ONE HUNDRED DOLLARS", fill=(25, 85, 40, 255))
+    # Paper currency wrapper band ($10,000 Bank Strap)
+    draw.rectangle([210, 6, 302, 250], fill=(250, 250, 245, 255), outline=(180, 140, 40, 255), width=4)
+    draw.text((220, 80), "$10,000", fill=(180, 20, 20, 255))
+    draw.text((225, 140), "CASH", fill=(30, 30, 30, 255))
+    money_img.save(os.path.join(output_dir, "money_cash_bundle.png"))
+
+    # 11. Schraderbräu Homebrew Beer Label (512x512)
+    beer_img = Image.new("RGBA", (512, 512), (245, 240, 220, 255))
+    draw = ImageDraw.Draw(beer_img)
+    draw.rectangle([16, 16, 496, 496], outline=(140, 20, 20, 255), width=12)
+    draw.rectangle([28, 28, 484, 484], outline=(200, 160, 40, 255), width=5)
+    # German crest arch
+    draw.ellipse([100, 60, 412, 220], fill=(160, 25, 25, 255))
+    draw.text((140, 115), "SCHRADERBRÄU", fill=(255, 235, 160, 255))
+    draw.text((180, 170), "SINCE 2008", fill=(255, 255, 255, 255))
+    # Hops & wheat graphic
+    draw.ellipse([216, 250, 296, 330], fill=(60, 130, 40, 255), outline=(40, 90, 25, 255), width=4)
+    draw.text((120, 360), "SILKY SMOOTH GERMAN LAGER", fill=(40, 30, 20, 255))
+    draw.text((150, 400), "HAND-CRAFTED BY HANK SCHRADER", fill=(160, 25, 25, 255))
+    draw.text((170, 440), "ALBUQUERQUE, NM - 5.8% ABV", fill=(80, 80, 80, 255))
+    beer_img.save(os.path.join(output_dir, "schraderbrau_label.png"))
+
+    # 12. Framed First Dollar Bill - A1A Carwash (512x256)
+    frame_img = Image.new("RGBA", (512, 256), (90, 50, 20, 255)) # Walnut frame
+    draw = ImageDraw.Draw(frame_img)
+    # Velvet matte inner backing
+    draw.rectangle([18, 18, 494, 238], fill=(30, 45, 30, 255), outline=(200, 170, 60, 255), width=4)
+    # $1 Bill in center
+    draw.rectangle([60, 40, 452, 175], fill=(215, 235, 215, 255), outline=(30, 90, 40, 255), width=5)
+    draw.ellipse([210, 60, 302, 155], fill=(235, 245, 235, 255), outline=(30, 90, 40, 255), width=3)
+    draw.text((230, 100), "WASH #1", fill=(30, 90, 40, 255))
+    draw.text((75, 50), "$1", fill=(30, 90, 40, 255))
+    draw.text((420, 50), "$1", fill=(30, 90, 40, 255))
+    # Brass commemorative plaque below bill
+    draw.rectangle([120, 190, 392, 230], fill=(215, 175, 55, 255), outline=(130, 95, 25, 255), width=3)
+    draw.text((135, 200), "FIRST DOLLAR EARNED - A-1-A CARWASH", fill=(40, 25, 10, 255))
+    frame_img.save(os.path.join(output_dir, "framed_first_dollar.png"))
+
+    # 13. Leaves of Grass - Walt Whitman Book Cover (512x512)
+    book_img = Image.new("RGBA", (512, 512), (25, 60, 40, 255)) # Dark green leather
+    draw = ImageDraw.Draw(book_img)
+    draw.rectangle([16, 16, 496, 496], outline=(215, 180, 65, 255), width=8)
+    draw.rectangle([30, 30, 482, 482], outline=(175, 140, 45, 255), width=2)
+    # Embossed gold lettering
+    draw.text((130, 80), "LEAVES OF GRASS", fill=(235, 205, 85, 255))
+    draw.text((180, 140), "WALT WHITMAN", fill=(215, 180, 65, 255))
+    # Floral embossed medallion
+    draw.ellipse([186, 210, 326, 350], outline=(215, 180, 65, 255), width=4)
+    draw.text((215, 270), "POEMS", fill=(235, 205, 85, 255))
+    # Gale Boetticher's famous inscription
+    draw.text((80, 400), "'To my other favorite W.W.", fill=(215, 195, 120, 255))
+    draw.text((80, 435), "It's an honour working with you.' - G.B.", fill=(215, 195, 120, 255))
+    book_img.save(os.path.join(output_dir, "leaves_of_grass.png"))
+
+    # 14. Save Walter White Billboard (1024x512)
+    sww_img = Image.new("RGBA", (1024, 512), (245, 245, 240, 255))
+    draw = ImageDraw.Draw(sww_img)
+    draw.rectangle([10, 10, 1014, 502], outline=(30, 90, 160, 255), width=14)
+    # Blue top banner
+    draw.rectangle([24, 24, 1000, 140], fill=(25, 95, 180, 255))
+    draw.text((120, 55), "SAVE WALTER WHITE - DONATING IS HEALING!", fill=(255, 255, 255, 255))
+    # Photo placeholder of Walter smiling in glasses
+    draw.rectangle([60, 170, 320, 460], fill=(220, 225, 230, 255), outline=(25, 95, 180, 255), width=6)
+    draw.text((105, 300), "[ WALT SR. ]", fill=(60, 80, 110, 255))
+    draw.text((360, 180), "My dad is a high school chemistry teacher.", fill=(30, 30, 30, 255))
+    draw.text((360, 220), "He has stage 3 lung cancer. He is our hero.", fill=(30, 30, 30, 255))
+    draw.text((360, 270), "Please help us fund his medical treatment!", fill=(180, 25, 25, 255))
+    draw.rectangle([350, 340, 960, 440], fill=(25, 150, 60, 255))
+    draw.text((380, 370), "VISIT: WWW.SAVEWALTERWHITE.COM", fill=(255, 255, 255, 255))
+    sww_img.save(os.path.join(output_dir, "save_walter_white_billboard.png"))
+
+    # 15. Crosswalk Zebra Stripes Texture (512x512)
+    cw_img = Image.new("RGBA", (512, 512), (45, 45, 48, 255)) # Dark asphalt
+    draw = ImageDraw.Draw(cw_img)
+    for sx in range(20, 500, 70):
+        draw.rectangle([sx, 30, sx + 45, 482], fill=(240, 240, 240, 255))
+    cw_img.save(os.path.join(output_dir, "crosswalk_stripes.png"))
+
     print("All enhanced textures generated successfully!")
 
 if __name__ == "__main__":

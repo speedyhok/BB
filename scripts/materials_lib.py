@@ -139,6 +139,35 @@ def init_all_materials():
     materials["Mat_Wood_Fence"] = get_or_create_material("Mat_Wood_Fence", base_color=(0.55, 0.40, 0.25, 1.0), roughness=0.85)
     materials["Mat_Blue_Meth_Crystal"] = get_or_create_material("Mat_Blue_Meth_Crystal", base_color=(0.15, 0.72, 0.98, 0.85), transmission=0.85, roughness=0.12, emission_color=(0.1, 0.5, 0.9, 1.0), emission_strength=2.2)
 
+    # 8b. Detailed Interior & Architectural Materials
+    materials["Mat_Saul_Constitution"] = get_or_create_material("Mat_Saul_Constitution", texture_path=tex("saul_constitution.png"), roughness=0.6)
+    materials["Mat_Money_Cash"] = get_or_create_material("Mat_Money_Cash", texture_path=tex("money_cash_bundle.png"), roughness=0.5)
+    materials["Mat_Schraderbrau"] = get_or_create_material("Mat_Schraderbrau", texture_path=tex("schraderbrau_label.png"), roughness=0.4)
+    materials["Mat_Framed_Dollar"] = get_or_create_material("Mat_Framed_Dollar", texture_path=tex("framed_first_dollar.png"), roughness=0.3)
+    materials["Mat_Leaves_Of_Grass"] = get_or_create_material("Mat_Leaves_Of_Grass", texture_path=tex("leaves_of_grass.png"), roughness=0.5)
+    materials["Mat_Save_Walter_White"] = get_or_create_material("Mat_Save_Walter_White", texture_path=tex("save_walter_white_billboard.png"), roughness=0.4)
+    materials["Mat_Crosswalk"] = get_or_create_material("Mat_Crosswalk", texture_path=tex("crosswalk_stripes.png"), roughness=0.85)
+
+    materials["Mat_Hardwood_Floor"] = get_or_create_material("Mat_Hardwood_Floor", base_color=(0.58, 0.40, 0.22, 1.0), roughness=0.35)
+    materials["Mat_Carpet_Beige"] = get_or_create_material("Mat_Carpet_Beige", base_color=(0.82, 0.78, 0.70, 1.0), roughness=0.95)
+    materials["Mat_Carpet_Purple"] = get_or_create_material("Mat_Carpet_Purple", base_color=(0.42, 0.12, 0.52, 1.0), roughness=0.92) # Marie's signature royal purple!
+    materials["Mat_Tile_Kitchen"] = get_or_create_material("Mat_Tile_Kitchen", base_color=(0.80, 0.76, 0.72, 1.0), roughness=0.45)
+    materials["Mat_Interior_Wall_Beige"] = get_or_create_material("Mat_Interior_Wall_Beige", base_color=(0.91, 0.88, 0.82, 1.0), roughness=0.88)
+    materials["Mat_Interior_Wall_White"] = get_or_create_material("Mat_Interior_Wall_White", base_color=(0.95, 0.95, 0.95, 1.0), roughness=0.85)
+    materials["Mat_Sofa_Fabric_Tan"] = get_or_create_material("Mat_Sofa_Fabric_Tan", base_color=(0.65, 0.56, 0.44, 1.0), roughness=0.9)
+    materials["Mat_Leather_Dark"] = get_or_create_material("Mat_Leather_Dark", base_color=(0.10, 0.08, 0.07, 1.0), roughness=0.35, metallic=0.05)
+    materials["Mat_Countertop_Granite"] = get_or_create_material("Mat_Countertop_Granite", base_color=(0.18, 0.18, 0.20, 1.0), roughness=0.25)
+    materials["Mat_Cabinet_Wood"] = get_or_create_material("Mat_Cabinet_Wood", base_color=(0.42, 0.26, 0.15, 1.0), roughness=0.55)
+    materials["Mat_Water_Heater"] = get_or_create_material("Mat_Water_Heater", base_color=(0.78, 0.80, 0.82, 1.0), metallic=0.85, roughness=0.3)
+    materials["Mat_CRT_Screen"] = get_or_create_material("Mat_CRT_Screen", base_color=(0.04, 0.04, 0.05, 1.0), roughness=0.1)
+    materials["Mat_Mineral_Amethyst"] = get_or_create_material("Mat_Mineral_Amethyst", base_color=(0.55, 0.15, 0.75, 0.9), transmission=0.8, roughness=0.15, emission_color=(0.3, 0.08, 0.4, 1.0), emission_strength=1.5)
+    materials["Mat_Mineral_Gold"] = get_or_create_material("Mat_Mineral_Gold", base_color=(0.95, 0.82, 0.20, 1.0), metallic=0.95, roughness=0.25)
+    materials["Mat_Mineral_Green"] = get_or_create_material("Mat_Mineral_Green", base_color=(0.10, 0.65, 0.35, 0.9), transmission=0.75, roughness=0.2)
+    materials["Mat_Beer_Bottle_Amber"] = get_or_create_material("Mat_Beer_Bottle_Amber", base_color=(0.40, 0.22, 0.08, 0.8), transmission=0.85, roughness=0.1)
+    materials["Mat_Fire_Hydrant_Yellow"] = get_or_create_material("Mat_Fire_Hydrant_Yellow", base_color=(0.95, 0.82, 0.05, 1.0), roughness=0.4)
+    materials["Mat_Mailbox_Blue"] = get_or_create_material("Mat_Mailbox_Blue", base_color=(0.10, 0.28, 0.65, 1.0), roughness=0.45)
+    materials["Mat_Payphone_Silver"] = get_or_create_material("Mat_Payphone_Silver", base_color=(0.75, 0.76, 0.78, 1.0), metallic=0.85, roughness=0.3)
+
     # 9. Neon & Lighting
     materials["Mat_Neon_Yellow"] = get_or_create_material("Mat_Neon_Yellow", base_color=(1.0, 0.88, 0.2, 1.0), emission_color=(1.0, 0.88, 0.2, 1.0), emission_strength=5.0)
     materials["Mat_Neon_Red"] = get_or_create_material("Mat_Neon_Red", base_color=(1.0, 0.15, 0.15, 1.0), emission_color=(1.0, 0.15, 0.15, 1.0), emission_strength=5.0)

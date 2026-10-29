@@ -81,6 +81,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <a href="#overview" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Overview</a>
         <a href="#interactive-map" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">City Map</a>
         <a href="#landmarks" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Landmarks</a>
+        <a href="#interiors" class="px-3 py-2 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 border border-amber-800/40 transition">Interiors</a>
         <a href="#vehicles" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Vehicles</a>
         <a href="#game-engine" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Game Engine</a>
         <a href="#downloads" class="px-3 py-2 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 border border-emerald-800/50 transition">Downloads</a>
@@ -608,6 +609,195 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- DETAILED WALKABLE INTERIORS SHOWCASE -->
+  <section id="interiors" class="py-16 border-t border-gray-800 bg-[#0d1017]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-12">
+        <span class="text-xs font-mono-code text-amber-400 uppercase tracking-widest font-semibold">Special Locations &bull; Fully Furnished &amp; Walkable</span>
+        <h2 class="text-4xl font-black text-white mt-1">INTERIOR ARCHITECTURE &amp; SET DESIGN</h2>
+        <p class="text-gray-400 text-sm mt-2 max-w-2xl">Every iconic Breaking Bad location is modeled from the inside out with hollow architecture, dedicated room illumination, furniture, props, and show-accurate easter eggs.</p>
+      </div>
+
+      <div class="space-y-12">
+        <!-- Walter White House Interior -->
+        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
+          <div class="lg:col-span-7 relative group">
+            <img src="renders/render_11_walter_white_interior.png" alt="Walter White Furnished Interior" class="w-full h-full object-cover min-h-[380px]">
+            <div class="absolute top-4 left-4 bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
+              308 NEGRA ARROYO &bull; INTERIOR
+            </div>
+          </div>
+          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono-code text-emerald-400 uppercase font-semibold">Living Room &amp; Crawl Space</span>
+                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: -150.5, Y: 298, Z: 1.2</span>
+              </div>
+              <h3 class="text-2xl font-black text-white mt-2">Walter White's Residence</h3>
+              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
+                Step inside the iconic Albuquerque home. Fully realized floorplan with hardwood floors, beige carpets, kitchen tiles, and dedicated point light illumination.
+              </p>
+              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
+                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
+                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
+                  <li><span class="text-amber-400 font-semibold">Leaves of Grass:</span> Walt Whitman's book on the coffee table ("To W.W., from G.B.").</li>
+                  <li><span class="text-emerald-400 font-semibold">Crawl Space Cash:</span> Water heater closet with secret trapdoor down to stacked bricks of cash!</li>
+                  <li><span class="text-cyan-400 font-semibold">Living Room &amp; CRT TV:</span> Tan fabric sofa, Walt's armchair, and retro CRT television.</li>
+                  <li><span class="text-gray-400 font-semibold">Walter Jr.'s Bedroom:</span> Wooden desk, bed, and aluminum walking crutches.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
+              <a href="drive.html" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saul Goodman Office Interior -->
+        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
+          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between order-2 lg:order-1">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono-code text-yellow-400 uppercase font-semibold">Executive Law Suite</span>
+                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: -60, Y: 53, Z: 1.2</span>
+              </div>
+              <h3 class="text-2xl font-black text-white mt-2">Saul Goodman &amp; Associates</h3>
+              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
+                Francesca's waiting room leads into Saul's grand private office featuring Neoclassical Greek Doric pillars and the full-wall US Constitution wallpaper.
+              </p>
+              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
+                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
+                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
+                  <li><span class="text-yellow-400 font-semibold">US Constitution Wallpaper:</span> 18m full-wall graphic ("We The People") behind Saul's desk.</li>
+                  <li><span class="text-amber-400 font-semibold">Golden Scales of Justice:</span> Brass scales on the polished mahogany executive desk.</li>
+                  <li><span class="text-emerald-400 font-semibold">Duffel Bag of Cash:</span> Canvas duffel bag packed with currency bundles on the carpet.</li>
+                  <li><span class="text-cyan-400 font-semibold">Burner Phones &amp; Law Degree:</span> Desk phone tray and framed University of American Samoa diploma.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
+              <a href="drive.html" class="px-3 py-1.5 rounded bg-yellow-500 hover:bg-yellow-400 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
+            </div>
+          </div>
+          <div class="lg:col-span-7 relative group order-1 lg:order-2">
+            <img src="renders/render_12_saul_goodman_interior.png" alt="Saul Goodman Interior with Constitution Wallpaper" class="w-full h-full object-cover min-h-[380px]">
+            <div class="absolute top-4 left-4 bg-yellow-950/90 border border-yellow-500/40 text-yellow-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
+              SAUL GOODMAN &bull; CONSTITUTION SUITE
+            </div>
+          </div>
+        </div>
+
+        <!-- Los Pollos Hermanos Interior -->
+        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
+          <div class="lg:col-span-7 relative group">
+            <img src="renders/render_13_los_pollos_hermanos_interior.png" alt="Los Pollos Hermanos Interior Dining and Kitchen" class="w-full h-full object-cover min-h-[380px]">
+            <div class="absolute top-4 left-4 bg-amber-950/90 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
+              LOS POLLOS HERMANOS &bull; DINING &amp; KITCHEN
+            </div>
+          </div>
+          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono-code text-amber-400 uppercase font-semibold">Dining &amp; Commercial Kitchen</span>
+                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: 140, Y: 38, Z: 1.2</span>
+              </div>
+              <h3 class="text-2xl font-black text-white mt-2">Los Pollos Hermanos</h3>
+              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
+                Step through the double glass doors into the pristine fast-food restaurant where Gus Fring watches every detail through overhead surveillance.
+              </p>
+              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
+                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
+                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
+                  <li><span class="text-amber-400 font-semibold">6 Customer Dining Booths:</span> Show-accurate yellow padded benches and red laminate tables.</li>
+                  <li><span class="text-yellow-400 font-semibold">Illuminated Menu &amp; POS:</span> Hanging overhead illuminated menu board and 3 touchscreen registers.</li>
+                  <li><span class="text-cyan-400 font-semibold">Commercial Deep Fryers:</span> Stainless steel chicken fryers, baskets, and exhaust hood.</li>
+                  <li><span class="text-emerald-400 font-semibold">Gus's Back Office:</span> Executive desk, digital wall safe, and desktop monitor with 4 CCTV feeds!</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
+              <a href="drive.html" class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-400 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Superlab Interior -->
+        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
+          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between order-2 lg:order-1">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono-code text-cyan-400 uppercase font-semibold">Subterranean Industrial Vault</span>
+                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: 90, Y: -260, Z: -6.5</span>
+              </div>
+              <h3 class="text-2xl font-black text-white mt-2">Underground Secret Superlab</h3>
+              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
+                Hidden beneath Lavandería Brillante behind sliding industrial Washer #3. A multimillion-dollar subterranean methamphetamine manufacturing laboratory.
+              </p>
+              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
+                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
+                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
+                  <li><span class="text-cyan-400 font-semibold">Giant Reaction Tanks:</span> Dual 3.8m stainless steel chemical reactors with agitator motors.</li>
+                  <li><span class="text-yellow-400 font-semibold">Yellow Steel Catwalk:</span> 22m overhead catwalk with safety railings spanning the lab ceiling.</li>
+                  <li><span class="text-blue-400 font-semibold">Methylamine Barrels:</span> Stacks of 55-gallon drums with the iconic golden bee logo.</li>
+                  <li><span class="text-emerald-400 font-semibold">Blue Crystal Trays:</span> Stainless workbenches with trays of pure 99.1% blue methamphetamine crystals.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+              <span class="text-xs font-mono-code text-gray-500">Walkable Subterranean Vault</span>
+              <a href="drive.html" class="px-3 py-1.5 rounded bg-cyan-500 hover:bg-cyan-400 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
+            </div>
+          </div>
+          <div class="lg:col-span-7 relative group order-1 lg:order-2">
+            <img src="renders/render_14_superlab_interior.png" alt="Underground Secret Superlab Interior" class="w-full h-full object-cover min-h-[380px]">
+            <div class="absolute top-4 left-4 bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
+              SUPERLAB &bull; SUBTERRANEAN VAULT
+            </div>
+          </div>
+        </div>
+
+        <!-- Hank & Marie Schrader House Interior -->
+        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
+          <div class="lg:col-span-7 relative group">
+            <img src="renders/render_15_hank_marie_interior.png" alt="Hank and Marie House Interior" class="w-full h-full object-cover min-h-[380px]">
+            <div class="absolute top-4 left-4 bg-purple-950/90 border border-purple-500/40 text-purple-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
+              4901 CUMBRE DEL SUR &bull; MARIE'S PURPLE PALACE
+            </div>
+          </div>
+          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono-code text-purple-400 uppercase font-semibold">Foothills &bull; Purple Palace &amp; Brewery</span>
+                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: 266.5, Y: 261, Z: 1.2</span>
+              </div>
+              <h3 class="text-2xl font-black text-white mt-2">Hank &amp; Marie Schrader's House</h3>
+              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
+                Nestled in the Sandia foothills. Features Marie's signature royal purple carpet living room and Hank's attached garage microbrewery.
+              </p>
+              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
+                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
+                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
+                  <li><span class="text-purple-400 font-semibold">Marie's Purple Palace:</span> Wall-to-wall royal purple carpet, purple couch, and purple ceramic decor.</li>
+                  <li><span class="text-yellow-400 font-semibold">"They're Minerals, Marie!":</span> Oak display cabinet with glowing amethyst, pyrite, and fluorite specimens.</li>
+                  <li><span class="text-amber-400 font-semibold">Schraderbr&auml;u Garage Brewery:</span> Workbench with bottle capper, carboys, and crates of Schraderbr&auml;u lager.</li>
+                  <li><span class="text-blue-400 font-semibold">Hank's Jeep Commander 4x4:</span> Dark blue muscular DEA SUV parked on the paved driveway.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
+              <a href="drive.html" class="px-3 py-1.5 rounded bg-purple-600 hover:bg-purple-500 text-xs font-mono-code text-white font-semibold transition">Teleport Inside &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 

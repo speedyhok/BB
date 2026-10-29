@@ -24,11 +24,16 @@ from props_gen import (
     build_prickly_pear, build_desert_fan_palm,
     build_saul_billboard, build_pollos_sign_tower,
     build_streetlight, build_traffic_light,
-    build_saguaro_cactus, build_desert_boulder
+    build_saguaro_cactus, build_desert_boulder,
+    build_fire_hydrant, build_usps_mailbox,
+    build_public_payphone, build_saul_bus_bench,
+    build_newspaper_box, build_street_trash_can,
+    build_cottonwood_tree, build_save_walter_white_billboard
 )
 from vehicles_gen import (
     build_fleetwood_bounder_rv, build_pontiac_aztek,
-    build_cadillac_deville, build_volvo_wagon
+    build_cadillac_deville, build_volvo_wagon,
+    build_jesse_tercel_wagon, build_hank_jeep_commander
 )
 import landmarks_gen
 
@@ -504,7 +509,7 @@ def build_rail_corridor(parent_col, start_x=-450, end_x=220, y=-350):
         # Top Dome Cap
         create_sphere(f"Chemical_Tank_Dome_{idx}", (tx, ty, 12.0), radius=5.5, material="Mat_Corrugated_Metal", collection=col)
         # NFPA Diamond Sign Plaque
-        create_textured_sign_plane(f"Tank_NFPA_{idx}", (tx, ty - 5.55, 5.0), width=1.5, height=1.5, material="Mat_Methylamine_Barrel", collection=col, rotation=(math.pi/2, 0, 0))
+        create_textured_sign_plane(f"Tank_NFPA_{idx}", (tx, ty - 5.55, 5.0), width=1.5, height=1.5, material="Mat_Methylamine_Barrel", collection=col, rotation=(0, 0, 0))
 
 # ==============================================================================
 # 6. MASTER CITY ASSEMBLY
@@ -782,9 +787,74 @@ def build_entire_albuquerque_city():
     for b_name, b_loc, b_rot in billboard_locs:
         build_saul_billboard(b_name, location=b_loc, rotation=(0, 0, b_rot), collection=prop_col)
 
-    # 10. DESERT VEGETATION, PALMS, CACTI & LANDSCAPING
-    print("Planting Desert Flora, Palms & Cacti...")
+    # Route 66 Pedestrian Zebra Crosswalks at Major Intersections
+    crosswalk_intersections = [-350, -180, 0, 180]
+    for cw_x in crosswalk_intersections:
+        # Crosswalk on West side of intersection (Spans Y: -9 to +9 across Route 66)
+        cw_w = create_textured_sign_plane(f"Crosswalk_W_{cw_x}", (cw_x - 12, 0, 0.04), width=3.5, height=18.0, material="Mat_Crosswalk", collection=prop_col, rotation=(-math.pi/2, 0, 0))
+        cw_w.parent = None
+        # Crosswalk on East side of intersection
+        cw_e = create_textured_sign_plane(f"Crosswalk_E_{cw_x}", (cw_x + 12, 0, 0.04), width=3.5, height=18.0, material="Mat_Crosswalk", collection=prop_col, rotation=(-math.pi/2, 0, 0))
+        cw_e.parent = None
+
+    # Fire Hydrants along Route 66 & Downtown Curbs
+    hydrant_locs = [
+        (-342, 10.2, 0), (-172, 10.2, 0), (12, 10.2, 0), (192, 10.2, 0),
+        (-250, -48, 0), (-75, 25, 0), (125, 25, 0), (-140, 288, 0)
+    ]
+    for i, hloc in enumerate(hydrant_locs):
+        build_fire_hydrant(f"FireHydrant_{i}", location=hloc, collection=prop_col)
+
+    # USPS Blue Postal Drop Boxes
+    mailbox_locs = [
+        (-255, -48, 0, 0), (-78, 26, 0, 0.2), (122, 26, 0, -0.2), (-345, 10.5, 0, 0)
+    ]
+    for i, (mx, my, mz, mrot) in enumerate(mailbox_locs):
+        build_usps_mailbox(f"USPS_Box_{i}", location=(mx, my, mz), rotation=(0, 0, mrot), collection=prop_col)
+
+    # Public Coin Payphones (Vital for Walt & Saul's burner calls!)
+    payphone_locs = [
+        (-112, -38, 0, 0),       # Outside Crossroads Motel
+        (-52, 26, 0, math.pi),   # Outside Saul's office
+        (-335, 10.5, 0, 0),      # Downtown Central Ave
+        (202, -26, 0, math.pi)   # Outside A1A Carwash
+    ]
+    for i, (px, py, pz, prot) in enumerate(payphone_locs):
+        build_public_payphone(f"Payphone_{i}", location=(px, py, pz), rotation=(0, 0, prot), collection=prop_col)
+
+    # Saul Goodman Bus Benches along Route 66
+    bus_bench_locs = [
+        (-275, 10.5, 0, 0), (-40, 10.5, 0, 0), (130, 10.5, 0, 0), (210, -10.5, 0, math.pi)
+    ]
+    for i, (bx, by, bz, brot) in enumerate(bus_bench_locs):
+        build_saul_bus_bench(f"Saul_BusBench_{i}", location=(bx, by, bz), rotation=(0, 0, brot), collection=prop_col)
+
+    # Newspaper Vending Boxes ("Albuquerque Journal")
+    news_locs = [(-248, -48, 0), (-48, 26, 0), (135, 26, 0), (-348, 10.5, 0)]
+    for i, nloc in enumerate(news_locs):
+        build_newspaper_box(f"NewsBox_{i}", location=nloc, collection=prop_col)
+
+    # Sidewalk Trash Receptacles
+    trash_locs = [(-270, 10.5, 0), (-35, 10.5, 0), (135, 10.5, 0), (215, -10.5, 0)]
+    for i, tloc in enumerate(trash_locs):
+        build_street_trash_can(f"Trash_{i}", location=tloc, collection=prop_col)
+
+    # Save Walter White Giant Highway Billboard (Heading East towards Sandia Mountains)
+    build_save_walter_white_billboard("SaveWalterWhite_Billboard_Hwy", location=(160, 190, 0), rotation=(0, 0, -0.3), collection=prop_col)
+
+    # 10. DESERT VEGETATION, PALMS, CACTI & RESIDENTIAL COTTONWOOD TREES
+    print("Planting Desert Flora, Palms, Cottonwoods & Cacti...")
     veg_col = get_or_create_collection("08_Desert_Foliage", city_col)
+
+    # Native Rio Grande Cottonwood Shade Trees along Residential Suburbs
+    cottonwood_locs = [
+        (-210, 275), (-180, 275), (-120, 275), (-90, 275),
+        (-210, 325), (-180, 325), (-120, 325), (-90, 325),
+        (-310, 225), (-290, 225), (-230, 225), (-170, 225),
+        (-250, -42), (-235, -42), (-370, -95) # Courthouse plaza shade trees
+    ]
+    for i, (tx, ty) in enumerate(cottonwood_locs):
+        build_cottonwood_tree(f"Cottonwood_{i}", location=(tx, ty, 0), height=random.uniform(7.0, 9.5), collection=veg_col)
 
     # Route 66 Desert Fan Palms (Majestic palm avenue along Central Blvd)
     for px in range(-500, 300, 40):

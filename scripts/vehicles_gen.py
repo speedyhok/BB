@@ -87,10 +87,10 @@ def build_fleetwood_bounder_rv(name="Crystal_Ship_RV", location=(0,0,0), rotatio
         wiper.parent = root
 
     # Side stripe decals with bullet holes (both sides)
-    stripe_r = create_textured_sign_plane(f"{name}_stripe_R", (0, -1.26, 1.9), width=9.2, height=0.75, material="Mat_RV_Stripe", collection=collection, rotation=(math.pi/2, 0, 0))
+    stripe_r = create_textured_sign_plane(f"{name}_stripe_R", (0, -1.26, 1.9), width=9.2, height=0.75, material="Mat_RV_Stripe", collection=collection, rotation=(0, 0, 0))
     stripe_r.parent = root
 
-    stripe_l = create_textured_sign_plane(f"{name}_stripe_L", (0, 1.26, 1.9), width=9.2, height=0.75, material="Mat_RV_Stripe", collection=collection, rotation=(-math.pi/2, math.pi, 0))
+    stripe_l = create_textured_sign_plane(f"{name}_stripe_L", (0, 1.26, 1.9), width=9.2, height=0.75, material="Mat_RV_Stripe", collection=collection, rotation=(0, 0, math.pi))
     stripe_l.parent = root
 
     # Side windows
@@ -243,9 +243,9 @@ def build_cadillac_deville(name="Saul_Cadillac", location=(0,0,0), rotation=(0,0
     ornament.parent = root
 
     # LWYRUP License Plate
-    plate_f = create_textured_sign_plane(f"{name}_plate_f", (2.74, 0, 0.44), width=0.45, height=0.22, material="Mat_License_Plate_LWYRUP", collection=collection, rotation=(math.pi/2, 0, 0))
+    plate_f = create_textured_sign_plane(f"{name}_plate_f", (2.74, 0, 0.44), width=0.45, height=0.22, material="Mat_License_Plate_LWYRUP", collection=collection, rotation=(0, 0, math.pi/2))
     plate_f.parent = root
-    plate_r = create_textured_sign_plane(f"{name}_plate_r", (-2.74, 0, 0.44), width=0.45, height=0.22, material="Mat_License_Plate_LWYRUP", collection=collection, rotation=(-math.pi/2, math.pi, 0))
+    plate_r = create_textured_sign_plane(f"{name}_plate_r", (-2.74, 0, 0.44), width=0.45, height=0.22, material="Mat_License_Plate_LWYRUP", collection=collection, rotation=(0, 0, -math.pi/2))
     plate_r.parent = root
 
     # Wire spoke wheels
@@ -281,5 +281,72 @@ def build_volvo_wagon(name="Gus_Volvo", location=(0,0,0), rotation=(0,0,0), coll
     create_detailed_wheel(f"{name}_wf_l", (1.45, 0.9, r), r, w, collection).parent = root
     create_detailed_wheel(f"{name}_wr_r", (-1.45, -0.9, r), r, w, collection).parent = root
     create_detailed_wheel(f"{name}_wr_l", (-1.45, 0.9, r), r, w, collection).parent = root
+
+    return root
+
+def build_jesse_tercel_wagon(name="Jesse_Tercel", location=(0,0,0), rotation=(0,0,0), collection=None):
+    """Jesse Pinkman's 1982 Red Toyota Tercel 4WD Station Wagon"""
+    root = bpy.data.objects.new(name, None)
+    root.location = Vector(location)
+    root.rotation_euler = Euler(rotation)
+    link_to_collection(root, collection)
+
+    body = create_cube(f"{name}_body", (0, 0, 0.65), (4.3, 1.62, 0.52), "Mat_Car_MonteCarlo_Red", collection)
+    body.parent = root
+
+    cabin = create_cube(f"{name}_cabin", (-0.35, 0, 1.22), (2.7, 1.48, 0.62), "Mat_Car_MonteCarlo_Red", collection)
+    cabin.parent = root
+
+    ws = create_cube(f"{name}_ws", (0.95, 0, 1.22), (0.05, 1.40, 0.52), "Mat_Glass_Tinted", collection, rotation=(0, -0.42, 0))
+    ws.parent = root
+
+    # Roof luggage rack
+    rack_l = create_cylinder(f"{name}_rack_l", (-0.35, -0.65, 1.58), radius=0.02, depth=2.4, material="Mat_Metal_Black", collection=collection, rotation=(math.pi/2, 0, 0))
+    rack_l.parent = root
+    rack_r = create_cylinder(f"{name}_rack_r", (-0.35, 0.65, 1.58), radius=0.02, depth=2.4, material="Mat_Metal_Black", collection=collection, rotation=(math.pi/2, 0, 0))
+    rack_r.parent = root
+
+    # Bumpers
+    bf = create_cube(f"{name}_bf", (2.16, 0, 0.42), (0.12, 1.62, 0.18), "Mat_Metal_Black", collection)
+    bf.parent = root
+    br = create_cube(f"{name}_br", (-2.16, 0, 0.42), (0.12, 1.62, 0.18), "Mat_Metal_Black", collection)
+    br.parent = root
+
+    r = 0.32
+    w = 0.20
+    create_detailed_wheel(f"{name}_wf_r", (1.35, -0.82, r), r, w, collection).parent = root
+    create_detailed_wheel(f"{name}_wf_l", (1.35, 0.82, r), r, w, collection).parent = root
+    create_detailed_wheel(f"{name}_wr_r", (-1.35, -0.82, r), r, w, collection).parent = root
+    create_detailed_wheel(f"{name}_wr_l", (-1.35, 0.82, r), r, w, collection).parent = root
+
+    return root
+
+def build_hank_jeep_commander(name="Hank_Jeep", location=(0,0,0), rotation=(0,0,0), collection=None):
+    """Hank Schrader's Dark Blue / Slate Jeep Commander 4x4 SUV"""
+    root = bpy.data.objects.new(name, None)
+    root.location = Vector(location)
+    root.rotation_euler = Euler(rotation)
+    link_to_collection(root, collection)
+
+    body = create_cube(f"{name}_body", (0, 0, 0.82), (4.8, 1.95, 0.68), "Mat_Car_Volvo_Blue", collection)
+    body.parent = root
+
+    cabin = create_cube(f"{name}_cabin", (-0.3, 0, 1.52), (3.1, 1.75, 0.76), "Mat_Car_Volvo_Blue", collection)
+    cabin.parent = root
+
+    ws = create_cube(f"{name}_ws", (1.2, 0, 1.52), (0.05, 1.65, 0.65), "Mat_Glass_Tinted", collection, rotation=(0, -0.38, 0))
+    ws.parent = root
+
+    grille = create_cube(f"{name}_grille", (2.42, 0, 0.82), (0.06, 1.45, 0.45), "Mat_Car_Chrome", collection)
+    grille.parent = root
+    bf = create_cube(f"{name}_bf", (2.44, 0, 0.48), (0.15, 1.95, 0.24), "Mat_Metal_Black", collection)
+    bf.parent = root
+
+    r = 0.42
+    w = 0.26
+    create_detailed_wheel(f"{name}_wf_r", (1.55, -0.98, r), r, w, collection).parent = root
+    create_detailed_wheel(f"{name}_wf_l", (1.55, 0.98, r), r, w, collection).parent = root
+    create_detailed_wheel(f"{name}_wr_r", (-1.55, -0.98, r), r, w, collection).parent = root
+    create_detailed_wheel(f"{name}_wr_l", (-1.55, 0.98, r), r, w, collection).parent = root
 
     return root

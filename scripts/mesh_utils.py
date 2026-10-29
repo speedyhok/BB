@@ -239,3 +239,14 @@ def create_box_collider(target_obj, name_override=None, collection=None):
     )
     collider.display_type = 'WIRE'
     return collider
+
+def add_interior_light(name, location=(0,0,0), energy=300.0, color=(1.0, 0.95, 0.88), radius=0.25, collection=None):
+    """Creates a point light for illuminating interior rooms in Cycles and real-time WebGL"""
+    ldata = bpy.data.lights.new(name=name, type='POINT')
+    ldata.energy = energy
+    ldata.color = color
+    ldata.shadow_soft_size = radius
+    lobj = bpy.data.objects.new(name, ldata)
+    lobj.location = Vector(location)
+    link_to_collection(lobj, collection)
+    return lobj

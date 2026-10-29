@@ -236,17 +236,22 @@
   <!-- Teleport Landmarks Panel -->
   <div id="teleport-panel" class="hud-layer glass-panel interactive">
     <div class="text-[11px] font-mono text-amber-400 font-bold uppercase mb-2">📍 WARP TO ROAD LOCATION</div>
-    <button class="btn-action" onclick="teleportTo('walt')">🏠 308 Negra Arroyo (Walt)</button>
+    <button class="btn-action" onclick="teleportTo('walt')">🏡 Walt's House (Exterior)</button>
+    <button class="btn-action" onclick="teleportTo('walt_int')">🛋️ Walt's Living Room &amp; Crawl Space</button>
     <button class="btn-action" onclick="teleportTo('pollos')">🍗 Los Pollos Hermanos</button>
-    <button class="btn-action" onclick="teleportTo('saul')">⚖️ Saul Goodman Office</button>
-    <button class="btn-action" onclick="teleportTo('carwash')">🧼 A1A Carwash</button>
+    <button class="btn-action" onclick="teleportTo('pollos_int')">🍗 Pollos Dining &amp; Kitchen (Inside)</button>
+    <button class="btn-action" onclick="teleportTo('saul')">⚖️ Saul Goodman Strip Mall</button>
+    <button class="btn-action" onclick="teleportTo('saul_int')">⚖️ Saul's Office (Constitution)</button>
+    <button class="btn-action" onclick="teleportTo('carwash')">🧼 A1A Carwash &amp; First Dollar</button>
     <button class="btn-action" onclick="teleportTo('superlab_ext')">🧺 Lavandería Brillante</button>
     <button class="btn-action" onclick="teleportTo('superlab_int')">🧪 Inside Superlab (Vault)</button>
     <button class="btn-action" onclick="teleportTo('tohajiilee')">🚐 To'hajiilee (Crystal Ship)</button>
     <button class="btn-action" onclick="teleportTo('motel')">🏨 Crossroads Motel</button>
     <button class="btn-action" onclick="teleportTo('junkyard')">🧲 Old Joe's Junkyard</button>
-    <button class="btn-action" onclick="teleportTo('jesse')">🏡 Jesse Pinkman's House</button>
+    <button class="btn-action" onclick="teleportTo('jesse')">🏡 Jesse's House &amp; Tercel</button>
+    <button class="btn-action" onclick="teleportTo('jesse_int')">🔊 Jesse's Stereo Living Room</button>
     <button class="btn-action" onclick="teleportTo('hank')">⛰️ Hank &amp; Marie Foothill</button>
+    <button class="btn-action" onclick="teleportTo('hank_int')">💎 Hank's Minerals &amp; Brewery</button>
     <button class="btn-action" onclick="teleportTo('downtown')">🏙️ Downtown Route 66</button>
   </div>
 
@@ -317,17 +322,22 @@
 
     // Landmark Locations Table
     const LANDMARKS = [
-      { id: 'walt', name: "308 Negra Arroyo (Walt's House)", x: -150, y: 300, z: 0, road: "NEGRA ARROYO WAY", rot: 0 },
+      { id: 'walt', name: "308 Negra Arroyo (Walt's House)", x: -150, y: 285, z: 0, road: "NEGRA ARROYO WAY", rot: 0 },
+      { id: 'walt_int', name: "Walt's Living Room & Crawl Space", x: -150.5, y: 298, z: 1.2, road: "INSIDE: 308 NEGRA ARROYO", rot: 0 },
       { id: 'pollos', name: "Los Pollos Hermanos", x: 140, y: 20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: Math.PI / 2 },
+      { id: 'pollos_int', name: "Pollos Hermanos Dining & Kitchen", x: 140, y: 38, z: 1.2, road: "INSIDE: LOS POLLOS HERMANOS", rot: 0 },
       { id: 'saul', name: "Saul Goodman & Associates", x: -60, y: 20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: Math.PI / 2 },
-      { id: 'carwash', name: "A1A Carwash", x: 220, y: -20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: -Math.PI / 2 },
+      { id: 'saul_int', name: "Saul's Office (Constitution)", x: -60, y: 53, z: 1.2, road: "INSIDE: SAUL GOODMAN'S OFFICE", rot: 0 },
+      { id: 'carwash', name: "A1A Carwash & First Dollar", x: 220, y: -20, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: -Math.PI / 2 },
       { id: 'superlab_ext', name: "Lavandería Brillante", x: 90, y: -220, z: 0, road: "SOUTH VALLEY WAY", rot: 0 },
       { id: 'superlab_int', name: "Underground Secret Superlab", x: 90, y: -260, z: -6.5, road: "SUBTERRANEAN LAB VAULT", rot: 0 },
       { id: 'tohajiilee', name: "To'hajiilee Cook Site (Crystal Ship)", x: -420, y: 390, z: 3.5, road: "TO'HAJIILEE ARROYO TRAIL", rot: 0.3 },
       { id: 'motel', name: "Crossroads Motel ('Crystal Palace')", x: -100, y: -25, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: -Math.PI / 2 },
       { id: 'junkyard', name: "Old Joe's Junkyard & Magnet", x: -180, y: -240, z: 0, road: "SOUTH VALLEY INDUSTRIAL", rot: 0 },
-      { id: 'jesse', name: "Jesse Pinkman's House", x: -260, y: 220, z: 0, road: "CANDELARIA ROAD", rot: 0 },
+      { id: 'jesse', name: "Jesse Pinkman's House & Tercel", x: -260, y: 220, z: 0, road: "CANDELARIA ROAD", rot: 0 },
+      { id: 'jesse_int', name: "Jesse's Stereo Living Room", x: -260, y: 242, z: 1.2, road: "INSIDE: JESSE PINKMAN'S RESIDENCE", rot: 0 },
       { id: 'hank', name: "Hank & Marie's Foothill House", x: 270, y: 240, z: 0, road: "SANDIA CREST PARKWAY", rot: -0.2 },
+      { id: 'hank_int', name: "Hank's Minerals & Schraderbräu", x: 266.5, y: 261, z: 1.2, road: "INSIDE: HANK & MARIE'S RESIDENCE", rot: 0 },
       { id: 'downtown', name: "Downtown Albuquerque Skyline", x: -320, y: 0, z: 0, road: "ROUTE 66 / CENTRAL AVE", rot: Math.PI / 2 }
     ];
 

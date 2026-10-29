@@ -52,12 +52,17 @@ def setup_lighting():
         bg_node.inputs["Color"].default_value = (0.55, 0.72, 0.92, 1.0) # Clear New Mexico sky blue
         bg_node.inputs["Strength"].default_value = 1.0
 
-def setup_render_engine(resolution=(960, 540), samples=24):
+def setup_render_engine(resolution=(960, 540), samples=16):
     scene = bpy.context.scene
     scene.render.engine = 'CYCLES'
     scene.cycles.device = 'CPU'
     scene.cycles.use_denoising = False
     scene.cycles.samples = samples
+    scene.cycles.max_bounces = 4
+    scene.cycles.diffuse_bounces = 3
+    scene.cycles.glossy_bounces = 2
+    scene.cycles.transmission_bounces = 2
+    scene.cycles.transparent_max_bounces = 4
     scene.render.resolution_x = resolution[0]
     scene.render.resolution_y = resolution[1]
 
@@ -108,7 +113,9 @@ def generate_individual_assets():
         ("fleetwood_bounder_rv", VEHICLES_DIR, lambda col: vehicles_gen.build_fleetwood_bounder_rv(collection=col)),
         ("pontiac_aztek", VEHICLES_DIR, lambda col: vehicles_gen.build_pontiac_aztek(collection=col)),
         ("cadillac_deville", VEHICLES_DIR, lambda col: vehicles_gen.build_cadillac_deville(collection=col)),
-        ("gus_volvo_wagon", VEHICLES_DIR, lambda col: vehicles_gen.build_volvo_wagon(collection=col))
+        ("gus_volvo_wagon", VEHICLES_DIR, lambda col: vehicles_gen.build_volvo_wagon(collection=col)),
+        ("jesse_tercel_wagon", VEHICLES_DIR, lambda col: vehicles_gen.build_jesse_tercel_wagon(collection=col)),
+        ("hank_jeep_commander", VEHICLES_DIR, lambda col: vehicles_gen.build_hank_jeep_commander(collection=col))
     ]
 
     for asset_name, target_dir, build_func in asset_builders:
@@ -219,6 +226,41 @@ def generate_master_city_and_renders():
             (1.42, 0, 0.0),
             32,
             "Bernalillo County Metropolitan Courthouse & Civic Flagpoles"
+        ),
+        (
+            "render_11_walter_white_interior.png",
+            (-150.5, 296.2, 1.55),
+            (1.48, 0, 0.05),
+            24,
+            "Walter White's Furnished Interior - Living Room, Leaves of Grass, Water Heater & Crawl Space Cash"
+        ),
+        (
+            "render_12_saul_goodman_interior.png",
+            (-60.0, 50.5, 1.55),
+            (1.50, 0, 0.0),
+            24,
+            "Saul Goodman's Office Interior - Full US Constitution Wallpaper, Golden Scales & Cash Duffel"
+        ),
+        (
+            "render_13_los_pollos_hermanos_interior.png",
+            (140.0, 34.0, 1.60),
+            (1.48, 0, 0.0),
+            24,
+            "Los Pollos Hermanos Interior - Yellow Dining Booths, Order Counter, Menu & Commercial Fryers"
+        ),
+        (
+            "render_14_superlab_interior.png",
+            (92.0, -255.0, -2.2),
+            (1.25, 0, -2.8),
+            22,
+            "Underground Superlab Catwalk View - Stainless Chemical Vats, Methylamine Barrels & Blue Meth"
+        ),
+        (
+            "render_15_hank_marie_interior.png",
+            (267.5, 256.0, 1.55),
+            (1.48, 0, 0.0),
+            24,
+            "Hank & Marie's Interior - Royal Purple Carpet, Mineral Collection & Schraderbräu Brewery"
         )
     ]
 
