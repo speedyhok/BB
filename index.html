@@ -1,1009 +1,929 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Breaking Bad 3D City of Albuquerque - Game World Showcase</title>
-  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Albuquerque 3D - Breaking Bad City</title>
+  <script src="js/three.min.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+  <script src="js/OrbitControls.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700;900&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .font-mono-code {
-      font-family: 'Fira Code', monospace;
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #080a0f;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #fff;
     }
-    .element-box {
+
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1;
+    }
+
+    /* TOP BAR - CLEAN & MINIMAL */
+    #top-nav {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 10px 6px 14px;
+      background: rgba(12, 16, 24, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-right: 6px;
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .element-pill {
       display: inline-flex;
       flex-direction: column;
-      justify-content: space-between;
-      width: 44px;
-      height: 48px;
-      padding: 3px 5px;
-      background: #0f5132;
-      border: 2px solid #20c997;
+      justify-content: center;
+      align-items: center;
+      width: 28px;
+      height: 28px;
+      background: #0d4a2d;
+      border: 1.5px solid #10b981;
+      border-radius: 4px;
+      color: #fff;
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f3f4f6;
+    }
+
+    /* THE TWO OPTIONS BUTTONS */
+    .mode-switch {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 9999px;
+      padding: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border: none;
+      border-radius: 9999px;
+      background: transparent;
+      color: #9ca3af;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mode-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .mode-btn.active {
+      color: #042f1a;
+      background: #10b981;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+    }
+
+    .mode-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* TOP VIEW 3D LANDMARK PINS */
+    #markers-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .landmark-pin {
+      position: absolute;
+      pointer-events: auto;
+      transform: translate(-50%, -100%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      background: rgba(14, 18, 28, 0.92);
+      border: 1px solid rgba(16, 185, 129, 0.6);
+      border-radius: 9999px;
+      color: #ecfdf5;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .landmark-pin:hover {
+      background: #10b981;
+      color: #042f1a;
+      transform: translate(-50%, -108%) scale(1.1);
+      box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5);
+    }
+
+    .landmark-pin .pin-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+
+    .landmark-pin:hover .pin-dot {
+      background: #042f1a;
+    }
+
+    /* GROUND EXPLORATION LOCATION BAR */
+    #ground-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      max-width: 95vw;
+      overflow-x: auto;
+      padding: 8px 14px;
+      background: rgba(12, 16, 24, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      scrollbar-width: none;
+    }
+
+    #ground-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ground-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      color: #d1d5db;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .ground-btn:hover {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #fff;
+    }
+
+    .ground-btn.active {
+      background: #10b981;
+      border-color: #10b981;
+      color: #042f1a;
+      font-weight: 700;
+    }
+
+    /* CONTROLS HINT PILL */
+    #controls-hint {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      padding: 5px 14px;
+      background: rgba(15, 20, 30, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 500;
+      pointer-events: none;
+      letter-spacing: 0.02em;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ONSCREEN D-PAD FOR TOUCH / MOUSE WALK */
+    #dpad {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      z-index: 20;
+      display: none;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 5px;
+    }
+
+    .dpad-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
       color: #fff;
       font-weight: bold;
-      line-height: 1;
-      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.1s ease;
     }
-    .element-box .num { font-size: 9px; opacity: 0.8; }
-    .element-box .sym { font-size: 19px; font-weight: 800; }
-    .glow-green {
-      box-shadow: 0 0 25px rgba(32, 201, 151, 0.25);
+
+    .dpad-btn:active {
+      background: #10b981;
+      color: #000;
+      transform: scale(0.94);
     }
-    .glow-amber {
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+
+    /* LOADING SCREEN */
+    #loader {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #090c12;
+      transition: opacity 0.6s ease;
     }
-    .map-pin {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .loader-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 320px;
+      text-align: center;
     }
-    .map-pin:hover {
-      transform: scale(1.35) translateY(-3px);
-      filter: drop-shadow(0 0 10px #20c997);
+
+    .loader-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fff;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+
+    .progress-bar-bg {
+      width: 240px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      overflow: hidden;
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #111827;
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: #10b981;
+      border-radius: 9999px;
+      transition: width 0.15s ease;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #374151;
-      border-radius: 4px;
+
+    .loader-status {
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      color: #9ca3af;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #4b5563;
+
+    @media (max-width: 640px) {
+      #top-nav {
+        top: 10px;
+        padding: 5px 8px;
+        gap: 8px;
+      }
+      .brand-title {
+        display: none;
+      }
+      .brand {
+        padding-right: 2px;
+      }
+      .mode-btn {
+        padding: 7px 14px;
+        font-size: 12px;
+      }
+      #ground-bar {
+        bottom: 12px;
+        padding: 6px 10px;
+      }
     }
   </style>
 </head>
-<body class="bg-[#0b0d13] text-gray-200 antialiased min-h-screen selection:bg-emerald-500 selection:text-black custom-scrollbar">
+<body>
 
-  <!-- TOP BAR -->
-  <header class="sticky top-0 z-50 bg-[#0b0d13]/90 backdrop-blur-md border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="flex space-x-1">
-          <div class="element-box rounded shadow-md"><span class="num">35</span><span class="sym">Br</span></div>
-          <div class="element-box rounded shadow-md"><span class="num">56</span><span class="sym">Ba</span></div>
-        </div>
-        <div class="pl-2">
-          <span class="text-xl font-black tracking-wider text-white uppercase block leading-none">ALBUQUERQUE 3D</span>
-          <span class="text-xs text-emerald-400 font-mono-code font-semibold tracking-widest uppercase">Game World Explorer &bull; Blender 4.0</span>
-        </div>
+  <!-- 3D Canvas -->
+  <div id="canvas-container"></div>
+
+  <!-- Loading Screen -->
+  <div id="loader">
+    <div class="loader-box">
+      <div style="display: flex; gap: 6px;">
+        <div class="element-pill" style="width: 36px; height: 36px; font-size: 14px;">Br</div>
+        <div class="element-pill" style="width: 36px; height: 36px; font-size: 14px;">Ba</div>
       </div>
-
-      <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
-        <a href="#overview" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Overview</a>
-        <a href="#interactive-map" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">City Map</a>
-        <a href="#landmarks" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Landmarks</a>
-        <a href="#interiors" class="px-3 py-2 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 border border-amber-800/40 transition">Interiors</a>
-        <a href="#vehicles" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Vehicles</a>
-        <a href="#game-engine" class="px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800/80 transition">Game Engine</a>
-        <a href="#downloads" class="px-3 py-2 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 border border-emerald-800/50 transition">Downloads</a>
-      </nav>
-
-      <div class="flex items-center space-x-3">
-        <a href="game_export/breaking_bad_albuquerque_master.glb" download class="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono-code transition shadow-lg shadow-emerald-500/20">
-          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-          Export GLB (3.5MB)
-        </a>
+      <div class="loader-title">ALBUQUERQUE 3D</div>
+      <div class="progress-bar-bg">
+        <div id="progress-fill" class="progress-bar-fill"></div>
       </div>
+      <div id="loader-status" class="loader-status">Loading City 0%</div>
     </div>
-  </header>
+  </div>
 
-  <!-- HERO SECTION -->
-  <section id="overview" class="relative overflow-hidden py-16 lg:py-24 border-b border-gray-800 bg-gradient-to-b from-[#131722] to-[#0b0d13]">
-    <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#20c997_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div class="lg:col-span-7 space-y-6">
-          <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-mono-code">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>1200m &times; 1200m Explorable 3D Game World</span>
-          </div>
-
-          <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
-            THE 3D CITY OF <br>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">BREAKING BAD</span>
-          </h1>
-
-          <p class="text-lg text-gray-300 leading-relaxed font-light">
-            A comprehensive, high-fidelity 3D replica of Albuquerque, New Mexico built in Blender for open-world game creation. Features all iconic show locations: Walter White's residence, Los Pollos Hermanos, Saul Goodman's office, the subterranean Superlab, and the To'hajiilee desert cook site.
-          </p>
-
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-800">
-            <div class="bg-gray-900/60 p-3 rounded-lg border border-gray-800">
-              <span class="block text-2xl font-black text-white font-mono-code">1.44 km&sup2;</span>
-              <span class="text-xs text-gray-400">World Terrain</span>
-            </div>
-            <div class="bg-gray-900/60 p-3 rounded-lg border border-gray-800">
-              <span class="block text-2xl font-black text-emerald-400 font-mono-code">10</span>
-              <span class="text-xs text-gray-400">Iconic Landmarks</span>
-            </div>
-            <div class="bg-gray-900/60 p-3 rounded-lg border border-gray-800">
-              <span class="block text-2xl font-black text-amber-400 font-mono-code">4</span>
-              <span class="text-xs text-gray-400">Custom Vehicles</span>
-            </div>
-            <div class="bg-gray-900/60 p-3 rounded-lg border border-gray-800">
-              <span class="block text-2xl font-black text-cyan-400 font-mono-code">UCX_</span>
-              <span class="text-xs text-gray-400">Game Colliders</span>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap gap-4 pt-2">
-            <a href="#interactive-map" class="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-sm transition shadow-lg shadow-emerald-500/20">
-              Explore Interactive Map &darr;
-            </a>
-            <a href="#landmarks" class="px-6 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-semibold text-sm transition border border-gray-700">
-              View All 10 Locations
-            </a>
-          </div>
-        </div>
-
-        <div class="lg:col-span-5">
-          <div class="relative rounded-2xl overflow-hidden border border-gray-700 bg-gray-900 shadow-2xl group">
-            <img src="renders/render_01_city_aerial_overview.png" alt="Albuquerque 3D Master City Aerial Overview" class="w-full h-auto object-cover group-hover:scale-105 transition duration-700">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-            <div class="absolute bottom-4 left-4 right-4 text-white">
-              <span class="px-2 py-0.5 rounded text-[11px] font-mono-code bg-emerald-500/90 text-black font-bold uppercase">Cycles Render</span>
-              <h3 class="text-base font-bold mt-1">Albuquerque Master World Aerial View</h3>
-              <p class="text-xs text-gray-300">Looking East toward the 115m Sandia Mountain ridge, Route 66 boulevard, and Downtown skyline.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Top Bar: The ONLY Two Options -->
+  <nav id="top-nav">
+    <div class="brand">
+      <div class="element-pill">Br</div>
+      <span class="brand-title">Albuquerque 3D</span>
     </div>
-  </section>
-
-  <!-- INTERACTIVE CITY MAP SECTION -->
-  <section id="interactive-map" class="py-16 border-b border-gray-800 bg-[#0e111a]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
-        <div>
-          <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-widest font-semibold">Tactical Minimap Navigator</span>
-          <h2 class="text-3xl font-black text-white mt-1">ALBUQUERQUE SECTOR MAP</h2>
-        </div>
-        <p class="text-sm text-gray-400 mt-2 md:mt-0 max-w-md">Click any radar pin to jump directly to that landmark's 3D render, lore details, and coordinates.</p>
-      </div>
-
-      <!-- SVG INTERACTIVE MAP CANVAS -->
-      <div class="relative w-full aspect-[16/9] max-h-[640px] bg-[#161a26] rounded-2xl border border-gray-700 shadow-2xl overflow-hidden">
-        <svg viewBox="0 0 1200 700" class="w-full h-full select-none">
-          <!-- Background Grid Lines -->
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#252c3d" stroke-width="0.8"/>
-            </pattern>
-            <linearGradient id="sandiaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#4d2f1f" stop-opacity="0.8"/>
-              <stop offset="100%" stop-color="#8b4513" stop-opacity="0.95"/>
-            </linearGradient>
-            <linearGradient id="desertGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#6e3f22" stop-opacity="0.7"/>
-              <stop offset="100%" stop-color="#422514" stop-opacity="0.85"/>
-            </linearGradient>
-          </defs>
-
-          <!-- Grid Background -->
-          <rect width="1200" height="700" fill="#131622"/>
-          <rect width="1200" height="700" fill="url(#grid)"/>
-
-          <!-- Eastern Sandia Mountain Range Region -->
-          <path d="M 940 0 L 1200 0 L 1200 700 L 940 700 Q 900 500 930 350 Q 890 200 940 0 Z" fill="url(#sandiaGrad)"/>
-          <text x="1050" y="360" fill="#fcd34d" font-size="20" font-weight="900" letter-spacing="4" transform="rotate(90, 1050, 360)" opacity="0.6">SANDIA MOUNTAIN RANGE</text>
-
-          <!-- Northwest To'hajiilee Desert Mesa Region -->
-          <path d="M 0 0 L 320 0 Q 300 120 220 180 Q 100 240 0 220 Z" fill="url(#desertGrad)"/>
-          <text x="70" y="60" fill="#f59e0b" font-size="14" font-weight="bold" opacity="0.7">TO'HAJIILEE DESERT MESA</text>
-
-          <!-- Main Roads & Boulevards -->
-          <!-- Route 66 / Central Ave (East-West) -->
-          <line x1="50" y1="350" x2="920" y2="350" stroke="#f59e0b" stroke-width="8" stroke-dasharray="16,8"/>
-          <text x="460" y="340" fill="#fcd34d" font-size="13" font-weight="bold" letter-spacing="2">ROUTE 66 / CENTRAL AVENUE</text>
-
-          <!-- 4th Street (-North-South) -->
-          <line x1="420" y1="80" x2="420" y2="650" stroke="#4b5563" stroke-width="6"/>
-          <text x="428" y="620" fill="#9ca3af" font-size="11" font-weight="600" transform="rotate(90, 428, 620)">4TH STREET</text>
-
-          <!-- Broadway Blvd -->
-          <line x1="600" y1="60" x2="600" y2="670" stroke="#4b5563" stroke-width="6"/>
-          <text x="608" y="620" fill="#9ca3af" font-size="11" font-weight="600" transform="rotate(90, 608, 620)">BROADWAY BLVD</text>
-
-          <!-- San Mateo Blvd -->
-          <line x1="780" y1="60" x2="780" y2="670" stroke="#4b5563" stroke-width="6"/>
-          <text x="788" y="620" fill="#9ca3af" font-size="11" font-weight="600" transform="rotate(90, 788, 620)">SAN MATEO BLVD</text>
-
-          <!-- Candelaria Road -->
-          <line x1="150" y1="200" x2="900" y2="200" stroke="#4b5563" stroke-width="5"/>
-          <text x="700" y="190" fill="#9ca3af" font-size="11" font-weight="600">CANDELARIA RD</text>
-
-          <!-- South Valley Way -->
-          <line x1="150" y1="520" x2="880" y2="520" stroke="#4b5563" stroke-width="5"/>
-          <text x="700" y="540" fill="#9ca3af" font-size="11" font-weight="600">SOUTH VALLEY WAY</text>
-
-          <!-- Dirt road to To'hajiilee -->
-          <path d="M 250 200 Q 200 130 130 90" fill="none" stroke="#b45309" stroke-width="4" stroke-dasharray="6,4"/>
-
-          <!-- DISTRICT LABELS -->
-          <rect x="230" y="270" width="160" height="28" rx="4" fill="#1f2937" opacity="0.8"/>
-          <text x="245" y="289" fill="#93c5fd" font-size="12" font-weight="bold">DOWNTOWN SKYLINE</text>
-
-          <rect x="440" y="110" width="180" height="28" rx="4" fill="#1f2937" opacity="0.8"/>
-          <text x="455" y="129" fill="#86efac" font-size="12" font-weight="bold">NORTHEAST HEIGHTS</text>
-
-          <rect x="520" y="580" width="180" height="28" rx="4" fill="#1f2937" opacity="0.8"/>
-          <text x="535" y="599" fill="#fca5a5" font-size="12" font-weight="bold">SOUTH VALLEY / INDUSTRIAL</text>
-
-          <!-- CLICKABLE LANDMARK PINS -->
-          <!-- 1. Walt House -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('walter-white')">
-            <circle cx="450" cy="170" r="14" fill="#10b981" fill-opacity="0.25" stroke="#10b981" stroke-width="2"/>
-            <circle cx="450" cy="170" r="6" fill="#10b981"/>
-            <rect x="465" y="158" width="160" height="24" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1"/>
-            <text x="473" y="174" fill="#ecfdf5" font-size="11" font-weight="bold">308 Negra Arroyo (Walt)</text>
-          </g>
-
-          <!-- 2. Pollos Hermanos -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('pollos-hermanos')">
-            <circle cx="740" cy="320" r="14" fill="#f59e0b" fill-opacity="0.25" stroke="#f59e0b" stroke-width="2"/>
-            <circle cx="740" cy="320" r="6" fill="#f59e0b"/>
-            <rect x="755" y="308" width="150" height="24" rx="4" fill="#78350f" stroke="#f59e0b" stroke-width="1"/>
-            <text x="763" y="324" fill="#fffbeb" font-size="11" font-weight="bold">Los Pollos Hermanos</text>
-          </g>
-
-          <!-- 3. Saul Goodman -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('saul-goodman')">
-            <circle cx="540" cy="320" r="14" fill="#eab308" fill-opacity="0.25" stroke="#eab308" stroke-width="2"/>
-            <circle cx="540" cy="320" r="6" fill="#eab308"/>
-            <rect x="555" y="308" width="165" height="24" rx="4" fill="#713f12" stroke="#eab308" stroke-width="1"/>
-            <text x="563" y="324" fill="#fefce8" font-size="11" font-weight="bold">Saul Goodman Office</text>
-          </g>
-
-          <!-- 4. A1A Carwash -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('a1a-carwash')">
-            <circle cx="820" cy="380" r="14" fill="#06b6d4" fill-opacity="0.25" stroke="#06b6d4" stroke-width="2"/>
-            <circle cx="820" cy="380" r="6" fill="#06b6d4"/>
-            <rect x="835" y="368" width="120" height="24" rx="4" fill="#164e63" stroke="#06b6d4" stroke-width="1"/>
-            <text x="843" y="384" fill="#ecfeff" font-size="11" font-weight="bold">A1A Carwash</text>
-          </g>
-
-          <!-- 5. Lavanderia & Superlab -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('superlab')">
-            <circle cx="690" cy="560" r="14" fill="#ef4444" fill-opacity="0.25" stroke="#ef4444" stroke-width="2"/>
-            <circle cx="690" cy="560" r="6" fill="#ef4444"/>
-            <rect x="705" y="548" width="175" height="24" rx="4" fill="#7f1d1d" stroke="#ef4444" stroke-width="1"/>
-            <text x="713" y="564" fill="#fef2f2" font-size="11" font-weight="bold">Lavander&iacute;a &amp; Superlab</text>
-          </g>
-
-          <!-- 6. To'hajiilee Cook Site -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('desert-cook')">
-            <circle cx="120" cy="90" r="14" fill="#f97316" fill-opacity="0.25" stroke="#f97316" stroke-width="2"/>
-            <circle cx="120" cy="90" r="6" fill="#f97316"/>
-            <rect x="135" y="78" width="170" height="24" rx="4" fill="#7c2d12" stroke="#f97316" stroke-width="1"/>
-            <text x="143" y="94" fill="#fff7ed" font-size="11" font-weight="bold">To'hajiilee (Crystal Ship)</text>
-          </g>
-
-          <!-- 7. Crossroads Motel -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('crossroads-motel')">
-            <circle cx="500" cy="390" r="12" fill="#a855f7" stroke="#a855f7" stroke-width="2"/>
-            <rect x="515" y="378" width="140" height="22" rx="4" fill="#581c87" stroke="#a855f7" stroke-width="1"/>
-            <text x="523" y="393" fill="#faf5ff" font-size="10" font-weight="bold">Crossroads Motel</text>
-          </g>
-
-          <!-- 8. Old Joe's Junkyard -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('old-joe')">
-            <circle cx="420" cy="570" r="12" fill="#78716c" stroke="#d6d3d1" stroke-width="2"/>
-            <rect x="435" y="558" width="145" height="22" rx="4" fill="#292524" stroke="#d6d3d1" stroke-width="1"/>
-            <text x="443" y="573" fill="#f5f5f4" font-size="10" font-weight="bold">Old Joe's Junkyard</text>
-          </g>
-
-          <!-- 9. Jesse Pinkman -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('jesse-house')">
-            <circle cx="340" cy="210" r="12" fill="#ec4899" stroke="#ec4899" stroke-width="2"/>
-            <rect x="355" y="198" width="145" height="22" rx="4" fill="#831843" stroke="#ec4899" stroke-width="1"/>
-            <text x="363" y="213" fill="#fdf2f8" font-size="10" font-weight="bold">Jesse Pinkman House</text>
-          </g>
-
-          <!-- 10. Hank & Marie -->
-          <g class="map-pin cursor-pointer" onclick="scrollToId('hank-house')">
-            <circle cx="870" cy="200" r="12" fill="#3b82f6" stroke="#3b82f6" stroke-width="2"/>
-            <rect x="885" y="188" width="150" height="22" rx="4" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1"/>
-            <text x="893" y="203" fill="#eff6ff" font-size="10" font-weight="bold">Hank &amp; Marie Foothill</text>
-          </g>
-        </svg>
-
-        <!-- Coordinate Legend Badge -->
-        <div class="absolute bottom-4 left-4 bg-gray-950/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-gray-700 text-xs font-mono-code text-gray-300 flex items-center space-x-4">
-          <div><span class="text-emerald-400 font-bold">GRID:</span> 1200 &times; 1200 METERS</div>
-          <div><span class="text-amber-400 font-bold">ORIGIN (0,0):</span> CENTRAL AVE CROSSING</div>
-          <div><span class="text-cyan-400 font-bold">SCALE:</span> 1 BLENDER UNIT = 1m</div>
-        </div>
-      </div>
+    <div class="mode-switch">
+      <button id="btn-top" class="mode-btn active" onclick="switchMode('top')">
+        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>
+        <span>Top View</span>
+      </button>
+      <button id="btn-ground" class="mode-btn" onclick="switchMode('ground')">
+        <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>
+        <span>Explore from Ground</span>
+      </button>
     </div>
-  </section>
+  </nav>
 
-  <!-- DETAILED LANDMARKS SECTION -->
-  <section id="landmarks" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-12">
-      <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-widest font-semibold">Iconic Locations &bull; 10 Key Sets</span>
-      <h2 class="text-4xl font-black text-white mt-1">BREAKING BAD 3D LOCATIONS</h2>
-      <p class="text-gray-400 text-sm mt-2 max-w-2xl">Every landmark is modeled down to show-accurate exterior/interior details, easter eggs, and pre-packaged with individual .blend and .glb files.</p>
-    </div>
+  <!-- Controls Hint -->
+  <div id="controls-hint">Drag: Rotate • Right-Click: Pan • Scroll: Zoom • Click Pin: Drop to Ground</div>
 
-    <!-- LANDMARK CARDS GRID -->
-    <div class="space-y-16">
+  <!-- Top View 3D Landmark Pins -->
+  <div id="markers-container"></div>
 
-      <!-- 1. WALTER WHITE HOUSE -->
-      <div id="walter-white" class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-7 relative group">
-          <img src="renders/render_02_walter_white_residence.png" alt="Walter White House with Pizza on Roof" class="w-full h-full object-cover min-h-[380px]">
-          <div class="absolute top-4 left-4 bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-            NEG-ARROYO-01
-          </div>
-        </div>
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono-code text-emerald-400 uppercase font-semibold">Residential Suburbs</span>
-              <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800 cursor-pointer hover:border-emerald-500 transition" onclick="copyCoord('(-150.0, 300.0, 0.0)')" title="Click to copy coordinates">X: -150, Y: 300, Z: 0</span>
-            </div>
-            <h3 class="text-2xl font-black text-white mt-2">308 Negra Arroyo Lane</h3>
-            <p class="text-xs text-amber-400 font-medium">Real Location: 3828 Piermont Dr NE, Albuquerque</p>
+  <!-- Ground Exploration Location Quick-Jump Bar -->
+  <div id="ground-bar">
+    <button class="ground-btn" onclick="teleportGround('walt')">🏡 Walt's House</button>
+    <button class="ground-btn" onclick="teleportGround('pollos')">🍗 Pollos Hermanos</button>
+    <button class="ground-btn" onclick="teleportGround('saul')">⚖️ Saul Goodman</button>
+    <button class="ground-btn" onclick="teleportGround('superlab')">🧺 Superlab</button>
+    <button class="ground-btn" onclick="teleportGround('carwash')">🧼 A1A Carwash</button>
+    <button class="ground-btn" onclick="teleportGround('desert')">🚐 Desert RV</button>
+    <button class="ground-btn" onclick="teleportGround('hank')">💎 Hank's House</button>
+    <button class="ground-btn" onclick="teleportGround('jesse')">🏡 Jesse's House</button>
+    <button class="ground-btn" onclick="teleportGround('downtown')">🏙️ Downtown</button>
+  </div>
 
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              Walter and Skyler White's iconic Southwest ranch house. Features attached two-car garage, pitched shingle roof, desert gravel xeriscape yard, and Walter's fern green Pontiac Aztek in the driveway.
-            </p>
-
-            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-              <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Key Easter Eggs &amp; Architecture:</h4>
-              <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                <li><span class="text-amber-400 font-semibold">The Pizza on the Roof:</span> Pepperoni pizza splattered on the front garage roof slope.</li>
-                <li><span class="text-emerald-400 font-semibold">Backyard Swimming Pool:</span> Inground pool with turquoise water and patio chairs.</li>
-                <li><span class="text-cyan-400 font-semibold">Pool Pump Shed:</span> Walt's money stash location behind the filter housing.</li>
-                <li><span class="text-gray-400 font-semibold">Fern Green Pontiac Aztek:</span> Parked on the driveway with roof rack and split grille.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-            <span class="text-xs font-mono-code text-gray-500">UCX_Walt_House_House</span>
-            <div class="flex space-x-2">
-              <a href="assets/landmarks/walter_white_house.glb" download class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white transition">Download .GLB</a>
-              <a href="assets/landmarks/walter_white_house.blend" download class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-xs font-mono-code text-black font-semibold transition">Source .BLEND</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 1B. WALT BACKYARD SHOWCASE -->
-      <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between order-2 lg:order-1">
-          <div>
-            <span class="text-xs font-mono-code text-cyan-400 uppercase font-semibold">Backyard Feature</span>
-            <h3 class="text-2xl font-black text-white mt-1">Walter's Pool &amp; Patio Deck</h3>
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              The setting of iconic scenes: the burning of the cash, the floating eye from Wayfarer 515, and the family cookouts. Modeled with translucent water shader, wooden patio trellis pergola, chaise lounge chairs, and perimeter cedar fence.
-            </p>
-            <div class="mt-4 p-3 rounded-lg bg-gray-900/80 border border-gray-800">
-              <div class="text-xs font-mono-code text-emerald-400">GAMEPLAY TRIGGER:</div>
-              <div class="text-xs text-gray-300 mt-1">Pool area volume configured for player relaxation, cutscenes, or searching the pump shed for hidden cash bundles.</div>
-            </div>
-          </div>
-          <div class="mt-4 text-xs font-mono-code text-gray-400">Resolution: 960 &times; 540 &bull; Cycles 24 Samples</div>
-        </div>
-        <div class="lg:col-span-7 order-1 lg:order-2">
-          <img src="renders/render_03_walter_white_backyard_pool.png" alt="Walter White Backyard Pool and Pergola" class="w-full h-full object-cover min-h-[340px]">
-        </div>
-      </div>
-
-      <!-- 2. LOS POLLOS HERMANOS -->
-      <div id="pollos-hermanos" class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-7 relative group">
-          <img src="renders/render_04_los_pollos_hermanos.png" alt="Los Pollos Hermanos Restaurant" class="w-full h-full object-cover min-h-[380px]">
-          <div class="absolute top-4 left-4 bg-amber-950/90 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-            POLLOS-HQ-02
-          </div>
-        </div>
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono-code text-amber-400 uppercase font-semibold">Route 66 Commercial</span>
-              <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800 cursor-pointer hover:border-amber-500 transition" onclick="copyCoord('(140.0, 40.0, 0.0)')">X: 140, Y: 40, Z: 0</span>
-            </div>
-            <h3 class="text-2xl font-black text-white mt-2">Los Pollos Hermanos</h3>
-            <p class="text-xs text-amber-400 font-medium">Real Location: 4257 Isleta Blvd SW (Twisters), Albuquerque</p>
-
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              Gustavo Fring's flagship fried chicken franchise restaurant and front operation. Adobe stucco architecture with signature yellow/red horizontal bands, glass storefront, drive-thru lane, and commercial asphalt lot.
-            </p>
-
-            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-              <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Key Easter Eggs &amp; Architecture:</h4>
-              <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                <li><span class="text-amber-400 font-semibold">13m Chicken Sign Tower:</span> Circular double-sided Pollos rooster emblem logo.</li>
-                <li><span class="text-cyan-400 font-semibold">Gus's Blue Volvo 240:</span> Parked in the reserved manager's stall.</li>
-                <li><span class="text-emerald-400 font-semibold">Drive-Thru Lane:</span> Fully modeled canopy, ordering intercom speaker, and menu display.</li>
-                <li><span class="text-gray-400 font-semibold">Dining Interior:</span> Counter registers, stainless fryers, and red/yellow booths.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-            <span class="text-xs font-mono-code text-gray-500">UCX_Los_Pollos_Building</span>
-            <div class="flex space-x-2">
-              <a href="assets/landmarks/los_pollos_hermanos.glb" download class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white transition">Download .GLB</a>
-              <a href="assets/landmarks/los_pollos_hermanos.blend" download class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-400 text-xs font-mono-code text-black font-semibold transition">Source .BLEND</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. SAUL GOODMAN OFFICE -->
-      <div id="saul-goodman" class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-7 relative group">
-          <img src="renders/render_05_saul_goodman_office.png" alt="Saul Goodman Office and Inflatable Statue of Liberty" class="w-full h-full object-cover min-h-[380px]">
-          <div class="absolute top-4 left-4 bg-yellow-950/90 border border-yellow-500/40 text-yellow-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-            SAUL-LWYRUP-03
-          </div>
-        </div>
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono-code text-yellow-400 uppercase font-semibold">Strip Mall Plaza</span>
-              <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800 cursor-pointer hover:border-yellow-500 transition" onclick="copyCoord('(-60.0, 40.0, 0.0)')">X: -60, Y: 40, Z: 0</span>
-            </div>
-            <h3 class="text-2xl font-black text-white mt-2">Saul Goodman &amp; Associates</h3>
-            <p class="text-xs text-amber-400 font-medium">Real Location: Montgomery Blvd Strip Mall, Albuquerque</p>
-
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              "Better Call Saul!" Headquarters in an American strip mall corner. Neoclassical white Doric columns support the pediment, crowned by the famous towering inflatable Statue of Liberty on the roof.
-            </p>
-
-            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-              <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Key Easter Eggs &amp; Architecture:</h4>
-              <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                <li><span class="text-emerald-400 font-semibold">8m Inflatable Statue of Liberty:</span> Patina green robe, spiked crown, raised torch.</li>
-                <li><span class="text-yellow-400 font-semibold">Saul's White Cadillac DeVille:</span> Parked in front with "LWYRUP" license plates.</li>
-                <li><span class="text-red-400 font-semibold">Highway Billboard:</span> "In Trouble? Better Call Saul! (505) 503-4455" billboard.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-            <span class="text-xs font-mono-code text-gray-500">UCX_Saul_Office_Mall</span>
-            <div class="flex space-x-2">
-              <a href="assets/landmarks/saul_goodman_office.glb" download class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white transition">Download .GLB</a>
-              <a href="assets/landmarks/saul_goodman_office.blend" download class="px-3 py-1.5 rounded bg-yellow-500 hover:bg-yellow-400 text-xs font-mono-code text-black font-semibold transition">Source .BLEND</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. A1A CARWASH -->
-      <div id="a1a-carwash" class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-7 relative group">
-          <img src="renders/render_06_a1a_carwash.png" alt="A1A Carwash Conveyor and Vacuum Canopy" class="w-full h-full object-cover min-h-[380px]">
-          <div class="absolute top-4 left-4 bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-            A1A-WASH-04
-          </div>
-        </div>
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono-code text-cyan-400 uppercase font-semibold">Commercial Corridor</span>
-              <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800 cursor-pointer hover:border-cyan-500 transition" onclick="copyCoord('(220.0, -40.0, 0.0)')">X: 220, Y: -40, Z: 0</span>
-            </div>
-            <h3 class="text-2xl font-black text-white mt-2">A1A Carwash</h3>
-            <p class="text-xs text-amber-400 font-medium">Real Location: 9516 Snow Heights Cir NE (Octopus), Albuquerque</p>
-
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              "Have an A-1 Day!" Walter and Skyler White's laundering enterprise. Features a 30m conveyor wash tunnel, spinning vertical/horizontal foam rollers, customer cashier office, and 6-bay vacuum canopy structure.
-            </p>
-
-            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-              <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Key Easter Eggs &amp; Architecture:</h4>
-              <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                <li><span class="text-cyan-400 font-semibold">Conveyor Wash Tunnel:</span> Guide rails and high-speed spinning foam brushes.</li>
-                <li><span class="text-yellow-400 font-semibold">Walt's Framed First Dollar:</span> Mounted on the cashier lobby wall.</li>
-                <li><span class="text-blue-400 font-semibold">6-Bay Vacuum Canopy:</span> Hanging corrugated suction tubes and air pump posts.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-            <span class="text-xs font-mono-code text-gray-500">UCX_A1A_Tunnel</span>
-            <div class="flex space-x-2">
-              <a href="assets/landmarks/a1a_carwash.glb" download class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white transition">Download .GLB</a>
-              <a href="assets/landmarks/a1a_carwash.blend" download class="px-3 py-1.5 rounded bg-cyan-500 hover:bg-cyan-400 text-xs font-mono-code text-black font-semibold transition">Source .BLEND</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. UNDERGROUND SUPERLAB -->
-      <div id="superlab" class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-7 relative group">
-          <img src="renders/render_07_underground_superlab.png" alt="Underground Secret Superlab" class="w-full h-full object-cover min-h-[380px]">
-          <div class="absolute top-4 left-4 bg-red-950/90 border border-red-500/40 text-red-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-            SUPERLAB-SUB-05
-          </div>
-        </div>
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono-code text-red-400 uppercase font-semibold">Industrial District (Subterranean)</span>
-              <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800 cursor-pointer hover:border-red-500 transition" onclick="copyCoord('(90.0, -260.0, -7.5)')">X: 90, Y: -260, Z: -7.5</span>
-            </div>
-            <h3 class="text-2xl font-black text-white mt-2">Lavander&iacute;a Brillante &amp; Superlab</h3>
-            <p class="text-xs text-amber-400 font-medium">Real Location: 1617 Candelaria Rd NE, Albuquerque</p>
-
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              Gustavo Fring's multi-million dollar subterranean meth superlab hidden beneath a commercial laundry facility. Modeled with high-gloss red epoxy floors, twin 4.5m stainless steel distillation reaction vats, and yellow steel catwalks.
-            </p>
-
-            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-              <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Key Easter Eggs &amp; Architecture:</h4>
-              <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                <li><span class="text-blue-400 font-semibold">Golden Moth Methylamine Drums:</span> Blue 55-gallon barrels with bee logo.</li>
-                <li><span class="text-red-400 font-semibold">Twin Distillation Vats:</span> Stainless steel tanks with pressure valves and agitator heads.</li>
-                <li><span class="text-yellow-400 font-semibold">Industrial Catwalk:</span> Mezzanine walkway overlooking the entire laboratory floor.</li>
-                <li><span class="text-cyan-400 font-semibold">Blue Crystal Meth Trays:</span> Stainless cooling trays with crystal meth shards.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-            <span class="text-xs font-mono-code text-gray-500">UCX_Lavanderia_Laundry</span>
-            <div class="flex space-x-2">
-              <a href="assets/landmarks/lavanderia_superlab.glb" download class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white transition">Download .GLB</a>
-              <a href="assets/landmarks/lavanderia_superlab.blend" download class="px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-xs font-mono-code text-white font-semibold transition">Source .BLEND</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 6. DESERT COOK SITE -->
-      <div id="desert-cook" class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <div class="lg:col-span-7 relative group">
-          <img src="renders/render_08_desert_rv_cook_site.png" alt="To'hajiilee Desert Mesa Cook Site with Fleetwood Bounder RV" class="w-full h-full object-cover min-h-[380px]">
-          <div class="absolute top-4 left-4 bg-orange-950/90 border border-orange-500/40 text-orange-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-            TOHAJIILEE-RV-06
-          </div>
-        </div>
-        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-mono-code text-orange-400 uppercase font-semibold">Northwest Desert Outskirts</span>
-              <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800 cursor-pointer hover:border-orange-500 transition" onclick="copyCoord('(-420.0, 420.0, 3.1)')">X: -420, Y: 420, Z: 3.1</span>
-            </div>
-            <h3 class="text-2xl font-black text-white mt-2">To'hajiilee Cook Site</h3>
-            <p class="text-xs text-amber-400 font-medium">Real Location: Navajo Nation Reservation, New Mexico</p>
-
-            <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-              The sacred pilot episode site and finale climax location. An elevated sandstone mesa surrounded by desert boulders and saguaro cacti, housing the legendary 1986 Fleetwood Bounder RV ("The Crystal Ship").
-            </p>
-
-            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-              <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Key Easter Eggs &amp; Architecture:</h4>
-              <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                <li><span class="text-orange-400 font-semibold">The Crystal Ship RV:</span> Cream body, orange/brown stripes, 5 duct-taped bullet holes.</li>
-                <li><span class="text-yellow-400 font-semibold">Portable Generator:</span> Gas generator powering the mobile distillation setup.</li>
-                <li><span class="text-emerald-400 font-semibold">Folding Lawn Chairs:</span> Walt and Jesse's desert chairs under camo tarp canopy.</li>
-                <li><span class="text-cyan-400 font-semibold">Chemistry Glassware:</span> Boiling flask on wooden crate burner stand.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-            <span class="text-xs font-mono-code text-gray-500">UCX_Desert_Cook_Mesa</span>
-            <div class="flex space-x-2">
-              <a href="assets/landmarks/desert_rv_cook_site.glb" download class="px-3 py-1.5 rounded bg-gray-800 hover:bg-gray-700 text-xs font-mono-code text-white transition">Download .GLB</a>
-              <a href="assets/landmarks/desert_rv_cook_site.blend" download class="px-3 py-1.5 rounded bg-orange-500 hover:bg-orange-400 text-xs font-mono-code text-black font-semibold transition">Source .BLEND</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- DETAILED WALKABLE INTERIORS SHOWCASE -->
-  <section id="interiors" class="py-16 border-t border-gray-800 bg-[#0d1017]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mb-12">
-        <span class="text-xs font-mono-code text-amber-400 uppercase tracking-widest font-semibold">Special Locations &bull; Fully Furnished &amp; Walkable</span>
-        <h2 class="text-4xl font-black text-white mt-1">INTERIOR ARCHITECTURE &amp; SET DESIGN</h2>
-        <p class="text-gray-400 text-sm mt-2 max-w-2xl">Every iconic Breaking Bad location is modeled from the inside out with hollow architecture, dedicated room illumination, furniture, props, and show-accurate easter eggs.</p>
-      </div>
-
-      <div class="space-y-12">
-        <!-- Walter White House Interior -->
-        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-          <div class="lg:col-span-7 relative group">
-            <img src="renders/render_11_walter_white_interior.png" alt="Walter White Furnished Interior" class="w-full h-full object-cover min-h-[380px]">
-            <div class="absolute top-4 left-4 bg-emerald-950/90 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-              308 NEGRA ARROYO &bull; INTERIOR
-            </div>
-          </div>
-          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-mono-code text-emerald-400 uppercase font-semibold">Living Room &amp; Crawl Space</span>
-                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: -150.5, Y: 298, Z: 1.2</span>
-              </div>
-              <h3 class="text-2xl font-black text-white mt-2">Walter White's Residence</h3>
-              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-                Step inside the iconic Albuquerque home. Fully realized floorplan with hardwood floors, beige carpets, kitchen tiles, and dedicated point light illumination.
-              </p>
-              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
-                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                  <li><span class="text-amber-400 font-semibold">Leaves of Grass:</span> Walt Whitman's book on the coffee table ("To W.W., from G.B.").</li>
-                  <li><span class="text-emerald-400 font-semibold">Crawl Space Cash:</span> Water heater closet with secret trapdoor down to stacked bricks of cash!</li>
-                  <li><span class="text-cyan-400 font-semibold">Living Room &amp; CRT TV:</span> Tan fabric sofa, Walt's armchair, and retro CRT television.</li>
-                  <li><span class="text-gray-400 font-semibold">Walter Jr.'s Bedroom:</span> Wooden desk, bed, and aluminum walking crutches.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
-              <a href="drive.html" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Saul Goodman Office Interior -->
-        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between order-2 lg:order-1">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-mono-code text-yellow-400 uppercase font-semibold">Executive Law Suite</span>
-                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: -60, Y: 53, Z: 1.2</span>
-              </div>
-              <h3 class="text-2xl font-black text-white mt-2">Saul Goodman &amp; Associates</h3>
-              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-                Francesca's waiting room leads into Saul's grand private office featuring Neoclassical Greek Doric pillars and the full-wall US Constitution wallpaper.
-              </p>
-              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
-                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                  <li><span class="text-yellow-400 font-semibold">US Constitution Wallpaper:</span> 18m full-wall graphic ("We The People") behind Saul's desk.</li>
-                  <li><span class="text-amber-400 font-semibold">Golden Scales of Justice:</span> Brass scales on the polished mahogany executive desk.</li>
-                  <li><span class="text-emerald-400 font-semibold">Duffel Bag of Cash:</span> Canvas duffel bag packed with currency bundles on the carpet.</li>
-                  <li><span class="text-cyan-400 font-semibold">Burner Phones &amp; Law Degree:</span> Desk phone tray and framed University of American Samoa diploma.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
-              <a href="drive.html" class="px-3 py-1.5 rounded bg-yellow-500 hover:bg-yellow-400 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
-            </div>
-          </div>
-          <div class="lg:col-span-7 relative group order-1 lg:order-2">
-            <img src="renders/render_12_saul_goodman_interior.png" alt="Saul Goodman Interior with Constitution Wallpaper" class="w-full h-full object-cover min-h-[380px]">
-            <div class="absolute top-4 left-4 bg-yellow-950/90 border border-yellow-500/40 text-yellow-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-              SAUL GOODMAN &bull; CONSTITUTION SUITE
-            </div>
-          </div>
-        </div>
-
-        <!-- Los Pollos Hermanos Interior -->
-        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-          <div class="lg:col-span-7 relative group">
-            <img src="renders/render_13_los_pollos_hermanos_interior.png" alt="Los Pollos Hermanos Interior Dining and Kitchen" class="w-full h-full object-cover min-h-[380px]">
-            <div class="absolute top-4 left-4 bg-amber-950/90 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-              LOS POLLOS HERMANOS &bull; DINING &amp; KITCHEN
-            </div>
-          </div>
-          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-mono-code text-amber-400 uppercase font-semibold">Dining &amp; Commercial Kitchen</span>
-                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: 140, Y: 38, Z: 1.2</span>
-              </div>
-              <h3 class="text-2xl font-black text-white mt-2">Los Pollos Hermanos</h3>
-              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-                Step through the double glass doors into the pristine fast-food restaurant where Gus Fring watches every detail through overhead surveillance.
-              </p>
-              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
-                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                  <li><span class="text-amber-400 font-semibold">6 Customer Dining Booths:</span> Show-accurate yellow padded benches and red laminate tables.</li>
-                  <li><span class="text-yellow-400 font-semibold">Illuminated Menu &amp; POS:</span> Hanging overhead illuminated menu board and 3 touchscreen registers.</li>
-                  <li><span class="text-cyan-400 font-semibold">Commercial Deep Fryers:</span> Stainless steel chicken fryers, baskets, and exhaust hood.</li>
-                  <li><span class="text-emerald-400 font-semibold">Gus's Back Office:</span> Executive desk, digital wall safe, and desktop monitor with 4 CCTV feeds!</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
-              <a href="drive.html" class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-400 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Superlab Interior -->
-        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between order-2 lg:order-1">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-mono-code text-cyan-400 uppercase font-semibold">Subterranean Industrial Vault</span>
-                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: 90, Y: -260, Z: -6.5</span>
-              </div>
-              <h3 class="text-2xl font-black text-white mt-2">Underground Secret Superlab</h3>
-              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-                Hidden beneath Lavandería Brillante behind sliding industrial Washer #3. A multimillion-dollar subterranean methamphetamine manufacturing laboratory.
-              </p>
-              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
-                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                  <li><span class="text-cyan-400 font-semibold">Giant Reaction Tanks:</span> Dual 3.8m stainless steel chemical reactors with agitator motors.</li>
-                  <li><span class="text-yellow-400 font-semibold">Yellow Steel Catwalk:</span> 22m overhead catwalk with safety railings spanning the lab ceiling.</li>
-                  <li><span class="text-blue-400 font-semibold">Methylamine Barrels:</span> Stacks of 55-gallon drums with the iconic golden bee logo.</li>
-                  <li><span class="text-emerald-400 font-semibold">Blue Crystal Trays:</span> Stainless workbenches with trays of pure 99.1% blue methamphetamine crystals.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-              <span class="text-xs font-mono-code text-gray-500">Walkable Subterranean Vault</span>
-              <a href="drive.html" class="px-3 py-1.5 rounded bg-cyan-500 hover:bg-cyan-400 text-xs font-mono-code text-black font-semibold transition">Teleport Inside &rarr;</a>
-            </div>
-          </div>
-          <div class="lg:col-span-7 relative group order-1 lg:order-2">
-            <img src="renders/render_14_superlab_interior.png" alt="Underground Secret Superlab Interior" class="w-full h-full object-cover min-h-[380px]">
-            <div class="absolute top-4 left-4 bg-cyan-950/90 border border-cyan-500/40 text-cyan-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-              SUPERLAB &bull; SUBTERRANEAN VAULT
-            </div>
-          </div>
-        </div>
-
-        <!-- Hank & Marie Schrader House Interior -->
-        <div class="bg-[#121622] rounded-2xl border border-gray-800 overflow-hidden shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-0">
-          <div class="lg:col-span-7 relative group">
-            <img src="renders/render_15_hank_marie_interior.png" alt="Hank and Marie House Interior" class="w-full h-full object-cover min-h-[380px]">
-            <div class="absolute top-4 left-4 bg-purple-950/90 border border-purple-500/40 text-purple-300 px-3 py-1 rounded-md text-xs font-mono-code font-bold">
-              4901 CUMBRE DEL SUR &bull; MARIE'S PURPLE PALACE
-            </div>
-          </div>
-          <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-mono-code text-purple-400 uppercase font-semibold">Foothills &bull; Purple Palace &amp; Brewery</span>
-                <span class="text-xs font-mono-code text-gray-400 bg-gray-900 px-2 py-0.5 rounded border border-gray-800">X: 266.5, Y: 261, Z: 1.2</span>
-              </div>
-              <h3 class="text-2xl font-black text-white mt-2">Hank &amp; Marie Schrader's House</h3>
-              <p class="text-sm text-gray-300 mt-4 leading-relaxed">
-                Nestled in the Sandia foothills. Features Marie's signature royal purple carpet living room and Hank's attached garage microbrewery.
-              </p>
-              <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
-                <h4 class="text-xs font-mono-code text-gray-400 uppercase font-semibold">Furnished Interior Details:</h4>
-                <ul class="text-xs text-gray-300 space-y-1.5 list-disc list-inside">
-                  <li><span class="text-purple-400 font-semibold">Marie's Purple Palace:</span> Wall-to-wall royal purple carpet, purple couch, and purple ceramic decor.</li>
-                  <li><span class="text-yellow-400 font-semibold">"They're Minerals, Marie!":</span> Oak display cabinet with glowing amethyst, pyrite, and fluorite specimens.</li>
-                  <li><span class="text-amber-400 font-semibold">Schraderbr&auml;u Garage Brewery:</span> Workbench with bottle capper, carboys, and crates of Schraderbr&auml;u lager.</li>
-                  <li><span class="text-blue-400 font-semibold">Hank's Jeep Commander 4x4:</span> Dark blue muscular DEA SUV parked on the paved driveway.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
-              <span class="text-xs font-mono-code text-gray-500">Walkable Interior Volume</span>
-              <a href="drive.html" class="px-3 py-1.5 rounded bg-purple-600 hover:bg-purple-500 text-xs font-mono-code text-white font-semibold transition">Teleport Inside &rarr;</a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- VEHICLES SECTION -->
-  <section id="vehicles" class="py-16 border-t border-gray-800 bg-[#0e111a]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mb-12">
-        <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-widest font-semibold">Drivable Game Assets</span>
-        <h2 class="text-3xl font-black text-white mt-1">ICONIC SHOW VEHICLES</h2>
-        <p class="text-gray-400 text-sm mt-2 max-w-xl">Every vehicle is modeled with separated wheel components and pivot points for immediate physics rigging in Unity, Unreal Engine 5, or Godot.</p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Fleetwood Bounder RV -->
-        <div class="bg-[#141824] p-5 rounded-xl border border-gray-800 hover:border-amber-500/50 transition">
-          <div class="text-amber-400 font-mono-code text-xs font-bold uppercase">1986 Motorhome</div>
-          <h3 class="text-lg font-bold text-white mt-1">The Crystal Ship RV</h3>
-          <p class="text-xs text-gray-400 mt-2">Fleetwood Bounder with cream paint, dual rear axles, orange racing stripes, and bullet hole patches.</p>
-          <div class="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center text-xs font-mono-code">
-            <span class="text-gray-500">108 KB</span>
-            <a href="assets/vehicles/fleetwood_bounder_rv.glb" download class="text-emerald-400 hover:underline">Get .GLB &rarr;</a>
-          </div>
-        </div>
-
-        <!-- Pontiac Aztek -->
-        <div class="bg-[#141824] p-5 rounded-xl border border-gray-800 hover:border-emerald-500/50 transition">
-          <div class="text-emerald-400 font-mono-code text-xs font-bold uppercase">2004 Crossover</div>
-          <h3 class="text-lg font-bold text-white mt-1">Walter's Pontiac Aztek</h3>
-          <p class="text-xs text-gray-400 mt-2">Fern green paint, dark lower cladding, split front grille, and sloped hatchback glass.</p>
-          <div class="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center text-xs font-mono-code">
-            <span class="text-gray-500">48 KB</span>
-            <a href="assets/vehicles/pontiac_aztek.glb" download class="text-emerald-400 hover:underline">Get .GLB &rarr;</a>
-          </div>
-        </div>
-
-        <!-- Cadillac DeVille -->
-        <div class="bg-[#141824] p-5 rounded-xl border border-gray-800 hover:border-yellow-500/50 transition">
-          <div class="text-yellow-400 font-mono-code text-xs font-bold uppercase">1997 Luxury Sedan</div>
-          <h3 class="text-lg font-bold text-white mt-1">Saul's Cadillac DeVille</h3>
-          <p class="text-xs text-gray-400 mt-2">White luxury body with chrome grille, chrome bumpers, and "LWYRUP" license plate badges.</p>
-          <div class="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center text-xs font-mono-code">
-            <span class="text-gray-500">44 KB</span>
-            <a href="assets/vehicles/cadillac_deville.glb" download class="text-emerald-400 hover:underline">Get .GLB &rarr;</a>
-          </div>
-        </div>
-
-        <!-- Gus's Volvo Wagon -->
-        <div class="bg-[#141824] p-5 rounded-xl border border-gray-800 hover:border-blue-500/50 transition">
-          <div class="text-blue-400 font-mono-code text-xs font-bold uppercase">1998 Station Wagon</div>
-          <h3 class="text-lg font-bold text-white mt-1">Gus's Volvo Wagon</h3>
-          <p class="text-xs text-gray-400 mt-2">Navy blue boxy estate wagon with roof rails and discrete understated Los Pollos manager profile.</p>
-          <div class="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center text-xs font-mono-code">
-            <span class="text-gray-500">35 KB</span>
-            <a href="assets/vehicles/gus_volvo_wagon.glb" download class="text-emerald-400 hover:underline">Get .GLB &rarr;</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GAME ENGINE INTEGRATION SECTION -->
-  <section id="game-engine" class="py-16 border-t border-gray-800 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-12">
-      <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-widest font-semibold">Engine Pipeline</span>
-      <h2 class="text-3xl font-black text-white mt-1">IMPORT &amp; COLLISION WORKFLOW</h2>
-      <p class="text-gray-400 text-sm mt-2 max-w-2xl">Step-by-step instructions for importing the 3D city into Unreal Engine 5, Unity, and Godot 4.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- UE5 -->
-      <div class="bg-[#121622] p-6 rounded-xl border border-gray-800">
-        <div class="flex items-center space-x-2 text-cyan-400 font-mono-code text-xs font-bold mb-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-          <span>UNREAL ENGINE 5</span>
-        </div>
-        <h3 class="text-lg font-bold text-white mb-2">Nanite &amp; Lumen Ready</h3>
-        <ol class="text-xs text-gray-300 space-y-2 list-decimal list-inside font-light">
-          <li>Drag <code class="text-emerald-400">breaking_bad_albuquerque_master.glb</code> into Content Browser.</li>
-          <li>Set <code class="text-amber-400">Import Uniform Scale = 1.0</code>.</li>
-          <li>Ensure <code class="text-cyan-400">One Convex Hull Per UCX</code> is checked for auto-collision.</li>
-          <li>Right-click meshes &rarr; Enable <strong>Nanite</strong> for high-performance mesh streaming.</li>
-        </ol>
-      </div>
-
-      <!-- Unity -->
-      <div class="bg-[#121622] p-6 rounded-xl border border-gray-800">
-        <div class="flex items-center space-x-2 text-emerald-400 font-mono-code text-xs font-bold mb-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-          <span>UNITY (URP / HDRP)</span>
-        </div>
-        <h3 class="text-lg font-bold text-white mb-2">Physics &amp; Lighting</h3>
-        <ol class="text-xs text-gray-300 space-y-2 list-decimal list-inside font-light">
-          <li>Import folder into <code class="text-emerald-400">Assets/BreakingBad/</code>.</li>
-          <li>Set Model tab <code class="text-amber-400">Convert Units = True</code>.</li>
-          <li>Use <code class="text-cyan-400">UCX_</code> child meshes as MeshCollider hulls.</li>
-          <li>Add <code class="text-emerald-400">WheelCollider</code> to vehicle wheel nodes for driving mechanics.</li>
-        </ol>
-      </div>
-
-      <!-- Godot 4 -->
-      <div class="bg-[#121622] p-6 rounded-xl border border-gray-800">
-        <div class="flex items-center space-x-2 text-blue-400 font-mono-code text-xs font-bold mb-3">
-          <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
-          <span>GODOT 4.X</span>
-        </div>
-        <h3 class="text-lg font-bold text-white mb-2">Native GLTF 2.0</h3>
-        <ol class="text-xs text-gray-300 space-y-2 list-decimal list-inside font-light">
-          <li>Copy <code class="text-emerald-400">breaking_bad_albuquerque_master.glb</code> into Godot project.</li>
-          <li>Double-click to inspect nodes and material bindings.</li>
-          <li>Instantiate as <code class="text-amber-400">Node3D</code> in your level scene.</li>
-          <li>Lightweight 3.5MB footprint runs smoothly on Vulkan and Web export.</li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <!-- DOWNLOADS SECTION -->
-  <section id="downloads" class="py-16 border-t border-gray-800 bg-[#0e111a]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
-        <div>
-          <span class="text-xs font-mono-code text-emerald-400 uppercase tracking-widest font-semibold">Download Center</span>
-          <h2 class="text-3xl font-black text-white mt-1">GAME ASSET PACKAGES</h2>
-        </div>
-        <p class="text-xs font-mono-code text-gray-400 mt-2 sm:mt-0">Location: /home/ubuntu/BB/</p>
-      </div>
-
-      <div class="overflow-x-auto bg-[#131722] rounded-xl border border-gray-800">
-        <table class="w-full text-left text-xs font-mono-code">
-          <thead class="bg-gray-900/80 text-gray-400 border-b border-gray-800">
-            <tr>
-              <th class="p-4">Package Name</th>
-              <th class="p-4">Format</th>
-              <th class="p-4">File Size</th>
-              <th class="p-4">Description</th>
-              <th class="p-4 text-right">Download</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-800/60 text-gray-300">
-            <tr class="hover:bg-gray-800/30 transition">
-              <td class="p-4 font-bold text-white">breaking_bad_albuquerque_master.glb</td>
-              <td class="p-4"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">GLB</span></td>
-              <td class="p-4 text-emerald-400">3.5 MB</td>
-              <td class="p-4 text-gray-400">Complete master city, roads, Sandia mountains &amp; all 10 landmarks</td>
-              <td class="p-4 text-right"><a href="game_export/breaking_bad_albuquerque_master.glb" download class="text-emerald-400 hover:text-emerald-300 underline font-semibold">Download</a></td>
-            </tr>
-            <tr class="hover:bg-gray-800/30 transition">
-              <td class="p-4 font-bold text-white">breaking_bad_albuquerque_master.blend</td>
-              <td class="p-4"><span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">BLEND</span></td>
-              <td class="p-4 text-amber-400">12 MB</td>
-              <td class="p-4 text-gray-400">Native Blender 4.0 master file with collections, shaders &amp; lights</td>
-              <td class="p-4 text-right"><a href="world/breaking_bad_albuquerque_master.blend" download class="text-amber-400 hover:text-amber-300 underline font-semibold">Download</a></td>
-            </tr>
-            <tr class="hover:bg-gray-800/30 transition">
-              <td class="p-4 font-bold text-white">assets/landmarks/*.glb</td>
-              <td class="p-4"><span class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">PACK</span></td>
-              <td class="p-4 text-cyan-400">10 Files</td>
-              <td class="p-4 text-gray-400">Individual landmark models (Walt, Pollos, Saul, A1A, Superlab, etc.)</td>
-              <td class="p-4 text-right"><a href="assets/landmarks/" class="text-cyan-400 hover:text-cyan-300 underline font-semibold">Browse</a></td>
-            </tr>
-            <tr class="hover:bg-gray-800/30 transition">
-              <td class="p-4 font-bold text-white">assets/vehicles/*.glb</td>
-              <td class="p-4"><span class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">PACK</span></td>
-              <td class="p-4 text-purple-400">4 Files</td>
-              <td class="p-4 text-gray-400">Vehicles: Bounder RV, Pontiac Aztek, Cadillac DeVille, Gus's Volvo</td>
-              <td class="p-4 text-right"><a href="assets/vehicles/" class="text-purple-400 hover:text-purple-300 underline font-semibold">Browse</a></td>
-            </tr>
-            <tr class="hover:bg-gray-800/30 transition">
-              <td class="p-4 font-bold text-white">renders/*.png</td>
-              <td class="p-4"><span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">PNG</span></td>
-              <td class="p-4 text-blue-400">8 Files (6.1MB)</td>
-              <td class="p-4 text-gray-400">Cycles cinematic beauty renders from multiple camera angles</td>
-              <td class="p-4 text-right"><a href="renders/" class="text-blue-400 hover:text-blue-300 underline font-semibold">Browse</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="py-12 border-t border-gray-800 bg-[#090b10] text-center text-xs text-gray-500 font-mono-code">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between">
-      <div class="flex items-center space-x-2">
-        <span class="text-emerald-400 font-bold">BREAKING BAD 3D CITY</span>
-        <span>&bull;</span>
-        <span>ALBUQUERQUE, NM</span>
-      </div>
-      <div class="mt-4 sm:mt-0 text-gray-400">
-        Built with Blender 4.0.2 for Open World Game Development &bull; <a href="#overview" class="text-emerald-400 hover:underline">Back to top &uarr;</a>
-      </div>
-    </div>
-  </footer>
+  <!-- D-Pad for Touch / Mobile Walk -->
+  <div id="dpad">
+    <div></div>
+    <div class="dpad-btn" onmousedown="keys.forward=true" onmouseup="keys.forward=false" ontouchstart="keys.forward=true" ontouchend="keys.forward=false">▲</div>
+    <div></div>
+    <div class="dpad-btn" onmousedown="keys.left=true" onmouseup="keys.left=false" ontouchstart="keys.left=true" ontouchend="keys.left=false">◀</div>
+    <div class="dpad-btn" onmousedown="keys.shift=true" onmouseup="keys.shift=false" ontouchstart="keys.shift=true" ontouchend="keys.shift=false" style="font-size: 11px;">RUN</div>
+    <div class="dpad-btn" onmousedown="keys.right=true" onmouseup="keys.right=false" ontouchstart="keys.right=true" ontouchend="keys.right=false">▶</div>
+    <div></div>
+    <div class="dpad-btn" onmousedown="keys.backward=true" onmouseup="keys.backward=false" ontouchstart="keys.backward=true" ontouchend="keys.backward=false">▼</div>
+    <div></div>
+  </div>
 
   <script>
-    function scrollToId(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ring-2', 'ring-emerald-400', 'transition-all');
-        setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-400'), 2000);
+    // --- APP STATE ---
+    let currentMode = 'top'; // 'top' or 'ground'
+    let isTransitioning = false;
+    let transitionStart = 0;
+    let transitionDuration = 1200;
+    let camStartPos = new THREE.Vector3();
+    let camEndPos = new THREE.Vector3();
+    let camStartLook = new THREE.Vector3();
+    let camEndLook = new THREE.Vector3();
+    let currentLookTarget = new THREE.Vector3(0, 0, 0);
+
+    // Three.js Core
+    let scene, camera, renderer, clock, orbitControls;
+    let cityModel = null;
+
+    // Ground Walk Navigation State
+    let groundPos = new THREE.Vector3(-150, 1.8, -282); // Eye level outside Walter's house
+    let groundYaw = 0;   // Radians horizontal angle
+    let groundPitch = 0; // Radians vertical tilt
+    let groundTargetYaw = 0;
+    let groundTargetPitch = 0;
+    let walkSpeed = 16;  // m/s
+    let sprintSpeed = 38;// m/s with Shift
+    const keys = { forward: false, backward: false, left: false, right: false, shift: false };
+    let isMouseDown = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    // Top View Landmark Locations (in Three.js Y-Up coordinate space)
+    const LANDMARKS = [
+      { id: 'walt', name: "Walt's House", x: -150, y: 0, z: -300, groundX: -150, groundZ: -282, groundYaw: 0, groundY: 1.8 },
+      { id: 'pollos', name: "Los Pollos Hermanos", x: 140, y: 0, z: -40, groundX: 140, groundZ: -20, groundYaw: 0, groundY: 1.8 },
+      { id: 'saul', name: "Saul Goodman", x: -60, y: 0, z: -40, groundX: -60, groundZ: -20, groundYaw: 0, groundY: 1.8 },
+      { id: 'superlab', name: "Superlab Laundry", x: 90, y: 0, z: 220, groundX: 90, groundZ: 200, groundYaw: Math.PI, groundY: 1.8 },
+      { id: 'carwash', name: "A1A Carwash", x: 220, y: 0, z: 40, groundX: 220, groundZ: 20, groundYaw: Math.PI, groundY: 1.8 },
+      { id: 'desert', name: "To'hajiilee RV", x: -420, y: 3.5, z: -380, groundX: -410, groundZ: -365, groundYaw: 0.4, groundY: 4.8 },
+      { id: 'hank', name: "Hank's House", x: 270, y: 0, z: -260, groundX: 270, groundZ: -242, groundYaw: 0, groundY: 1.8 },
+      { id: 'jesse', name: "Jesse's House", x: -260, y: 0, z: -220, groundX: -260, groundZ: -205, groundYaw: 0, groundY: 1.8 },
+      { id: 'downtown', name: "Route 66 Plaza", x: -250, y: 0, z: 40, groundX: -250, groundZ: 25, groundYaw: Math.PI, groundY: 1.8 }
+    ];
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+      clock = new THREE.Clock();
+
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x8eb4d6);
+      scene.fog = new THREE.FogExp2(0xccaf8a, 0.0015);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.2, 3500);
+      
+      // Initial Top View Camera Setup
+      camera.position.set(0, 560, 420);
+      currentLookTarget.set(0, 0, 0);
+      camera.lookAt(currentLookTarget);
+
+      // WebGL Renderer
+      const canvas = document.createElement('canvas');
+      let glContext = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        context: glContext,
+        antialias: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      container.appendChild(renderer.domElement);
+
+      // OrbitControls for Top View
+      orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+      orbitControls.enableDamping = true;
+      orbitControls.dampingFactor = 0.05;
+      orbitControls.maxPolarAngle = Math.PI / 2 - 0.04;
+      orbitControls.minDistance = 20;
+      orbitControls.maxDistance = 1600;
+      orbitControls.target.set(0, 0, 0);
+
+      // Lighting
+      setupLighting();
+
+      // Create Top View Landmark Pins DOM elements
+      buildLandmarkPins();
+
+      // Load Master GLB Model
+      loadModel();
+
+      // Input Event Listeners
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+      
+      // Mouse / Touch Look Controls
+      container.addEventListener('mousedown', onPointerDown);
+      window.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('mouseup', onPointerUp);
+
+      container.addEventListener('touchstart', onTouchStart, { passive: false });
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onPointerUp);
+
+      // Check if touch device for D-pad display
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        document.getElementById('dpad').style.display = 'grid';
+      }
+
+      // Render loop
+      animate();
+    }
+
+    function setupLighting() {
+      // Warm Desert Sun
+      const sun = new THREE.DirectionalLight(0xfff5e6, 2.6);
+      sun.position.set(280, 500, 200);
+      sun.castShadow = true;
+      sun.shadow.mapSize.width = 2048;
+      sun.shadow.mapSize.height = 2048;
+      sun.shadow.camera.near = 10;
+      sun.shadow.camera.far = 1200;
+      const d = 320;
+      sun.shadow.camera.left = -d;
+      sun.shadow.camera.right = d;
+      sun.shadow.camera.top = d;
+      sun.shadow.camera.bottom = -d;
+      scene.add(sun);
+
+      // Hemisphere Fill
+      const hemi = new THREE.HemisphereLight(0xbbe0ff, 0x82644b, 1.25);
+      scene.add(hemi);
+
+      // Ambient
+      const amb = new THREE.AmbientLight(0xffffff, 0.45);
+      scene.add(amb);
+    }
+
+    function loadModel() {
+      const loader = new THREE.GLTFLoader();
+      const statusText = document.getElementById('loader-status');
+      const progressFill = document.getElementById('progress-fill');
+
+      loader.load(
+        'game_export/breaking_bad_albuquerque_master.glb',
+        (gltf) => {
+          cityModel = gltf.scene;
+
+          cityModel.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+
+          scene.add(cityModel);
+
+          // Fade out loader
+          const loaderElem = document.getElementById('loader');
+          loaderElem.style.opacity = '0';
+          setTimeout(() => loaderElem.style.display = 'none', 600);
+        },
+        (xhr) => {
+          if (xhr.lengthComputable) {
+            const pct = Math.round((xhr.loaded / xhr.total) * 100);
+            statusText.innerText = `Loading Albuquerque 3D... ${pct}%`;
+            progressFill.style.width = `${pct}%`;
+          }
+        },
+        (err) => {
+          console.error("Error loading city model:", err);
+          statusText.innerText = "Error loading 3D city. Please refresh.";
+        }
+      );
+    }
+
+    // --- BUILD 3D LANDMARK PINS FOR TOP VIEW ---
+    function buildLandmarkPins() {
+      const container = document.getElementById('markers-container');
+      LANDMARKS.forEach((lm) => {
+        const pin = document.createElement('div');
+        pin.className = 'landmark-pin';
+        pin.id = `pin-${lm.id}`;
+        pin.innerHTML = `<span class="pin-dot"></span><span>${lm.name}</span>`;
+        pin.onclick = (e) => {
+          e.stopPropagation();
+          jumpToLandmark(lm);
+        };
+        container.appendChild(pin);
+      });
+    }
+
+    function updateLandmarkPins() {
+      if (currentMode !== 'top') {
+        document.getElementById('markers-container').style.display = 'none';
+        return;
+      }
+      document.getElementById('markers-container').style.display = 'block';
+
+      const tempV = new THREE.Vector3();
+      LANDMARKS.forEach((lm) => {
+        const pin = document.getElementById(`pin-${lm.id}`);
+        if (!pin) return;
+
+        tempV.set(lm.x, lm.y + 16, lm.z); // Hover above landmark
+        tempV.project(camera);
+
+        // Behind camera check
+        if (tempV.z > 1) {
+          pin.style.display = 'none';
+          return;
+        }
+
+        const screenX = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+        const screenY = (-(tempV.y * 0.5) + 0.5) * window.innerHeight;
+
+        pin.style.display = 'flex';
+        pin.style.left = `${screenX}px`;
+        pin.style.top = `${screenY}px`;
+      });
+    }
+
+    // --- MODE SWITCHING: ONLY TOP VIEW & GROUND EXPLORE ---
+    function switchMode(newMode) {
+      if (currentMode === newMode && !isTransitioning) return;
+
+      currentMode = newMode;
+      document.getElementById('btn-top').classList.toggle('active', newMode === 'top');
+      document.getElementById('btn-ground').classList.toggle('active', newMode === 'ground');
+
+      if (newMode === 'top') {
+        // Switch to Top View
+        document.getElementById('controls-hint').innerText = "Drag: Rotate • Right-Click: Pan • Scroll: Zoom • Click Pin: Drop to Ground";
+        document.getElementById('ground-bar').style.display = 'none';
+        document.getElementById('dpad').style.display = 'none';
+        orbitControls.enabled = false;
+
+        // Smooth glide to aerial perspective
+        startCameraTransition(
+          camera.position.clone(),
+          new THREE.Vector3(0, 560, 420),
+          currentLookTarget.clone(),
+          new THREE.Vector3(0, 0, 0),
+          1200,
+          () => {
+            orbitControls.enabled = true;
+            orbitControls.target.set(0, 0, 0);
+          }
+        );
+
+      } else {
+        // Switch to Explore from Ground
+        document.getElementById('controls-hint').innerText = "WASD / Arrows: Walk • Drag: Look Around • Shift: Run";
+        document.getElementById('ground-bar').style.display = 'flex';
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+          document.getElementById('dpad').style.display = 'grid';
+        }
+        orbitControls.enabled = false;
+
+        // Smooth glide down to street level
+        const forwardVector = new THREE.Vector3(-Math.sin(groundYaw), 0, -Math.cos(groundYaw));
+        const lookAtGround = groundPos.clone().add(forwardVector.clone().multiplyScalar(30));
+
+        startCameraTransition(
+          camera.position.clone(),
+          new THREE.Vector3(groundPos.x, groundPos.y, groundPos.z),
+          currentLookTarget.clone(),
+          lookAtGround,
+          1300,
+          () => {
+            camera.rotation.set(groundPitch, groundYaw, 0, 'YXZ');
+          }
+        );
       }
     }
 
-    function copyCoord(coord) {
-      navigator.clipboard.writeText(coord).then(() => {
-        alert("Copied coordinates to clipboard: " + coord);
+    function jumpToLandmark(lm) {
+      // Set ground position & rotation for this landmark
+      groundPos.set(lm.groundX, lm.groundY, lm.groundZ);
+      groundYaw = lm.groundYaw;
+      groundPitch = 0;
+      groundTargetYaw = lm.groundYaw;
+      groundTargetPitch = 0;
+
+      // Switch mode to Ground
+      switchMode('ground');
+
+      // Highlight active button in ground bar
+      updateGroundBarActive(lm.id);
+    }
+
+    function teleportGround(lmId) {
+      const lm = LANDMARKS.find(item => item.id === lmId);
+      if (!lm) return;
+
+      groundPos.set(lm.groundX, lm.groundY, lm.groundZ);
+      groundYaw = lm.groundYaw;
+      groundPitch = 0;
+      groundTargetYaw = lm.groundYaw;
+      groundTargetPitch = 0;
+
+      camera.position.set(groundPos.x, groundPos.y, groundPos.z);
+      camera.rotation.set(groundPitch, groundYaw, 0, 'YXZ');
+      
+      updateGroundBarActive(lmId);
+    }
+
+    function updateGroundBarActive(lmId) {
+      const buttons = document.querySelectorAll('.ground-btn');
+      buttons.forEach(b => {
+        if (b.getAttribute('onclick').includes(lmId)) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
       });
     }
+
+    // --- SMOOTH CAMERA TRANSITION (EASE-IN-OUT) ---
+    function startCameraTransition(fromPos, toPos, fromLook, toLook, duration, onComplete) {
+      isTransitioning = true;
+      transitionStart = performance.now();
+      transitionDuration = duration;
+
+      camStartPos.copy(fromPos);
+      camEndPos.copy(toPos);
+      camStartLook.copy(fromLook);
+      camEndLook.copy(toLook);
+
+      function stepTransition() {
+        if (!isTransitioning) return;
+
+        const now = performance.now();
+        let progress = (now - transitionStart) / transitionDuration;
+
+        if (progress >= 1) {
+          progress = 1;
+          isTransitioning = false;
+          camera.position.copy(camEndPos);
+          currentLookTarget.copy(camEndLook);
+          camera.lookAt(currentLookTarget);
+          if (onComplete) onComplete();
+          return;
+        }
+
+        // Cubic Ease-In-Out
+        const ease = progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        camera.position.lerpVectors(camStartPos, camEndPos, ease);
+        currentLookTarget.lerpVectors(camStartLook, camEndLook, ease);
+        camera.lookAt(currentLookTarget);
+
+        requestAnimationFrame(stepTransition);
+      }
+
+      stepTransition();
+    }
+
+    // --- GROUND MOVEMENT PHYSICS ---
+    function updateGroundWalk(delta) {
+      if (currentMode !== 'ground' || isTransitioning) return;
+
+      const currentSpeed = keys.shift ? sprintSpeed : walkSpeed;
+      const moveDistance = currentSpeed * delta;
+
+      // Forward / Back / Strafe vectors based on camera yaw
+      const forward = new THREE.Vector3(-Math.sin(groundYaw), 0, -Math.cos(groundYaw));
+      const right = new THREE.Vector3(Math.cos(groundYaw), 0, -Math.sin(groundYaw));
+
+      if (keys.forward) groundPos.addScaledVector(forward, moveDistance);
+      if (keys.backward) groundPos.addScaledVector(forward, -moveDistance);
+      if (keys.left) groundPos.addScaledVector(right, -moveDistance);
+      if (keys.right) groundPos.addScaledVector(right, moveDistance);
+
+      // Map boundary clamping
+      groundPos.x = Math.max(-580, Math.min(580, groundPos.x));
+      groundPos.z = Math.max(-580, Math.min(580, groundPos.z));
+
+      // Smooth Yaw / Pitch interpolation for mouse look
+      groundYaw += (groundTargetYaw - groundYaw) * 0.25;
+      groundPitch += (groundTargetPitch - groundPitch) * 0.25;
+
+      camera.position.set(groundPos.x, groundPos.y, groundPos.z);
+      camera.rotation.set(groundPitch, groundYaw, 0, 'YXZ');
+    }
+
+    // --- INPUT HANDLING ---
+    function onKeyDown(e) {
+      switch (e.code) {
+        case 'KeyW': case 'ArrowUp': keys.forward = true; break;
+        case 'KeyS': case 'ArrowDown': keys.backward = true; break;
+        case 'KeyA': case 'ArrowLeft': keys.left = true; break;
+        case 'KeyD': case 'ArrowRight': keys.right = true; break;
+        case 'ShiftLeft': case 'ShiftRight': keys.shift = true; break;
+        case 'Digit1': switchMode('top'); break;
+        case 'Digit2': switchMode('ground'); break;
+      }
+    }
+
+    function onKeyUp(e) {
+      switch (e.code) {
+        case 'KeyW': case 'ArrowUp': keys.forward = false; break;
+        case 'KeyS': case 'ArrowDown': keys.backward = false; break;
+        case 'KeyA': case 'ArrowLeft': keys.left = false; break;
+        case 'KeyD': case 'ArrowRight': keys.right = false; break;
+        case 'ShiftLeft': case 'ShiftRight': keys.shift = false; break;
+      }
+    }
+
+    function onPointerDown(e) {
+      if (currentMode !== 'ground') return;
+      isMouseDown = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    }
+
+    function onPointerMove(e) {
+      if (currentMode !== 'ground' || !isMouseDown || isTransitioning) return;
+
+      const deltaX = e.clientX - lastMouseX;
+      const deltaY = e.clientY - lastMouseY;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+
+      const sensitivity = 0.0035;
+      groundTargetYaw -= deltaX * sensitivity;
+      groundTargetPitch -= deltaY * sensitivity;
+
+      // Clamp vertical pitch to avoid flipping (-80 deg to +80 deg)
+      groundTargetPitch = Math.max(-1.4, Math.min(1.4, groundTargetPitch));
+    }
+
+    function onPointerUp() {
+      isMouseDown = false;
+    }
+
+    function onTouchStart(e) {
+      if (currentMode !== 'ground' || e.touches.length !== 1) return;
+      isMouseDown = true;
+      lastMouseX = e.touches[0].clientX;
+      lastMouseY = e.touches[0].clientY;
+    }
+
+    function onTouchMove(e) {
+      if (currentMode !== 'ground' || !isMouseDown || e.touches.length !== 1) return;
+      const deltaX = e.touches[0].clientX - lastMouseX;
+      const deltaY = e.touches[0].clientY - lastMouseY;
+      lastMouseX = e.touches[0].clientX;
+      lastMouseY = e.touches[0].clientY;
+
+      const sensitivity = 0.004;
+      groundTargetYaw -= deltaX * sensitivity;
+      groundTargetPitch -= deltaY * sensitivity;
+      groundTargetPitch = Math.max(-1.4, Math.min(1.4, groundTargetPitch));
+      e.preventDefault();
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // --- MAIN RENDER LOOP ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+
+      if (currentMode === 'top') {
+        if (!isTransitioning) {
+          orbitControls.update();
+        }
+        updateLandmarkPins();
+      } else if (currentMode === 'ground') {
+        updateGroundWalk(delta);
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
