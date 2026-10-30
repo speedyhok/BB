@@ -363,6 +363,361 @@
         padding: 6px 10px;
       }
     }
+
+    /* CINEMATIC LETTERBOX BARS */
+    .cinematic-bar {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 9vh;
+      background: #000;
+      z-index: 30;
+      pointer-events: none;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cinematic-bar.top {
+      top: 0;
+      transform: translateY(-100%);
+    }
+    .cinematic-bar.bottom {
+      bottom: 0;
+      transform: translateY(100%);
+    }
+    body.in-cinema .cinematic-bar.top {
+      transform: translateY(0);
+    }
+    body.in-cinema .cinematic-bar.bottom {
+      transform: translateY(0);
+    }
+
+    /* SCREEN BLACKOUT FADER */
+    #cinematic-fader {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 35;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    /* DIZZINESS & BLUR OVERLAY */
+    #dizziness-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 32;
+      opacity: 0;
+      background: radial-gradient(circle at center, transparent 35%, rgba(180, 20, 20, 0.35) 75%, rgba(0, 0, 0, 0.9) 100%);
+      transition: opacity 0.4s ease;
+    }
+
+    /* CINEMATIC CONTROLS (Top Right) */
+    #cinematic-controls {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .cinema-ctrl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: rgba(14, 18, 28, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+      color: #e5e7eb;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+    .cinema-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      transform: scale(1.04);
+    }
+
+    /* CINEMATIC SUBTITLES & DIALOGUE */
+    #cinematic-dialogue {
+      position: absolute;
+      bottom: 11vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 720px;
+      width: 90%;
+      padding: 16px 24px;
+      background: rgba(8, 12, 18, 0.90);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85);
+      text-align: center;
+      animation: subtitlePop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes subtitlePop {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    .speaker-badge {
+      display: inline-block;
+      align-self: center;
+      padding: 3px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .speaker-badge.walt {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #34d399;
+    }
+    .speaker-badge.skyler {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid #3b82f6;
+      color: #60a5fa;
+    }
+    .speaker-badge.doctor {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid #f59e0b;
+      color: #fbbf24;
+    }
+    .speaker-badge.narration {
+      background: rgba(156, 163, 175, 0.2);
+      border: 1px solid #9ca3af;
+      color: #d1d5db;
+    }
+    .dialogue-text {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.45;
+      color: #f9fafb;
+      letter-spacing: 0.01em;
+    }
+
+    /* THE FIRST DECISION MODAL (SCENE 4) */
+    #decision-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 7, 12, 0.90);
+      backdrop-filter: blur(18px);
+      padding: 24px;
+      animation: fadeInModal 0.6s ease;
+    }
+    @keyframes fadeInModal {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1.0); }
+    }
+    .decision-header {
+      text-align: center;
+      max-width: 680px;
+      margin-bottom: 24px;
+    }
+    .decision-chapter {
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #10b981;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .decision-title {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: #fff;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .decision-premise {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #9ca3af;
+    }
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(240px, 320px));
+      gap: 20px;
+      width: 100%;
+      max-width: 1060px;
+    }
+    .choice-card {
+      background: rgba(14, 20, 32, 0.95);
+      border-radius: 16px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .choice-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    }
+    .choice-card.choice-a {
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .choice-card.choice-a:hover {
+      border-color: #10b981;
+      box-shadow: 0 20px 45px rgba(16, 185, 129, 0.25);
+    }
+    .choice-card.choice-b {
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+    .choice-card.choice-b:hover {
+      border-color: #ef4444;
+      box-shadow: 0 20px 45px rgba(239, 68, 68, 0.25);
+    }
+    .choice-card.choice-c {
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+    .choice-card.choice-c:hover {
+      border-color: #f59e0b;
+      box-shadow: 0 20px 45px rgba(245, 158, 11, 0.25);
+    }
+    .choice-pill {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .choice-a .choice-pill { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .choice-b .choice-pill { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .choice-c .choice-pill { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .choice-headline {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .choice-desc {
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.45;
+      flex-grow: 1;
+    }
+    .choice-preview {
+      font-size: 11px;
+      color: #6b7280;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .choice-btn-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .choice-a .choice-btn-action { background: #10b981; color: #042f1a; }
+    .choice-b .choice-btn-action { background: #ef4444; color: #fff; }
+    .choice-c .choice-btn-action { background: #f59e0b; color: #1c1402; }
+
+    /* BRANCH OUTCOME CARD MODAL */
+    #branch-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 55;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3, 5, 8, 0.92);
+      backdrop-filter: blur(20px);
+      padding: 24px;
+      text-align: center;
+      animation: fadeInModal 0.5s ease;
+    }
+    .branch-box {
+      max-width: 640px;
+      background: rgba(14, 20, 32, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+    }
+    .branch-badge {
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+    .branch-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.25;
+    }
+    .branch-desc {
+      font-size: 14px;
+      color: #9ca3af;
+      line-height: 1.55;
+    }
+    .branch-btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .branch-action-btn {
+      padding: 10px 22px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .branch-action-btn.primary {
+      background: #10b981;
+      color: #042f1a;
+    }
+    .branch-action-btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .branch-action-btn:hover {
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -385,7 +740,7 @@
     </div>
   </div>
 
-  <!-- Top Bar: The ONLY Two Options -->
+  <!-- Top Bar: Navigation & Chapter 1 Entry -->
   <nav id="top-nav">
     <div class="brand">
       <div class="element-pill">Br</div>
@@ -400,8 +755,105 @@
         <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>
         <span>Explore from Ground</span>
       </button>
+      <button id="btn-cinema" class="mode-btn" onclick="startCinematicEpisode()" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(245, 158, 11, 0.22)); border: 1px solid rgba(245, 158, 11, 0.6); color: #fef08a;">
+        <svg viewBox="0 0 24 24" style="fill: #f59e0b;"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+        <span>🎬 Chapter 1: The First Choice</span>
+      </button>
     </div>
   </nav>
+
+  <!-- CINEMATIC SYSTEM ELEMENTS -->
+  <div id="cinematic-bars-top" class="cinematic-bar top"></div>
+  <div id="cinematic-bars-bottom" class="cinematic-bar bottom"></div>
+  <div id="cinematic-fader"></div>
+  <div id="dizziness-overlay"></div>
+
+  <!-- Cinematic Top Controls -->
+  <div id="cinematic-controls">
+    <button class="cinema-ctrl-btn" onclick="toggleAudioMute()">
+      <span id="audio-icon">🔊</span>
+      <span id="audio-label">Audio FX</span>
+    </button>
+    <button class="cinema-ctrl-btn" onclick="skipToDecision()">
+      <span>⏭</span>
+      <span>Skip to Decision</span>
+    </button>
+    <button class="cinema-ctrl-btn" onclick="exitCinematic()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+      <span>✕</span>
+      <span>Exit Cinema</span>
+    </button>
+  </div>
+
+  <!-- Cinematic Subtitle Box -->
+  <div id="cinematic-dialogue">
+    <div id="speaker-badge" class="speaker-badge narration">ALBUQUERQUE, NM</div>
+    <div id="dialogue-text" class="dialogue-text">...</div>
+  </div>
+
+  <!-- THE FIRST DECISION MODAL (SCENE 4) -->
+  <div id="decision-modal">
+    <div class="decision-header">
+      <div class="decision-chapter">Breaking Bad • Chapter 1 • 10:48 AM</div>
+      <h1 class="decision-title">The First Choice</h1>
+      <p class="decision-premise">
+        Dr. Delcavoli explains that your scan results show an abnormality and insists you remain admitted for emergency observation. Skyler pleads with you to stay. You have missed several calls from the school. What will Walter do?
+      </p>
+    </div>
+
+    <div class="choices-grid">
+      <!-- Choice A -->
+      <div class="choice-card choice-a" onclick="selectDecisionChoice('A')">
+        <span class="choice-pill">Choice A</span>
+        <div class="choice-headline">Listen to the Doctors</div>
+        <p class="choice-desc">
+          Agree to remain admitted in Room 304B for comprehensive oncology staging and chest biopsy. Skyler breathes a sigh of relief, though the impending diagnosis will change everything.
+        </p>
+        <div class="choice-preview">
+          <b>Next Scene:</b> Hospital diagnosis & family consultation.
+        </div>
+        <button class="choice-btn-action">Select Choice A</button>
+      </div>
+
+      <!-- Choice B -->
+      <div class="choice-card choice-b" onclick="selectDecisionChoice('B')">
+        <span class="choice-pill">Choice B</span>
+        <div class="choice-headline">Leave the Hospital</div>
+        <p class="choice-desc">
+          Refuse further medical observation, rip off the IV line, and demand to go home immediately to avoid hospital bills and protect your family from panic.
+        </p>
+        <div class="choice-preview">
+          <b>Next Scene:</b> Confrontation with Skyler & secrecy at home.
+        </div>
+        <button class="choice-btn-action">Select Choice B</button>
+      </div>
+
+      <!-- Choice C -->
+      <div class="choice-card choice-c" onclick="selectDecisionChoice('C')">
+        <span class="choice-pill">Choice C</span>
+        <div class="choice-headline">Demand the Whole Truth</div>
+        <p class="choice-desc">
+          Command Dr. Delcavoli to bypass all clinical euphemisms and give you the raw, unfiltered truth right now before making any life decisions.
+        </p>
+        <div class="choice-preview">
+          <b>Next Scene:</b> Private consultation: the inoperable 4.8cm mass.
+        </div>
+        <button class="choice-btn-action">Select Choice C</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRANCH OUTCOME MODAL -->
+  <div id="branch-modal">
+    <div class="branch-box">
+      <span id="branch-badge" class="branch-badge">CHAPTER 1 COMPLETED</span>
+      <h2 id="branch-title" class="branch-title">...</h2>
+      <p id="branch-desc" class="branch-desc">...</p>
+      <div class="branch-btn-row">
+        <button class="branch-action-btn primary" onclick="exitCinematic()">🚶 Explore Albuquerque Master World</button>
+        <button class="branch-action-btn secondary" onclick="replayCinematic()">🔄 Replay & Try Other Choices</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Controls Hint -->
   <div id="controls-hint">Drag: Rotate • Right-Click: Pan • Scroll: Zoom • Click Pin: Drop to Ground</div>
@@ -530,6 +982,9 @@
 
       // Load Master GLB Model
       loadModel();
+
+      // Load Chapter 1 Story Characters
+      loadStoryCharacters();
 
       // Input Event Listeners
       window.addEventListener('resize', onWindowResize);
@@ -663,16 +1118,23 @@
       });
     }
 
-    // --- MODE SWITCHING: ONLY TOP VIEW & GROUND EXPLORE ---
+    // --- MODE SWITCHING: TOP VIEW, GROUND EXPLORE & CINEMA ---
     function switchMode(newMode) {
       if (currentMode === newMode && !isTransitioning) return;
 
+      if (cinematicDirector.active && newMode !== 'cinema') {
+        cinematicDirector.stop();
+      }
+
       currentMode = newMode;
+      document.getElementById('top-nav').style.display = 'flex';
       document.getElementById('btn-top').classList.toggle('active', newMode === 'top');
       document.getElementById('btn-ground').classList.toggle('active', newMode === 'ground');
+      document.getElementById('btn-cinema').classList.toggle('active', newMode === 'cinema');
 
       if (newMode === 'top') {
         // Switch to Top View
+        document.getElementById('controls-hint').style.display = 'block';
         document.getElementById('controls-hint').innerText = "Drag: Rotate • Right-Click: Pan • Scroll: Zoom • Click Pin: Drop to Ground";
         document.getElementById('ground-bar').style.display = 'none';
         document.getElementById('dpad').style.display = 'none';
@@ -829,6 +1291,671 @@
       camera.rotation.set(groundPitch, groundYaw, 0, 'YXZ');
     }
 
+    // =========================================================================
+    // BREAKING BAD AUDIO SYNTHESIZER (ZERO-DEPENDENCY WEB AUDIO API)
+    // =========================================================================
+    class BreakingBadAudioFX {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.heartInterval = null;
+        this.monitorInterval = null;
+        this.tinnitusOsc = null;
+        this.tinnitusGain = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClockTick() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.04);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+
+      playAlarmBeep() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+          const t = now + i * 0.12;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(880, t);
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.setValueAtTime(0, t + 0.07);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.08);
+        }
+      }
+
+      startDizziness() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        // High-frequency ear ringing (4150 Hz pure tinnitus tone)
+        this.tinnitusOsc = this.ctx.createOscillator();
+        this.tinnitusGain = this.ctx.createGain();
+        this.tinnitusOsc.type = 'sine';
+        this.tinnitusOsc.frequency.setValueAtTime(4150, now);
+        this.tinnitusGain.gain.setValueAtTime(0.001, now);
+        this.tinnitusGain.gain.linearRampToValueAtTime(0.25, now + 2.0);
+        this.tinnitusOsc.connect(this.tinnitusGain);
+        this.tinnitusGain.connect(this.ctx.destination);
+        this.tinnitusOsc.start(now);
+
+        // Muffled heavy heartbeat (thump-thump)
+        this.playHeartbeat();
+        this.heartInterval = setInterval(() => {
+          this.playHeartbeat();
+        }, 900);
+      }
+
+      playHeartbeat() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const gain1 = this.ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(65, now);
+        osc1.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+        gain1.gain.setValueAtTime(0.35, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+        osc1.connect(gain1);
+        gain1.connect(this.ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.15);
+
+        const osc2 = this.ctx.createOscillator();
+        const gain2 = this.ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(55, now + 0.16);
+        osc2.frequency.exponentialRampToValueAtTime(30, now + 0.28);
+        gain2.gain.setValueAtTime(0.28, now + 0.16);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.30);
+        osc2.connect(gain2);
+        gain2.connect(this.ctx.destination);
+        osc2.start(now + 0.16);
+        osc2.stop(now + 0.32);
+      }
+
+      stopDizziness() {
+        if (this.tinnitusGain && this.ctx) {
+          const now = this.ctx.currentTime;
+          this.tinnitusGain.gain.linearRampToValueAtTime(0.001, now + 0.5);
+          setTimeout(() => {
+            if (this.tinnitusOsc) {
+              try { this.tinnitusOsc.stop(); } catch(e) {}
+              this.tinnitusOsc = null;
+            }
+          }, 600);
+        }
+        if (this.heartInterval) {
+          clearInterval(this.heartInterval);
+          this.heartInterval = null;
+        }
+      }
+
+      playCollapseThud() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(90, now);
+        osc.frequency.exponentialRampToValueAtTime(25, now + 0.45);
+        gain.gain.setValueAtTime(0.48, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+
+      playSiren() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(650, now);
+        osc.frequency.linearRampToValueAtTime(920, now + 1.2);
+        osc.frequency.linearRampToValueAtTime(650, now + 2.4);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.14, now + 0.6);
+        gain.gain.linearRampToValueAtTime(0.001, now + 2.5);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 2.6);
+      }
+
+      startHeartMonitor() {
+        if (!this.ctx || this.muted) return;
+        if (this.monitorInterval) return;
+        this.playMonitorBeep();
+        this.monitorInterval = setInterval(() => {
+          this.playMonitorBeep();
+        }, 850);
+      }
+
+      playMonitorBeep() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(980, now);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.09);
+      }
+
+      stopHeartMonitor() {
+        if (this.monitorInterval) {
+          clearInterval(this.monitorInterval);
+          this.monitorInterval = null;
+        }
+      }
+
+      playDramaticHit() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(65.4, now); // Low C
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 2.6);
+      }
+
+      playChoiceChime() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.06);
+          gain.gain.setValueAtTime(0.15, now + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.06);
+          osc.stop(now + i * 0.06 + 0.4);
+        });
+      }
+    }
+
+    const audioFX = new BreakingBadAudioFX();
+
+    // =========================================================================
+    // CHAPTER 1 STORY CHARACTERS LOADER
+    // =========================================================================
+    let storyCharacters = {
+      waltPilot: null,
+      waltPatient: null,
+      skyler: null,
+      doctor: null
+    };
+
+    function loadStoryCharacters() {
+      const loader = new THREE.GLTFLoader();
+
+      // 1. Walter Pilot (Morning) in Master Bedroom at 308 Negra Arroyo Lane
+      loader.load('assets/characters/walter_white_pilot.glb', (gltf) => {
+        storyCharacters.waltPilot = gltf.scene;
+        storyCharacters.waltPilot.position.set(-151.0, 0.40, -306.8);
+        storyCharacters.waltPilot.rotation.y = Math.PI * 0.5;
+        scene.add(storyCharacters.waltPilot);
+      });
+
+      // 2. Walter Patient (Hospital Examination Bed)
+      loader.load('assets/characters/walter_white_patient.glb', (gltf) => {
+        storyCharacters.waltPatient = gltf.scene;
+        storyCharacters.waltPatient.position.set(42.2, 0.78, 82.8);
+        storyCharacters.waltPatient.rotation.y = Math.PI * 0.5;
+        scene.add(storyCharacters.waltPatient);
+      });
+
+      // 3. Skyler White (Hospital Visitor Chair)
+      loader.load('assets/characters/skyler_white.glb', (gltf) => {
+        storyCharacters.skyler = gltf.scene;
+        storyCharacters.skyler.position.set(41.0, 0.0, 83.8);
+        storyCharacters.skyler.rotation.y = 0.35;
+        scene.add(storyCharacters.skyler);
+      });
+
+      // 4. Dr. Delcavoli (Consultation Desk & Foot of Bed)
+      loader.load('assets/characters/dr_delcavoli.glb', (gltf) => {
+        storyCharacters.doctor = gltf.scene;
+        storyCharacters.doctor.position.set(40.5, 0.0, 82.5);
+        storyCharacters.doctor.rotation.y = -Math.PI * 0.65;
+        scene.add(storyCharacters.doctor);
+      });
+    }
+
+    // =========================================================================
+    // CHAPTER 1 CINEMATIC DIRECTOR (BREAKING BAD: THE FIRST CHOICE)
+    // =========================================================================
+    class CinematicDirector {
+      constructor() {
+        this.active = false;
+        this.step = 0;
+        this.timer = 0;
+        this.timeouts = [];
+        this.camAnim = null;
+      }
+
+      start() {
+        audioFX.init();
+        this.active = true;
+        this.step = 0;
+        document.body.classList.add('in-cinema');
+        document.getElementById('top-nav').style.display = 'none';
+        document.getElementById('ground-bar').style.display = 'none';
+        document.getElementById('controls-hint').style.display = 'none';
+        document.getElementById('markers-container').style.display = 'none';
+        document.getElementById('cinematic-controls').style.display = 'flex';
+        document.getElementById('cinematic-dialogue').style.display = 'flex';
+        document.getElementById('decision-modal').style.display = 'none';
+        document.getElementById('branch-modal').style.display = 'none';
+
+        // Clear existing timeouts
+        this.clearTimeouts();
+
+        // SCENE 1: AN ORDINARY MORNING (6:15 AM)
+        this.playScene1();
+      }
+
+      setDialogue(speaker, text, speakerClass = 'narration') {
+        const badge = document.getElementById('speaker-badge');
+        const textEl = document.getElementById('dialogue-text');
+        badge.className = `speaker-badge ${speakerClass}`;
+        badge.textContent = speaker;
+        textEl.textContent = text;
+      }
+
+      fadeScreen(black, durationMs = 800) {
+        const fader = document.getElementById('cinematic-fader');
+        fader.style.transition = `opacity ${durationMs}ms ease`;
+        fader.style.opacity = black ? '1' : '0';
+      }
+
+      setDizziness(blurPx, opacity) {
+        const overlay = document.getElementById('dizziness-overlay');
+        overlay.style.opacity = opacity;
+        renderer.domElement.style.filter = blurPx > 0 ? `blur(${blurPx}px) contrast(140%)` : 'none';
+      }
+
+      setCameraShot(pos, target, durationMs = 1200) {
+        this.camAnim = {
+          startPos: camera.position.clone(),
+          endPos: pos.clone(),
+          startTarget: currentLookTarget.clone(),
+          endTarget: target.clone(),
+          startTime: performance.now(),
+          duration: durationMs
+        };
+      }
+
+      update(delta) {
+        if (!this.active) return;
+        if (this.camAnim) {
+          const elapsed = performance.now() - this.camAnim.startTime;
+          const t = Math.min(1.0, elapsed / this.camAnim.duration);
+          const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+          camera.position.lerpVectors(this.camAnim.startPos, this.camAnim.endPos, ease);
+          currentLookTarget.lerpVectors(this.camAnim.startTarget, this.camAnim.endTarget, ease);
+          camera.lookAt(currentLookTarget);
+
+          if (t >= 1.0) this.camAnim = null;
+        }
+      }
+
+      // --- SCENE 1: AN ORDINARY MORNING ---
+      playScene1() {
+        this.step = 1;
+        // Total black screen
+        this.fadeScreen(true, 100);
+        this.setCameraShot(new THREE.Vector3(-151.0, 0.95, -305.4), new THREE.Vector3(-151.0, 0.70, -306.8), 100);
+        this.setDialogue("ALBUQUERQUE, NEW MEXICO", "6:15 AM — Master Bedroom, 308 Negra Arroyo Lane.", "narration");
+
+        // Clock ticking in darkness
+        let ticks = 0;
+        const tickInt = setInterval(() => {
+          if (!this.active || this.step !== 1) { clearInterval(tickInt); return; }
+          audioFX.playClockTick();
+          ticks++;
+          if (ticks >= 4) clearInterval(tickInt);
+        }, 900);
+
+        // Fade in to morning sunlight bedroom
+        this.addTimeout(() => {
+          this.fadeScreen(false, 1800);
+          this.setDialogue("SOUND", "A distant car hums along the asphalt outside.", "narration");
+          this.setCameraShot(new THREE.Vector3(-151.8, 0.85, -305.8), new THREE.Vector3(-151.0, 0.70, -306.8), 3500);
+        }, 3200);
+
+        // Alarm rings
+        this.addTimeout(() => {
+          audioFX.playAlarmBeep();
+          this.setDialogue("ALARM CLOCK", "6:15 AM — [ Red digital LED pulses ]", "narration");
+        }, 6500);
+
+        // Walter mutters
+        this.addTimeout(() => {
+          this.setDialogue("WALTER WHITE", '"Another day..."', "walt");
+          if (storyCharacters.waltPilot) {
+            storyCharacters.waltPilot.position.set(-151.0, 0.40, -306.8);
+          }
+        }, 9500);
+
+        // Puts on glasses and walks towards bathroom
+        this.addTimeout(() => {
+          this.setDialogue("WALTER WHITE", "[ Walter puts on his wire-rim glasses and steps towards the bathroom ]", "walt");
+          this.setCameraShot(new THREE.Vector3(-150.2, 1.45, -306.0), new THREE.Vector3(-148.5, 1.5, -307.8), 2800);
+        }, 13000);
+
+        // Transition to Scene 2
+        this.addTimeout(() => {
+          this.playScene2();
+        }, 16500);
+      }
+
+      // --- SCENE 2: SOMETHING ISN'T RIGHT ---
+      playScene2() {
+        this.step = 2;
+        // Bathroom Vanity Mirror Angle
+        this.setCameraShot(new THREE.Vector3(-148.0, 1.45, -307.2), new THREE.Vector3(-148.0, 1.50, -308.7), 1200);
+        this.setDialogue("SCENE 2: MASTER BATHROOM", "Walter turns on the faucet and splashes cold water across his face.", "narration");
+
+        // Sudden Dizziness onset
+        this.addTimeout(() => {
+          this.setDizziness(6, 0.75);
+          audioFX.startDizziness();
+          this.setDialogue("WALTER WHITE", '"What the hell..." [ Vision blurs, high-frequency ringing fills his ears ]', "walt");
+          // Sway camera
+          this.setCameraShot(new THREE.Vector3(-148.2, 1.35, -307.4), new THREE.Vector3(-148.0, 1.50, -308.7), 1800);
+        }, 4000);
+
+        // Collapse to bathroom floor
+        this.addTimeout(() => {
+          this.setDizziness(10, 0.95);
+          this.setDialogue("NARRATION", "Walter's knees buckle. His wire glasses slide across the cold tiles.", "narration");
+          audioFX.playCollapseThud();
+          // Camera drops to tile level and tilts
+          this.setCameraShot(new THREE.Vector3(-148.1, 0.32, -307.6), new THREE.Vector3(-147.8, 0.15, -308.5), 800);
+          camera.rotation.z = 0.65; // crash roll
+        }, 8500);
+
+        // Fade to black with ambulance audio
+        this.addTimeout(() => {
+          audioFX.stopDizziness();
+          this.fadeScreen(true, 1200);
+          this.setDizziness(0, 0);
+          camera.rotation.z = 0;
+          this.setDialogue("DISTANT VOICES", '"Sir? Can you hear me? Call an ambulance!"', "narration");
+          audioFX.playSiren();
+        }, 11500);
+
+        // Transition to Scene 3
+        this.addTimeout(() => {
+          this.playScene3();
+        }, 16000);
+      }
+
+      // --- SCENE 3: THE HOSPITAL (ALBUQUERQUE MEDICAL CENTER) ---
+      playScene3() {
+        this.step = 3;
+        audioFX.startHeartMonitor();
+
+        // Fade in looking up at hospital fluorescent lights
+        this.setCameraShot(new THREE.Vector3(42.2, 2.1, 83.2), new THREE.Vector3(42.2, 3.2, 83.2), 100);
+        this.fadeScreen(false, 1500);
+        this.setDialogue("ALBUQUERQUE MEDICAL CENTER", "10:42 AM — Room 304B, Oncology & Pulmonology Wing.", "narration");
+
+        // Pan down to Walter in bed
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(42.2, 1.45, 84.4), new THREE.Vector3(42.2, 0.85, 82.8), 2400);
+          this.setDialogue("NARRATION", "A heart monitor beeps rhythmically. Walter opens his eyes. An IV line runs into his arm.", "narration");
+        }, 3200);
+
+        // Reverse shot to Skyler
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(41.8, 1.25, 83.2), new THREE.Vector3(41.0, 1.05, 83.8), 1600);
+          this.setDialogue("SKYLER WHITE", '"Walter? Oh my God. You\'re awake."', "skyler");
+        }, 6800);
+
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(42.0, 1.35, 83.6), new THREE.Vector3(42.2, 0.85, 82.8), 1200);
+          this.setDialogue("WALTER WHITE", '"What happened?"', "walt");
+        }, 10000);
+
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(41.8, 1.25, 83.2), new THREE.Vector3(41.0, 1.05, 83.8), 1200);
+          this.setDialogue("SKYLER WHITE", '"You collapsed. They brought you here in an ambulance."', "skyler");
+        }, 12500);
+
+        this.addTimeout(() => {
+          this.setDialogue("WALTER WHITE", '"I\'m fine. I just need to go home."', "walt");
+        }, 15500);
+
+        this.addTimeout(() => {
+          this.setDialogue("SKYLER WHITE", '"Walter, please. Just listen to the doctors."', "skyler");
+        }, 18000);
+
+        // Doctor Delcavoli enters
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(41.4, 1.55, 83.8), new THREE.Vector3(40.5, 1.60, 82.5), 1800);
+          this.setDialogue("DR. DELCAVOLI", '"Mr. White, I\'d like to speak with you about your test results. Can we speak privately?"', "doctor");
+        }, 21000);
+
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(42.0, 1.35, 83.6), new THREE.Vector3(42.2, 0.85, 82.8), 1000);
+          this.setDialogue("WALTER WHITE", '"No. She stays."', "walt");
+        }, 25000);
+
+        this.addTimeout(() => {
+          this.setCameraShot(new THREE.Vector3(40.8, 1.55, 83.5), new THREE.Vector3(40.5, 1.55, 82.5), 1500);
+          this.setDialogue("DR. DELCAVOLI", '"We\'ve found something concerning in your results. There is a possibility of a serious underlying condition."', "doctor");
+        }, 28000);
+
+        // Dramatic close-up on Walt's face and Doctor's Mustard Stain & X-Ray lightbox
+        this.addTimeout(() => {
+          audioFX.playDramaticHit();
+          // Close up on Mustard Stain on doctor's lapel
+          this.setCameraShot(new THREE.Vector3(40.6, 1.48, 83.0), new THREE.Vector3(40.5, 1.42, 82.5), 2200);
+          this.setDialogue("NARRATION", "Walter tunes out the words. His eyes fixate on a bright yellow mustard stain on Dr. Delcavoli's lab coat.", "narration");
+        }, 33000);
+
+        this.addTimeout(() => {
+          // Pan to Wall Lightbox X-Ray tumor
+          this.setCameraShot(new THREE.Vector3(38.5, 1.75, 83.2), new THREE.Vector3(35.6, 1.85, 82.8), 2400);
+          this.setDialogue("CHEST RADIOGRAPH", "[ Wall Lightbox emits blue glow: 4.8 cm mass circled in red grease pencil ]", "narration");
+        }, 37000);
+
+        // Transition to Scene 4 Decision
+        this.addTimeout(() => {
+          this.playScene4();
+        }, 41000);
+      }
+
+      // --- SCENE 4: THE FIRST DECISION ---
+      playScene4() {
+        this.step = 4;
+        audioFX.stopHeartMonitor();
+        document.getElementById('cinematic-dialogue').style.display = 'none';
+        document.getElementById('decision-modal').style.display = 'flex';
+      }
+
+      // --- BRANCH RESOLUTIONS ---
+      resolveChoice(choice) {
+        document.getElementById('decision-modal').style.display = 'none';
+        document.getElementById('cinematic-dialogue').style.display = 'flex';
+        audioFX.playChoiceChime();
+
+        const branchBadge = document.getElementById('branch-badge');
+        const branchTitle = document.getElementById('branch-title');
+        const branchDesc = document.getElementById('branch-desc');
+
+        if (choice === 'A') {
+          // Choice A: Listen to the Doctors
+          branchBadge.textContent = "BRANCH A: CLINICAL STAGING & FAMILY CONSULTATION";
+          branchBadge.style.background = "rgba(16, 185, 129, 0.2)";
+          branchBadge.style.color = "#34d399";
+          branchTitle.textContent = "Walter Agrees to Further Observation";
+          branchDesc.textContent = "Walter looks into Skyler's eyes and whispers: 'Alright. I'll stay.' Skyler breaks down into tears of relief and clasps his hand. Dr. Delcavoli orders high-resolution chest CT scans and schedules a bronchoscopy for tomorrow morning. The brutal reality of Stage IIIA inoperable cancer begins to close in.";
+
+          this.setCameraShot(new THREE.Vector3(41.6, 1.30, 83.4), new THREE.Vector3(41.4, 0.95, 83.2), 1800);
+          this.setDialogue("WALTER WHITE", '"Alright. I\'ll stay for the tests."', "walt");
+
+          this.addTimeout(() => {
+            this.setDialogue("SKYLER WHITE", '"Thank you, Walter. Everything is going to be okay."', "skyler");
+          }, 4000);
+
+          this.addTimeout(() => {
+            document.getElementById('cinematic-dialogue').style.display = 'none';
+            document.getElementById('branch-modal').style.display = 'flex';
+          }, 8000);
+
+        } else if (choice === 'B') {
+          // Choice B: Leave the Hospital
+          branchBadge.textContent = "BRANCH B: DISCHARGE AMA & DENIAL";
+          branchBadge.style.background = "rgba(239, 68, 68, 0.2)";
+          branchBadge.style.color = "#f87171";
+          branchTitle.textContent = "Walter Discharges Against Medical Advice";
+          branchDesc.textContent = "Refusing to accept illness or accumulate catastrophic hospital bills, Walter pulls off the adhesive IV port tape from his hand and demands his wallet and keys. Skyler is furious and heartbroken. Walter walks out into the Albuquerque sunlight in total denial, coughing quietly into a napkin in the parking lot.";
+
+          this.setCameraShot(new THREE.Vector3(42.0, 1.35, 83.6), new THREE.Vector3(42.2, 0.85, 82.8), 1600);
+          this.setDialogue("WALTER WHITE", '"I am signing the AMA discharge. I am leaving now."', "walt");
+
+          this.addTimeout(() => {
+            this.setDialogue("DR. DELCAVOLI", '"Mr. White, as your physician, I strongly advise against leaving."', "doctor");
+          }, 4000);
+
+          this.addTimeout(() => {
+            document.getElementById('cinematic-dialogue').style.display = 'none';
+            document.getElementById('branch-modal').style.display = 'flex';
+          }, 8000);
+
+        } else if (choice === 'C') {
+          // Choice C: Demand the Whole Truth
+          branchBadge.textContent = "BRANCH C: THE INOPERABLE TRUTH & MUSTARD OBSESSION";
+          branchBadge.style.background = "rgba(245, 158, 11, 0.2)";
+          branchBadge.style.color = "#fbbf24";
+          branchTitle.textContent = "Walter Demands the Complete Truth";
+          branchDesc.textContent = "Walter cuts Dr. Delcavoli off: 'I have a master's in chemistry, Doctor. Skip the soft language. What did the radiograph find?' Dr. Delcavoli points to the lightbox: 'Stage IIIA bronchogenic non-small cell carcinoma. A 4.8 cm lesion. It is inoperable.' A deafening silence falls over Room 304B as Walter stares frozen at the yellow mustard stain on the doctor's lapel.";
+
+          this.setCameraShot(new THREE.Vector3(42.0, 1.35, 83.6), new THREE.Vector3(42.2, 0.85, 82.8), 1600);
+          this.setDialogue("WALTER WHITE", '"I am a chemist, Doctor. Skip the preamble. Tell me the pathology."', "walt");
+
+          this.addTimeout(() => {
+            this.setDialogue("DR. DELCAVOLI", '"A 4.8 centimeter mass in the left hilar region. Stage IIIA non-small cell carcinoma. It is inoperable."', "doctor");
+            audioFX.playDramaticHit();
+          }, 4500);
+
+          this.addTimeout(() => {
+            document.getElementById('cinematic-dialogue').style.display = 'none';
+            document.getElementById('branch-modal').style.display = 'flex';
+          }, 10000);
+        }
+      }
+
+      addTimeout(fn, ms) {
+        const id = setTimeout(fn, ms);
+        this.timeouts.push(id);
+      }
+
+      clearTimeouts() {
+        this.timeouts.forEach(id => clearTimeout(id));
+        this.timeouts = [];
+      }
+
+      stop() {
+        this.active = false;
+        this.clearTimeouts();
+        audioFX.stopDizziness();
+        audioFX.stopHeartMonitor();
+        this.fadeScreen(false, 300);
+        this.setDizziness(0, 0);
+        camera.rotation.z = 0;
+        document.body.classList.remove('in-cinema');
+        document.getElementById('cinematic-controls').style.display = 'none';
+        document.getElementById('cinematic-dialogue').style.display = 'none';
+        document.getElementById('decision-modal').style.display = 'none';
+        document.getElementById('branch-modal').style.display = 'none';
+      }
+    }
+
+    const cinematicDirector = new CinematicDirector();
+
+    // UI Trigger Functions
+    function startCinematicEpisode() {
+      audioFX.init();
+      currentMode = 'cinema';
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-cinema').classList.add('active');
+      cinematicDirector.start();
+    }
+
+    function skipToDecision() {
+      cinematicDirector.clearTimeouts();
+      cinematicDirector.setCameraShot(new THREE.Vector3(41.4, 1.55, 83.8), new THREE.Vector3(40.5, 1.60, 82.5), 600);
+      cinematicDirector.fadeScreen(false, 300);
+      cinematicDirector.setDizziness(0, 0);
+      camera.rotation.z = 0;
+      cinematicDirector.playScene4();
+    }
+
+    function selectDecisionChoice(choice) {
+      cinematicDirector.resolveChoice(choice);
+    }
+
+    function toggleAudioMute() {
+      audioFX.muted = !audioFX.muted;
+      const icon = document.getElementById('audio-icon');
+      const label = document.getElementById('audio-label');
+      icon.textContent = audioFX.muted ? '🔇' : '🔊';
+      label.textContent = audioFX.muted ? 'Muted' : 'Audio FX';
+    }
+
+    function exitCinematic() {
+      cinematicDirector.stop();
+      switchMode('ground');
+    }
+
+    function replayCinematic() {
+      cinematicDirector.stop();
+      cinematicDirector.start();
+    }
+
     // --- INPUT HANDLING ---
     function onKeyDown(e) {
       switch (e.code) {
@@ -919,6 +2046,8 @@
         updateLandmarkPins();
       } else if (currentMode === 'ground') {
         updateGroundWalk(delta);
+      } else if (currentMode === 'cinema') {
+        cinematicDirector.update(delta);
       }
 
       renderer.render(scene, camera);

@@ -138,6 +138,8 @@ def init_all_materials():
     materials["Mat_Pine_Air_Freshener"] = get_or_create_material("Mat_Pine_Air_Freshener", base_color=(0.08, 0.55, 0.15, 1.0), roughness=0.8)
 
     # Hospital & Oncology Cabin Materials
+    materials["Mat_Emergency_Red"] = get_or_create_material("Mat_Emergency_Red", base_color=(0.85, 0.12, 0.12, 1.0), roughness=0.4)
+    materials["Mat_Desk_Wood"] = get_or_create_material("Mat_Desk_Wood", base_color=(0.42, 0.28, 0.16, 1.0), roughness=0.55)
     materials["Mat_Hospital_XRay"] = get_or_create_material("Mat_Hospital_XRay", texture_path=tex("hospital_xray_lung_scan.png"), emission_color=(0.75, 0.88, 1.0, 1.0), emission_strength=2.8, roughness=0.1)
     materials["Mat_Hospital_Sign"] = get_or_create_material("Mat_Hospital_Sign", texture_path=tex("hospital_sign_oncology.png"), roughness=0.35)
     materials["Mat_Hospital_Chart"] = get_or_create_material("Mat_Hospital_Chart", texture_path=tex("hospital_patient_chart.png"), roughness=0.6)
@@ -256,6 +258,40 @@ def init_all_materials():
     materials["Mat_Mike_Cargo_Pants"] = get_or_create_material("Mat_Mike_Cargo_Pants", base_color=(0.20, 0.22, 0.24, 1.0), roughness=0.85)
     materials["Mat_Mike_Boots"] = get_or_create_material("Mat_Mike_Boots", base_color=(0.08, 0.08, 0.09, 1.0), roughness=0.7)
     materials["Mat_Mike_Belt"] = get_or_create_material("Mat_Mike_Belt", base_color=(0.06, 0.06, 0.06, 1.0), roughness=0.8)
+
+    # --- CHAPTER 1 OPENING CINEMATIC CHARACTERS ---
+    # 1. Walter White (Pilot / Chemistry Teacher / Morning Routine)
+    materials["Mat_Walt_Hair_Brown"] = get_or_create_material("Mat_Walt_Hair_Brown", base_color=(0.32, 0.22, 0.14, 1.0), roughness=0.8)
+    materials["Mat_Walt_Mustache_Brown"] = get_or_create_material("Mat_Walt_Mustache_Brown", base_color=(0.30, 0.20, 0.12, 1.0), roughness=0.85)
+    materials["Mat_Walt_Glasses_Wire"] = get_or_create_material("Mat_Walt_Glasses_Wire", base_color=(0.88, 0.88, 0.90, 1.0), metallic=0.92, roughness=0.15)
+    materials["Mat_Walt_Glasses_Glass"] = get_or_create_material("Mat_Walt_Glasses_Glass", base_color=(0.95, 0.98, 1.0, 1.0), roughness=0.08)
+    materials["Mat_Walt_Morning_Shirt"] = get_or_create_material("Mat_Walt_Morning_Shirt", base_color=(0.90, 0.90, 0.88, 1.0), roughness=0.85)
+    materials["Mat_Walt_Morning_Pants"] = get_or_create_material("Mat_Walt_Morning_Pants", base_color=(0.28, 0.32, 0.38, 1.0), roughness=0.8)
+    materials["Mat_Walt_Teacher_Shirt"] = get_or_create_material("Mat_Walt_Teacher_Shirt", base_color=(0.48, 0.52, 0.38, 1.0), roughness=0.75)
+    materials["Mat_Walt_Teacher_Pants"] = get_or_create_material("Mat_Walt_Teacher_Pants", base_color=(0.68, 0.60, 0.48, 1.0), roughness=0.75)
+    materials["Mat_Walt_Wallabees"] = get_or_create_material("Mat_Walt_Wallabees", base_color=(0.44, 0.32, 0.22, 1.0), roughness=0.85)
+
+    # 2. Walter White (Hospital Patient)
+    materials["Mat_Hospital_Gown"] = get_or_create_material("Mat_Hospital_Gown", texture_path=tex("hospital_gown_pattern.png"), roughness=0.75)
+    materials["Mat_Hospital_Wristband"] = get_or_create_material("Mat_Hospital_Wristband", texture_path=tex("patient_wristband.png"), roughness=0.35)
+    materials["Mat_IV_Cannula_Tape"] = get_or_create_material("Mat_IV_Cannula_Tape", base_color=(0.95, 0.92, 0.85, 1.0), roughness=0.5)
+    materials["Mat_Skin_Walt_Pale"] = get_or_create_material("Mat_Skin_Walt_Pale", base_color=(0.84, 0.72, 0.65, 1.0), roughness=0.6)
+
+    # 3. Skyler White
+    materials["Mat_Skyler_Hair_Blonde"] = get_or_create_material("Mat_Skyler_Hair_Blonde", base_color=(0.88, 0.76, 0.46, 1.0), roughness=0.65)
+    materials["Mat_Skyler_Cardigan_Blue"] = get_or_create_material("Mat_Skyler_Cardigan_Blue", base_color=(0.28, 0.42, 0.64, 1.0), roughness=0.8)
+    materials["Mat_Skyler_Blouse"] = get_or_create_material("Mat_Skyler_Blouse", base_color=(0.95, 0.94, 0.92, 1.0), roughness=0.75)
+    materials["Mat_Skyler_Pants"] = get_or_create_material("Mat_Skyler_Pants", base_color=(0.18, 0.22, 0.30, 1.0), roughness=0.75)
+    materials["Mat_Skyler_Shoes"] = get_or_create_material("Mat_Skyler_Shoes", base_color=(0.35, 0.22, 0.16, 1.0), roughness=0.5)
+
+    # 4. Dr. Delcavoli (The Oncologist / Doctor)
+    materials["Mat_Doctor_LabCoat"] = get_or_create_material("Mat_Doctor_LabCoat", base_color=(0.96, 0.97, 0.98, 1.0), roughness=0.5)
+    materials["Mat_Doctor_Shirt"] = get_or_create_material("Mat_Doctor_Shirt", base_color=(0.72, 0.82, 0.94, 1.0), roughness=0.6)
+    materials["Mat_Doctor_Tie"] = get_or_create_material("Mat_Doctor_Tie", base_color=(0.12, 0.18, 0.36, 1.0), roughness=0.35)
+    materials["Mat_Doctor_Slacks"] = get_or_create_material("Mat_Doctor_Slacks", base_color=(0.22, 0.24, 0.26, 1.0), roughness=0.65)
+    materials["Mat_Doctor_Hair"] = get_or_create_material("Mat_Doctor_Hair", base_color=(0.18, 0.18, 0.20, 1.0), roughness=0.6)
+    materials["Mat_Doctor_Badge"] = get_or_create_material("Mat_Doctor_Badge", texture_path=tex("doctor_id_badge.png"), roughness=0.3)
+    materials["Mat_Stethoscope"] = get_or_create_material("Mat_Stethoscope", base_color=(0.10, 0.10, 0.12, 1.0), roughness=0.3)
 
     return materials
 

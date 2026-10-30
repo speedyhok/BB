@@ -1005,6 +1005,706 @@ def build_mike_ehrmantraut(collection=None):
     return arm_obj, char_mesh
 
 
+# ==============================================================================
+# CHAPTER 1 OPENING CINEMATIC CHARACTERS
+# ==============================================================================
+
+def create_bed_rest_action(arm_obj, name="Bed_Rest"):
+    """Keyframed reclining / bed-rest pose action for patient in hospital bed."""
+    act = bpy.data.actions.new(name=name)
+    if not arm_obj.animation_data:
+        arm_obj.animation_data_create()
+    arm_obj.animation_data.action = act
+    for pb in arm_obj.pose.bones:
+        pb.rotation_mode = 'XYZ'
+        
+    num_frames = 60
+    for frame in range(num_frames + 1):
+        phi = (frame / num_frames) * math.pi * 2.0
+        # Reclined root posture
+        root_pb = arm_obj.pose.bones.get('Root')
+        if root_pb:
+            root_pb.location = (0, -0.25, -0.45)
+            root_pb.rotation_euler = (-1.25, 0, 0) # reclined on bed backrest
+            root_pb.keyframe_insert('location', frame=frame)
+            root_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Faint shallow chest breathing
+        chest_pb = arm_obj.pose.bones.get('Chest')
+        if chest_pb:
+            breath = 0.015 * math.sin(phi)
+            chest_pb.rotation_euler = (breath - 0.10, 0, 0)
+            chest_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Head tilted back against hospital pillow
+        head_pb = arm_obj.pose.bones.get('Head')
+        if head_pb:
+            head_pb.rotation_euler = (0.28, 0, 0.05 * math.sin(phi * 0.5))
+            head_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Arms resting along side of bed
+        ua_l = arm_obj.pose.bones.get('UpperArm.L')
+        fa_l = arm_obj.pose.bones.get('Forearm.L')
+        ua_r = arm_obj.pose.bones.get('UpperArm.R')
+        fa_r = arm_obj.pose.bones.get('Forearm.R')
+        if ua_l:
+            ua_l.rotation_euler = (0.20, 0, 0.25)
+            ua_l.keyframe_insert('rotation_euler', frame=frame)
+        if fa_l:
+            fa_l.rotation_euler = (0.15, 0, -0.10)
+            fa_l.keyframe_insert('rotation_euler', frame=frame)
+        if ua_r:
+            ua_r.rotation_euler = (0.25, 0, -0.22)
+            ua_r.keyframe_insert('rotation_euler', frame=frame)
+        if fa_r:
+            # Right arm resting on abdomen with IV tube
+            fa_r.rotation_euler = (0.45, 0, 0.20)
+            fa_r.keyframe_insert('rotation_euler', frame=frame)
+        # Legs extended straight out along bed
+        thigh_l = arm_obj.pose.bones.get('Thigh.L')
+        thigh_r = arm_obj.pose.bones.get('Thigh.R')
+        shin_l = arm_obj.pose.bones.get('Shin.L')
+        shin_r = arm_obj.pose.bones.get('Shin.R')
+        if thigh_l:
+            thigh_l.rotation_euler = (0.10, 0, 0.05)
+            thigh_l.keyframe_insert('rotation_euler', frame=frame)
+        if thigh_r:
+            thigh_r.rotation_euler = (0.10, 0, -0.05)
+            thigh_r.keyframe_insert('rotation_euler', frame=frame)
+        if shin_l:
+            shin_l.rotation_euler = (0.05, 0, 0)
+            shin_l.keyframe_insert('rotation_euler', frame=frame)
+        if shin_r:
+            shin_r.rotation_euler = (0.05, 0, 0)
+            shin_r.keyframe_insert('rotation_euler', frame=frame)
+    return act
+
+
+def create_seated_visitor_action(arm_obj, name="Sit_Worry", head_turn=-0.25):
+    """Keyframed seated visitor pose with hands clasped in lap and anxious posture."""
+    act = bpy.data.actions.new(name=name)
+    if not arm_obj.animation_data:
+        arm_obj.animation_data_create()
+    arm_obj.animation_data.action = act
+    for pb in arm_obj.pose.bones:
+        pb.rotation_mode = 'XYZ'
+        
+    num_frames = 60
+    for frame in range(num_frames + 1):
+        phi = (frame / num_frames) * math.pi * 2.0
+        root_pb = arm_obj.pose.bones.get('Root')
+        if root_pb:
+            root_pb.location = (0, -0.05, -0.42)
+            root_pb.rotation_euler = (0, 0, 0)
+            root_pb.keyframe_insert('location', frame=frame)
+            root_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Torso leans slightly forward towards bed
+        spine_pb = arm_obj.pose.bones.get('Spine')
+        if spine_pb:
+            spine_pb.rotation_euler = (0.18, 0, -0.10)
+            spine_pb.keyframe_insert('rotation_euler', frame=frame)
+        chest_pb = arm_obj.pose.bones.get('Chest')
+        if chest_pb:
+            breath = 0.02 * math.sin(phi)
+            chest_pb.rotation_euler = (0.15 + breath, 0, -0.10)
+            chest_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Head turned towards patient bed
+        head_pb = arm_obj.pose.bones.get('Head')
+        if head_pb:
+            head_pb.rotation_euler = (0.05, 0, head_turn + 0.02 * math.sin(phi * 0.5))
+            head_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Legs bent at 90 degrees for seated chair position
+        thigh_l = arm_obj.pose.bones.get('Thigh.L')
+        thigh_r = arm_obj.pose.bones.get('Thigh.R')
+        shin_l = arm_obj.pose.bones.get('Shin.L')
+        shin_r = arm_obj.pose.bones.get('Shin.R')
+        if thigh_l:
+            thigh_l.rotation_euler = (1.55, 0, 0.05)
+            thigh_l.keyframe_insert('rotation_euler', frame=frame)
+        if thigh_r:
+            thigh_r.rotation_euler = (1.55, 0, -0.05)
+            thigh_r.keyframe_insert('rotation_euler', frame=frame)
+        if shin_l:
+            shin_l.rotation_euler = (1.55, 0, 0)
+            shin_l.keyframe_insert('rotation_euler', frame=frame)
+        if shin_r:
+            shin_r.rotation_euler = (1.55, 0, 0)
+            shin_r.keyframe_insert('rotation_euler', frame=frame)
+        # Arms forward with hands clasped in lap
+        ua_l = arm_obj.pose.bones.get('UpperArm.L')
+        fa_l = arm_obj.pose.bones.get('Forearm.L')
+        ua_r = arm_obj.pose.bones.get('UpperArm.R')
+        fa_r = arm_obj.pose.bones.get('Forearm.R')
+        if ua_l:
+            ua_l.rotation_euler = (0.55, 0, 0.20)
+            ua_l.keyframe_insert('rotation_euler', frame=frame)
+        if fa_l:
+            fa_l.rotation_euler = (1.05, 0, 0.35)
+            fa_l.keyframe_insert('rotation_euler', frame=frame)
+        if ua_r:
+            ua_r.rotation_euler = (0.55, 0, -0.20)
+            ua_r.keyframe_insert('rotation_euler', frame=frame)
+        if fa_r:
+            fa_r.rotation_euler = (1.05, 0, -0.35)
+            fa_r.keyframe_insert('rotation_euler', frame=frame)
+    return act
+
+
+def create_consultation_action(arm_obj, name="Consultation"):
+    """Doctor consultation pose holding clipboard up at chest level with authoritative posture."""
+    act = bpy.data.actions.new(name=name)
+    if not arm_obj.animation_data:
+        arm_obj.animation_data_create()
+    arm_obj.animation_data.action = act
+    for pb in arm_obj.pose.bones:
+        pb.rotation_mode = 'XYZ'
+        
+    num_frames = 60
+    for frame in range(num_frames + 1):
+        phi = (frame / num_frames) * math.pi * 2.0
+        root_pb = arm_obj.pose.bones.get('Root')
+        if root_pb:
+            root_pb.location = (0, 0, 0)
+            root_pb.rotation_euler = (0, 0, 0)
+            root_pb.keyframe_insert('location', frame=frame)
+            root_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Chest upright with controlled breathing
+        chest_pb = arm_obj.pose.bones.get('Chest')
+        if chest_pb:
+            breath = 0.015 * math.sin(phi)
+            chest_pb.rotation_euler = (breath - 0.03, 0, 0)
+            chest_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Head tilted slightly down towards patient
+        head_pb = arm_obj.pose.bones.get('Head')
+        if head_pb:
+            head_pb.rotation_euler = (0.12, 0, 0.04 * math.sin(phi * 0.5))
+            head_pb.keyframe_insert('rotation_euler', frame=frame)
+        # Left Arm holding the clipboard up in front of chest
+        ua_l = arm_obj.pose.bones.get('UpperArm.L')
+        fa_l = arm_obj.pose.bones.get('Forearm.L')
+        if ua_l:
+            ua_l.rotation_euler = (0.45, 0, 0.22)
+            ua_l.keyframe_insert('rotation_euler', frame=frame)
+        if fa_l:
+            fa_l.rotation_euler = (1.25, 0, 0.40)
+            fa_l.keyframe_insert('rotation_euler', frame=frame)
+        # Right Arm gesturing calmly
+        ua_r = arm_obj.pose.bones.get('UpperArm.R')
+        fa_r = arm_obj.pose.bones.get('Forearm.R')
+        if ua_r:
+            ua_r.rotation_euler = (0.22 + 0.03 * math.sin(phi), 0, -0.15)
+            ua_r.keyframe_insert('rotation_euler', frame=frame)
+        if fa_r:
+            fa_r.rotation_euler = (0.65 + 0.05 * math.sin(phi), 0, 0.10)
+            fa_r.keyframe_insert('rotation_euler', frame=frame)
+        # Standing feet firmly placed
+        thigh_l = arm_obj.pose.bones.get('Thigh.L')
+        thigh_r = arm_obj.pose.bones.get('Thigh.R')
+        if thigh_l:
+            thigh_l.rotation_euler = (-0.03, 0, 0.04)
+            thigh_l.keyframe_insert('rotation_euler', frame=frame)
+        if thigh_r:
+            thigh_r.rotation_euler = (-0.03, 0, -0.04)
+            thigh_r.keyframe_insert('rotation_euler', frame=frame)
+    return act
+
+
+def build_walter_white_pilot(collection=None, outfit="morning"):
+    """
+    Walter White (Pilot / High School Chemistry Teacher)
+    - Combed thinning brown hair with side part (no fedora!)
+    - Neatly trimmed brown mustache (no goatee!)
+    - Thin silver wire-rim rectangular glasses
+    - 'morning': White ribbed cotton undershirt, slate-blue lounge pajama pants, slippers
+    - 'teacher': Olive-green button-up collared shirt, pleated khaki trousers, Wallabee shoes
+    """
+    col = collection or bpy.context.scene.collection
+    parts = []
+    
+    # 1. HEAD & ACCESSORIES
+    parts.append(create_mesh_primitive("Walt_Head", lambda bm: make_sphere(bm, radius=0.108, segments=18, rings=12),
+                                       location=(0, 0, 1.68), scale=(0.95, 1.05, 1.15),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Ear_L", lambda bm: make_sphere(bm, radius=0.03, segments=10, rings=6),
+                                       location=(-0.11, 0, 1.68), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Ear_R", lambda bm: make_sphere(bm, radius=0.03, segments=10, rings=6),
+                                       location=(0.11, 0, 1.68), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Nose", lambda bm: make_box(bm, size=(0.024, 0.040, 0.040)),
+                                       location=(0, 0.11, 1.68), material="Mat_Skin_Caucasian", parent_bone="Head"))
+    
+    # Season 1 Combed Brown Hair
+    parts.append(create_mesh_primitive("Walt_Hair_Top", lambda bm: make_sphere(bm, radius=0.112, segments=16, rings=10),
+                                       location=(0, -0.015, 1.74), scale=(0.98, 1.05, 0.60),
+                                       material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Hair_Side_L", lambda bm: make_box(bm, size=(0.022, 0.15, 0.09)),
+                                       location=(-0.108, -0.01, 1.70), material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Hair_Side_R", lambda bm: make_box(bm, size=(0.022, 0.15, 0.09)),
+                                       location=(0.108, -0.01, 1.70), material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Hair_Back", lambda bm: make_box(bm, size=(0.19, 0.03, 0.09)),
+                                       location=(0, -0.095, 1.69), material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    
+    # Season 1 Brown Mustache (No goatee!)
+    parts.append(create_mesh_primitive("Walt_Mustache", lambda bm: make_box(bm, size=(0.065, 0.022, 0.016)),
+                                       location=(0, 0.112, 1.635), material="Mat_Walt_Mustache_Brown", parent_bone="Head"))
+    
+    # Thin Silver Wire-Rim Glasses
+    parts.append(create_mesh_primitive("Walt_Glasses_Rim_L", lambda bm: make_box(bm, size=(0.042, 0.010, 0.026)),
+                                       location=(-0.045, 0.112, 1.70), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Glasses_Rim_R", lambda bm: make_box(bm, size=(0.042, 0.010, 0.026)),
+                                       location=(0.045, 0.112, 1.70), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Glasses_Bridge", lambda bm: make_box(bm, size=(0.018, 0.008, 0.005)),
+                                       location=(0, 0.113, 1.705), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Glasses_Temple_L", lambda bm: make_box(bm, size=(0.005, 0.12, 0.005)),
+                                       location=(-0.095, 0.04, 1.70), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Glasses_Temple_R", lambda bm: make_box(bm, size=(0.005, 0.12, 0.005)),
+                                       location=(0.095, 0.04, 1.70), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Glasses_Lens_L", lambda bm: make_box(bm, size=(0.038, 0.004, 0.022)),
+                                       location=(-0.045, 0.112, 1.70), material="Mat_Walt_Glasses_Glass", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Glasses_Lens_R", lambda bm: make_box(bm, size=(0.038, 0.004, 0.022)),
+                                       location=(0.045, 0.112, 1.70), material="Mat_Walt_Glasses_Glass", parent_bone="Head"))
+    
+    # 2. NECK
+    parts.append(create_mesh_primitive("Walt_Neck", lambda bm: make_cylinder(bm, radius=0.052, depth=0.10, segments=14),
+                                       location=(0, 0, 1.54), material="Mat_Skin_Caucasian", parent_bone="Neck"))
+    
+    # 3. TORSO & CLOTHING
+    if outfit == "morning":
+        # Undershirt
+        parts.append(create_mesh_primitive("Walt_Shirt_Collar", lambda bm: make_cylinder(bm, radius=0.072, depth=0.03, segments=14),
+                                           location=(0, 0, 1.49), material="Mat_Walt_Morning_Shirt", parent_bone="Chest"))
+        parts.append(create_mesh_primitive("Walt_Shirt_Chest", lambda bm: make_box(bm, size=(0.34, 0.20, 0.26)),
+                                           location=(0, 0, 1.38), material="Mat_Walt_Morning_Shirt", parent_bone="Chest"))
+        parts.append(create_mesh_primitive("Walt_Shirt_Midriff", lambda bm: make_box(bm, size=(0.32, 0.18, 0.20)),
+                                           location=(0, 0, 1.18), material="Mat_Walt_Morning_Shirt", parent_bone="Spine"))
+        parts.append(create_mesh_primitive("Walt_Pajama_Hips", lambda bm: make_box(bm, size=(0.33, 0.19, 0.14)),
+                                           location=(0, 0, 1.01), material="Mat_Walt_Morning_Pants", parent_bone="Root"))
+        parts.append(create_mesh_primitive("Walt_Pajama_Drawstring", lambda bm: make_box(bm, size=(0.04, 0.015, 0.06)),
+                                           location=(0, 0.10, 1.03), material="Mat_Walt_Morning_Shirt", parent_bone="Root"))
+        # Arms
+        for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+            parts.append(create_mesh_primitive(f"Walt_Sleeve_{side}", lambda bm: make_cylinder(bm, radius=0.068, depth=0.12, segments=14),
+                                               location=(sign * 0.20, 0, 1.36), material="Mat_Walt_Morning_Shirt", parent_bone=f"UpperArm{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_UpperArm_{side}", lambda bm: make_cylinder(bm, radius=0.058, depth=0.16, segments=14),
+                                               location=(sign * 0.20, 0, 1.22), material="Mat_Skin_Caucasian", parent_bone=f"UpperArm{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Forearm_{side}", lambda bm: make_cylinder(bm, radius=0.052, depth=0.28, segments=14),
+                                               location=(sign * 0.21, 0, 0.98), material="Mat_Skin_Caucasian", parent_bone=f"Forearm{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Hand_{side}", lambda bm: make_box(bm, size=(0.045, 0.07, 0.09)),
+                                               location=(sign * 0.215, 0, 0.77), material="Mat_Skin_Caucasian", parent_bone=f"Hand{suffix}"))
+        # Legs & Slippers
+        for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+            parts.append(create_mesh_primitive(f"Walt_Thigh_{side}", lambda bm: make_cylinder(bm, radius=0.082, depth=0.42, segments=14),
+                                               location=(sign * 0.12, 0, 0.72), material="Mat_Walt_Morning_Pants", parent_bone=f"Thigh{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Shin_{side}", lambda bm: make_cylinder(bm, radius=0.075, depth=0.38, segments=14),
+                                               location=(sign * 0.12, 0, 0.30), material="Mat_Walt_Morning_Pants", parent_bone=f"Shin{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Slipper_{side}", lambda bm: make_box(bm, size=(0.095, 0.21, 0.06)),
+                                               location=(sign * 0.12, 0.06, 0.04), material="Mat_Walt_Morning_Pants", parent_bone=f"Foot{suffix}"))
+    else: # teacher outfit
+        parts.append(create_mesh_primitive("Walt_Shirt_Collar", lambda bm: make_box(bm, size=(0.14, 0.14, 0.04)),
+                                           location=(0, 0, 1.50), material="Mat_Walt_Teacher_Shirt", parent_bone="Chest"))
+        parts.append(create_mesh_primitive("Walt_Shirt_Chest", lambda bm: make_box(bm, size=(0.35, 0.21, 0.26)),
+                                           location=(0, 0, 1.38), material="Mat_Walt_Teacher_Shirt", parent_bone="Chest"))
+        parts.append(create_mesh_primitive("Walt_Shirt_Pocket", lambda bm: make_box(bm, size=(0.07, 0.01, 0.09)),
+                                           location=(-0.08, 0.106, 1.40), material="Mat_Walt_Teacher_Shirt", parent_bone="Chest"))
+        parts.append(create_mesh_primitive("Walt_Shirt_Placket", lambda bm: make_box(bm, size=(0.02, 0.01, 0.26)),
+                                           location=(0, 0.106, 1.38), material="Mat_Walt_Teacher_Shirt", parent_bone="Chest"))
+        parts.append(create_mesh_primitive("Walt_Shirt_Midriff", lambda bm: make_box(bm, size=(0.33, 0.19, 0.20)),
+                                           location=(0, 0, 1.18), material="Mat_Walt_Teacher_Shirt", parent_bone="Spine"))
+        parts.append(create_mesh_primitive("Walt_Khaki_Hips", lambda bm: make_box(bm, size=(0.34, 0.20, 0.14)),
+                                           location=(0, 0, 1.01), material="Mat_Walt_Teacher_Pants", parent_bone="Root"))
+        parts.append(create_mesh_primitive("Walt_Belt", lambda bm: make_box(bm, size=(0.345, 0.205, 0.035)),
+                                           location=(0, 0, 1.06), material="Mat_Mike_Belt", parent_bone="Root"))
+        for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+            parts.append(create_mesh_primitive(f"Walt_UpperArm_{side}", lambda bm: make_cylinder(bm, radius=0.065, depth=0.28, segments=14),
+                                               location=(sign * 0.20, 0, 1.28), material="Mat_Walt_Teacher_Shirt", parent_bone=f"UpperArm{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Forearm_{side}", lambda bm: make_cylinder(bm, radius=0.055, depth=0.28, segments=14),
+                                               location=(sign * 0.21, 0, 0.98), material="Mat_Walt_Teacher_Shirt", parent_bone=f"Forearm{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Hand_{side}", lambda bm: make_box(bm, size=(0.045, 0.07, 0.09)),
+                                               location=(sign * 0.215, 0, 0.77), material="Mat_Skin_Caucasian", parent_bone=f"Hand{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Thigh_{side}", lambda bm: make_cylinder(bm, radius=0.08, depth=0.42, segments=14),
+                                               location=(sign * 0.12, 0, 0.72), material="Mat_Walt_Teacher_Pants", parent_bone=f"Thigh{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Shin_{side}", lambda bm: make_cylinder(bm, radius=0.07, depth=0.38, segments=14),
+                                               location=(sign * 0.12, 0, 0.30), material="Mat_Walt_Teacher_Pants", parent_bone=f"Shin{suffix}"))
+            parts.append(create_mesh_primitive(f"Walt_Wallabee_{side}", lambda bm: make_box(bm, size=(0.10, 0.22, 0.08)),
+                                               location=(sign * 0.12, 0.06, 0.06), material="Mat_Walt_Wallabees", parent_bone=f"Foot{suffix}"))
+
+    # Armature and Animations
+    arm_obj = build_biped_armature("Walter_White_Pilot_Armature")
+    link_to_collection(arm_obj, col)
+    char_mesh = attach_parts_and_bind_to_armature("Walter_White_Pilot", parts, arm_obj, col)
+    
+    walk_act = create_walk_cycle_action(arm_obj, "Walk_Cycle",
+                                        stride_angle=0.40, knee_bend=0.50, arm_swing=0.30,
+                                        bounce_amp=0.025, sway_amp=0.012, forward_lean=0.06,
+                                        torso_twist=0.04, head_counter=0.90, elbow_bend=0.20,
+                                        foot_roll=0.26)
+    idle_act = create_idle_action(arm_obj, "Idle", breath_amp=0.025, weight_shift=0.012, head_quirk=(0.02, 0, 0.01))
+    register_nla_tracks(arm_obj, walk_act, idle_act)
+    
+    return arm_obj, char_mesh
+
+
+def build_walter_white_patient(collection=None):
+    """
+    Walter White (Hospital Patient)
+    - Pale fatigued skin tone
+    - Tousled brown hair
+    - Pale seafoam patterned hospital patient gown
+    - Barcode patient identification wristband with red alert tab
+    - IV cannula tape & port on hand leading to IV line
+    - Yellow non-slip hospital socks
+    - Actions: Bed_Rest, Weak_Sit, Idle
+    """
+    col = collection or bpy.context.scene.collection
+    parts = []
+    
+    # 1. HEAD
+    parts.append(create_mesh_primitive("Walt_Patient_Head", lambda bm: make_sphere(bm, radius=0.108, segments=18, rings=12),
+                                       location=(0, 0, 1.68), scale=(0.95, 1.05, 1.15),
+                                       material="Mat_Skin_Walt_Pale", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Patient_Ear_L", lambda bm: make_sphere(bm, radius=0.03, segments=10, rings=6),
+                                       location=(-0.11, 0, 1.68), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Walt_Pale", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Patient_Ear_R", lambda bm: make_sphere(bm, radius=0.03, segments=10, rings=6),
+                                       location=(0.11, 0, 1.68), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Walt_Pale", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Patient_Nose", lambda bm: make_box(bm, size=(0.024, 0.040, 0.040)),
+                                       location=(0, 0.11, 1.68), material="Mat_Skin_Walt_Pale", parent_bone="Head"))
+    
+    # Tousled Hair
+    parts.append(create_mesh_primitive("Walt_Patient_Hair_Top", lambda bm: make_sphere(bm, radius=0.114, segments=16, rings=10),
+                                       location=(0, -0.015, 1.74), scale=(0.98, 1.06, 0.62),
+                                       material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Patient_Hair_Side_L", lambda bm: make_box(bm, size=(0.024, 0.15, 0.09)),
+                                       location=(-0.108, -0.01, 1.70), material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Patient_Hair_Side_R", lambda bm: make_box(bm, size=(0.024, 0.15, 0.09)),
+                                       location=(0.108, -0.01, 1.70), material="Mat_Walt_Hair_Brown", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Walt_Patient_Mustache", lambda bm: make_box(bm, size=(0.065, 0.022, 0.016)),
+                                       location=(0, 0.112, 1.635), material="Mat_Walt_Mustache_Brown", parent_bone="Head"))
+    
+    # 2. NECK
+    parts.append(create_mesh_primitive("Walt_Patient_Neck", lambda bm: make_cylinder(bm, radius=0.052, depth=0.10, segments=14),
+                                       location=(0, 0, 1.54), material="Mat_Skin_Walt_Pale", parent_bone="Neck"))
+    
+    # 3. HOSPITAL GOWN
+    parts.append(create_mesh_primitive("Walt_Gown_Chest", lambda bm: make_box(bm, size=(0.36, 0.22, 0.26)),
+                                       location=(0, 0, 1.38), material="Mat_Hospital_Gown", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Walt_Gown_Spine", lambda bm: make_box(bm, size=(0.34, 0.20, 0.20)),
+                                       location=(0, 0, 1.18), material="Mat_Hospital_Gown", parent_bone="Spine"))
+    parts.append(create_mesh_primitive("Walt_Gown_Skirt", lambda bm: make_cylinder(bm, radius=0.20, depth=0.45, segments=16),
+                                       location=(0, 0, 0.95), material="Mat_Hospital_Gown", parent_bone="Root"))
+    parts.append(create_mesh_primitive("Walt_Gown_Tie_Upper", lambda bm: make_box(bm, size=(0.04, 0.02, 0.08)),
+                                       location=(0, -0.115, 1.40), material="Mat_Hospital_Gown", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Walt_Gown_Tie_Lower", lambda bm: make_box(bm, size=(0.04, 0.02, 0.08)),
+                                       location=(0, -0.105, 1.20), material="Mat_Hospital_Gown", parent_bone="Spine"))
+    
+    # 4. ARMS, WRISTBAND & IV CANNULA
+    for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+        parts.append(create_mesh_primitive(f"Walt_Gown_Sleeve_{side}", lambda bm: make_cylinder(bm, radius=0.072, depth=0.14, segments=14),
+                                           location=(sign * 0.20, 0, 1.35), material="Mat_Hospital_Gown", parent_bone=f"UpperArm{suffix}"))
+        parts.append(create_mesh_primitive(f"Walt_Patient_UpperArm_{side}", lambda bm: make_cylinder(bm, radius=0.058, depth=0.16, segments=14),
+                                           location=(sign * 0.20, 0, 1.21), material="Mat_Skin_Walt_Pale", parent_bone=f"UpperArm{suffix}"))
+        parts.append(create_mesh_primitive(f"Walt_Patient_Forearm_{side}", lambda bm: make_cylinder(bm, radius=0.052, depth=0.28, segments=14),
+                                           location=(sign * 0.21, 0, 0.98), material="Mat_Skin_Walt_Pale", parent_bone=f"Forearm{suffix}"))
+        parts.append(create_mesh_primitive(f"Walt_Patient_Hand_{side}", lambda bm: make_box(bm, size=(0.045, 0.07, 0.09)),
+                                           location=(sign * 0.215, 0, 0.77), material="Mat_Skin_Walt_Pale", parent_bone=f"Hand{suffix}"))
+    
+    # Left Wrist Barcode Identification Band + Red Allergy Tag
+    parts.append(create_mesh_primitive("Walt_Wristband", lambda bm: make_cylinder(bm, radius=0.054, depth=0.035, segments=16),
+                                       location=(-0.215, 0, 0.83), material="Mat_Hospital_Wristband", parent_bone="Forearm.L"))
+    parts.append(create_mesh_primitive("Walt_Allergy_Tag", lambda bm: make_box(bm, size=(0.015, 0.015, 0.035)),
+                                       location=(-0.24, 0, 0.83), material="Mat_Emergency_Red", parent_bone="Forearm.L"))
+    
+    # Right Hand IV Cannula Tape & Tubing
+    parts.append(create_mesh_primitive("Walt_IV_Tape", lambda bm: make_box(bm, size=(0.035, 0.045, 0.008)),
+                                       location=(0.215, 0.02, 0.78), material="Mat_IV_Cannula_Tape", parent_bone="Hand.R"))
+    parts.append(create_mesh_primitive("Walt_IV_Port", lambda bm: make_cylinder(bm, radius=0.008, depth=0.016, segments=8),
+                                       location=(0.215, 0.02, 0.79), material="Mat_IV_Saline", parent_bone="Hand.R"))
+    parts.append(create_mesh_primitive("Walt_IV_Tube", lambda bm: make_cylinder(bm, radius=0.004, depth=0.35, segments=8),
+                                       location=(0.23, 0.02, 0.95), material="Mat_IV_Saline", parent_bone="Forearm.R"))
+    
+    # 5. LEGS & YELLOW NON-SLIP SOCKS
+    for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+        parts.append(create_mesh_primitive(f"Walt_Patient_Thigh_{side}", lambda bm: make_cylinder(bm, radius=0.078, depth=0.38, segments=14),
+                                           location=(sign * 0.12, 0, 0.70), material="Mat_Skin_Walt_Pale", parent_bone=f"Thigh{suffix}"))
+        parts.append(create_mesh_primitive(f"Walt_Patient_Shin_{side}", lambda bm: make_cylinder(bm, radius=0.068, depth=0.38, segments=14),
+                                           location=(sign * 0.12, 0, 0.30), material="Mat_Skin_Walt_Pale", parent_bone=f"Shin{suffix}"))
+        parts.append(create_mesh_primitive(f"Walt_Patient_Sock_{side}", lambda bm: make_box(bm, size=(0.095, 0.21, 0.07)),
+                                           location=(sign * 0.12, 0.06, 0.045), material="Mat_Mustard_Yellow", parent_bone=f"Foot{suffix}"))
+
+    # Armature and Animations
+    arm_obj = build_biped_armature("Walter_White_Patient_Armature")
+    link_to_collection(arm_obj, col)
+    char_mesh = attach_parts_and_bind_to_armature("Walter_White_Patient", parts, arm_obj, col)
+    
+    bed_act = create_bed_rest_action(arm_obj, "Bed_Rest")
+    idle_act = create_idle_action(arm_obj, "Idle", breath_amp=0.015, weight_shift=0.005)
+    
+    # Setup NLA
+    anim_data = arm_obj.animation_data
+    for tr in list(anim_data.nla_tracks):
+        anim_data.nla_tracks.remove(tr)
+    t1 = anim_data.nla_tracks.new()
+    t1.name = "Bed_Rest"
+    t1.strips.new("Bed_Rest", 0, bed_act)
+    t2 = anim_data.nla_tracks.new()
+    t2.name = "Idle"
+    t2.strips.new("Idle", 0, idle_act)
+    anim_data.action = bed_act
+    
+    return arm_obj, char_mesh
+
+
+def build_skyler_white(collection=None):
+    """
+    Skyler White
+    - Shoulder-length blonde wavy hair
+    - Concerned facial features, pearl stud earrings
+    - Periwinkle blue cardigan jacket over cream blouse
+    - Maternity belly (pregnant with Holly in Season 1)
+    - Gold wedding ring on left hand
+    - Dark maternity trousers and leather flats
+    - Actions: Sit_Worry, Walk_Cycle, Idle
+    """
+    col = collection or bpy.context.scene.collection
+    parts = []
+    
+    # 1. HEAD & HAIR
+    parts.append(create_mesh_primitive("Skyler_Head", lambda bm: make_sphere(bm, radius=0.102, segments=18, rings=12),
+                                       location=(0, 0, 1.63), scale=(0.92, 0.98, 1.10),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Ear_L", lambda bm: make_sphere(bm, radius=0.025, segments=10, rings=6),
+                                       location=(-0.105, 0, 1.63), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Ear_R", lambda bm: make_sphere(bm, radius=0.025, segments=10, rings=6),
+                                       location=(0.105, 0, 1.63), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Earring_L", lambda bm: make_sphere(bm, radius=0.008, segments=8, rings=6),
+                                       location=(-0.108, 0, 1.61), material="Mat_Jesse_Sneakers_White", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Earring_R", lambda bm: make_sphere(bm, radius=0.008, segments=8, rings=6),
+                                       location=(0.108, 0, 1.61), material="Mat_Jesse_Sneakers_White", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Nose", lambda bm: make_box(bm, size=(0.020, 0.035, 0.032)),
+                                       location=(0, 0.10, 1.63), material="Mat_Skin_Caucasian", parent_bone="Head"))
+    
+    # Wavy Blonde Hair
+    parts.append(create_mesh_primitive("Skyler_Hair_Top", lambda bm: make_sphere(bm, radius=0.118, segments=18, rings=12),
+                                       location=(0, -0.015, 1.70), scale=(1.02, 1.08, 0.80),
+                                       material="Mat_Skyler_Hair_Blonde", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Hair_Side_L", lambda bm: make_box(bm, size=(0.045, 0.09, 0.28)),
+                                       location=(-0.115, -0.01, 1.54), material="Mat_Skyler_Hair_Blonde", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Hair_Side_R", lambda bm: make_box(bm, size=(0.045, 0.09, 0.28)),
+                                       location=(0.115, -0.01, 1.54), material="Mat_Skyler_Hair_Blonde", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Skyler_Hair_Back", lambda bm: make_box(bm, size=(0.20, 0.06, 0.26)),
+                                       location=(0, -0.085, 1.55), material="Mat_Skyler_Hair_Blonde", parent_bone="Head"))
+    
+    # 2. NECK
+    parts.append(create_mesh_primitive("Skyler_Neck", lambda bm: make_cylinder(bm, radius=0.046, depth=0.10, segments=14),
+                                       location=(0, 0, 1.51), material="Mat_Skin_Caucasian", parent_bone="Neck"))
+    
+    # 3. TORSO, CARDIGAN & PREGNANT MATERNITY BUMP
+    parts.append(create_mesh_primitive("Skyler_Blouse", lambda bm: make_box(bm, size=(0.20, 0.16, 0.24)),
+                                       location=(0, 0.01, 1.36), material="Mat_Skyler_Blouse", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Skyler_Cardigan_Chest", lambda bm: make_box(bm, size=(0.33, 0.20, 0.24)),
+                                       location=(0, 0, 1.36), material="Mat_Skyler_Cardigan_Blue", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Skyler_Lapel_L", lambda bm: make_box(bm, size=(0.04, 0.02, 0.24)),
+                                       location=(-0.11, 0.10, 1.36), material="Mat_Skyler_Cardigan_Blue", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Skyler_Lapel_R", lambda bm: make_box(bm, size=(0.04, 0.02, 0.24)),
+                                       location=(0.11, 0.10, 1.36), material="Mat_Skyler_Cardigan_Blue", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Skyler_Cardigan_Midriff", lambda bm: make_box(bm, size=(0.31, 0.18, 0.18)),
+                                       location=(0, 0, 1.18), material="Mat_Skyler_Cardigan_Blue", parent_bone="Spine"))
+    # Season 1 Pregnancy Bump
+    parts.append(create_mesh_primitive("Skyler_Maternity_Bump", lambda bm: make_sphere(bm, radius=0.125, segments=16, rings=10),
+                                       location=(0, 0.065, 1.15), scale=(1.0, 1.25, 0.95),
+                                       material="Mat_Skyler_Blouse", parent_bone="Spine"))
+    parts.append(create_mesh_primitive("Skyler_Hips", lambda bm: make_box(bm, size=(0.31, 0.18, 0.14)),
+                                       location=(0, 0, 1.00), material="Mat_Skyler_Pants", parent_bone="Root"))
+    
+    # 4. ARMS & WEDDING BAND
+    for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+        parts.append(create_mesh_primitive(f"Skyler_Sleeve_Upper_{side}", lambda bm: make_cylinder(bm, radius=0.058, depth=0.26, segments=14),
+                                           location=(sign * 0.18, 0, 1.26), material="Mat_Skyler_Cardigan_Blue", parent_bone=f"UpperArm{suffix}"))
+        parts.append(create_mesh_primitive(f"Skyler_Sleeve_Forearm_{side}", lambda bm: make_cylinder(bm, radius=0.050, depth=0.26, segments=14),
+                                           location=(sign * 0.19, 0, 0.98), material="Mat_Skyler_Cardigan_Blue", parent_bone=f"Forearm{suffix}"))
+        parts.append(create_mesh_primitive(f"Skyler_Hand_{side}", lambda bm: make_box(bm, size=(0.040, 0.065, 0.08)),
+                                           location=(sign * 0.195, 0, 0.77), material="Mat_Skin_Caucasian", parent_bone=f"Hand{suffix}"))
+    parts.append(create_mesh_primitive("Skyler_Wedding_Ring", lambda bm: make_cylinder(bm, radius=0.012, depth=0.01, segments=10),
+                                       location=(-0.195, 0.02, 0.77), material="Mat_Saul_Gold", parent_bone="Hand.L"))
+    
+    # 5. LEGS & SLIP-ON SHOES
+    for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+        parts.append(create_mesh_primitive(f"Skyler_Thigh_{side}", lambda bm: make_cylinder(bm, radius=0.075, depth=0.40, segments=14),
+                                           location=(sign * 0.11, 0, 0.70), material="Mat_Skyler_Pants", parent_bone=f"Thigh{suffix}"))
+        parts.append(create_mesh_primitive(f"Skyler_Shin_{side}", lambda bm: make_cylinder(bm, radius=0.065, depth=0.38, segments=14),
+                                           location=(sign * 0.11, 0, 0.28), material="Mat_Skyler_Pants", parent_bone=f"Shin{suffix}"))
+        parts.append(create_mesh_primitive(f"Skyler_Shoe_{side}", lambda bm: make_box(bm, size=(0.09, 0.20, 0.055)),
+                                           location=(sign * 0.11, 0.05, 0.04), material="Mat_Skyler_Shoes", parent_bone=f"Foot{suffix}"))
+
+    # Armature and Animations
+    arm_obj = build_biped_armature("Skyler_White_Armature")
+    link_to_collection(arm_obj, col)
+    char_mesh = attach_parts_and_bind_to_armature("Skyler_White", parts, arm_obj, col)
+    
+    sit_act = create_seated_visitor_action(arm_obj, "Sit_Worry", head_turn=-0.25)
+    walk_act = create_walk_cycle_action(arm_obj, "Walk_Cycle",
+                                        stride_angle=0.38, knee_bend=0.48, arm_swing=0.28,
+                                        bounce_amp=0.022, sway_amp=0.014, forward_lean=0.03,
+                                        torso_twist=0.04, head_counter=0.95, elbow_bend=0.22,
+                                        foot_roll=0.25)
+    idle_act = create_idle_action(arm_obj, "Idle", breath_amp=0.022, weight_shift=0.010, head_quirk=(0.02, 0, 0.03))
+    
+    anim_data = arm_obj.animation_data
+    for tr in list(anim_data.nla_tracks):
+        anim_data.nla_tracks.remove(tr)
+    t1 = anim_data.nla_tracks.new()
+    t1.name = "Sit_Worry"
+    t1.strips.new("Sit_Worry", 0, sit_act)
+    t2 = anim_data.nla_tracks.new()
+    t2.name = "Walk_Cycle"
+    t2.strips.new("Walk_Cycle", 0, walk_act)
+    t3 = anim_data.nla_tracks.new()
+    t3.name = "Idle"
+    t3.strips.new("Idle", 0, idle_act)
+    anim_data.action = sit_act
+    
+    return arm_obj, char_mesh
+
+
+def build_dr_delcavoli(collection=None):
+    """
+    Dr. Delcavoli (The Oncologist / Pulmonology Specialist)
+    - Salt & pepper hair, silver temples, wire spectacles
+    - White clinical lab coat over hospital blue dress shirt & navy tie
+    - THE ICONIC MUSTARD STAIN on right upper lapel!
+    - Hospital staff physician ID badge
+    - Stethoscope draped around neck
+    - Walter White's clinical chart clipboard held in hand
+    - Charcoal pressed slacks and polished black dress shoes
+    - Actions: Consultation, Walk_Cycle, Idle
+    """
+    col = collection or bpy.context.scene.collection
+    parts = []
+    
+    # 1. HEAD & GLASSES
+    parts.append(create_mesh_primitive("Doctor_Head", lambda bm: make_sphere(bm, radius=0.108, segments=18, rings=12),
+                                       location=(0, 0, 1.70), scale=(0.95, 1.04, 1.14),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Ear_L", lambda bm: make_sphere(bm, radius=0.03, segments=10, rings=6),
+                                       location=(-0.11, 0, 1.70), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Ear_R", lambda bm: make_sphere(bm, radius=0.03, segments=10, rings=6),
+                                       location=(0.11, 0, 1.70), scale=(0.4, 0.7, 1.1),
+                                       material="Mat_Skin_Caucasian", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Nose", lambda bm: make_box(bm, size=(0.024, 0.040, 0.040)),
+                                       location=(0, 0.11, 1.70), material="Mat_Skin_Caucasian", parent_bone="Head"))
+    
+    # Salt & Pepper Hair with Grey Temples
+    parts.append(create_mesh_primitive("Doctor_Hair_Top", lambda bm: make_sphere(bm, radius=0.114, segments=18, rings=12),
+                                       location=(0, -0.015, 1.76), scale=(0.98, 1.05, 0.65),
+                                       material="Mat_Doctor_Hair", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Hair_Side_L", lambda bm: make_box(bm, size=(0.024, 0.16, 0.10)),
+                                       location=(-0.108, -0.01, 1.71), material="Mat_Doctor_Hair", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Hair_Side_R", lambda bm: make_box(bm, size=(0.024, 0.16, 0.10)),
+                                       location=(0.108, -0.01, 1.71), material="Mat_Doctor_Hair", parent_bone="Head"))
+    
+    # Wire Spectacles
+    parts.append(create_mesh_primitive("Doctor_Glasses_L", lambda bm: make_box(bm, size=(0.042, 0.010, 0.026)),
+                                       location=(-0.045, 0.112, 1.715), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Glasses_R", lambda bm: make_box(bm, size=(0.042, 0.010, 0.026)),
+                                       location=(0.045, 0.112, 1.715), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    parts.append(create_mesh_primitive("Doctor_Glasses_Bridge", lambda bm: make_box(bm, size=(0.018, 0.008, 0.005)),
+                                       location=(0, 0.113, 1.720), material="Mat_Walt_Glasses_Wire", parent_bone="Head"))
+    
+    # 2. NECK
+    parts.append(create_mesh_primitive("Doctor_Neck", lambda bm: make_cylinder(bm, radius=0.052, depth=0.10, segments=14),
+                                       location=(0, 0, 1.55), material="Mat_Skin_Caucasian", parent_bone="Neck"))
+    
+    # 3. CLINICAL LAB COAT & ATTIRE
+    parts.append(create_mesh_primitive("Doctor_Shirt", lambda bm: make_box(bm, size=(0.18, 0.14, 0.24)),
+                                       location=(0, 0.01, 1.40), material="Mat_Doctor_Shirt", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Doctor_Tie", lambda bm: make_box(bm, size=(0.045, 0.015, 0.22)),
+                                       location=(0, 0.105, 1.38), material="Mat_Doctor_Tie", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Doctor_LabCoat_Chest", lambda bm: make_box(bm, size=(0.36, 0.22, 0.28)),
+                                       location=(0, 0, 1.38), material="Mat_Doctor_LabCoat", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Doctor_LabCoat_Spine", lambda bm: make_box(bm, size=(0.35, 0.21, 0.22)),
+                                       location=(0, 0, 1.16), material="Mat_Doctor_LabCoat", parent_bone="Spine"))
+    parts.append(create_mesh_primitive("Doctor_LabCoat_Tails", lambda bm: make_cylinder(bm, radius=0.19, depth=0.45, segments=16),
+                                       location=(0, 0, 0.88), material="Mat_Doctor_LabCoat", parent_bone="Root"))
+    
+    # --- THE ICONIC MUSTARD STAIN ON RIGHT LAPEL ---
+    parts.append(create_mesh_primitive("Doctor_Mustard_Main", lambda bm: make_box(bm, size=(0.024, 0.012, 0.024)),
+                                       location=(0.085, 0.118, 1.42), material="Mat_Mustard_Yellow", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Doctor_Mustard_Drip", lambda bm: make_box(bm, size=(0.008, 0.008, 0.016)),
+                                       location=(0.088, 0.119, 1.40), material="Mat_Mustard_Yellow", parent_bone="Chest"))
+    
+    # ID Badge on Left Breast Pocket
+    parts.append(create_mesh_primitive("Doctor_Badge", lambda bm: make_box(bm, size=(0.05, 0.006, 0.075)),
+                                       location=(-0.105, 0.118, 1.40), material="Mat_Doctor_Badge", parent_bone="Chest"))
+    
+    # Stethoscope Draped Around Neck
+    parts.append(create_mesh_primitive("Doctor_Stethoscope_Tubing", lambda bm: make_cylinder(bm, radius=0.088, depth=0.014, segments=16),
+                                       location=(0, 0, 1.49), material="Mat_Stethoscope", parent_bone="Chest"))
+    parts.append(create_mesh_primitive("Doctor_Stethoscope_Diaphragm", lambda bm: make_cylinder(bm, radius=0.022, depth=0.01, segments=12),
+                                       location=(-0.04, 0.122, 1.30), material="Mat_Walt_Glasses_Wire", parent_bone="Chest"))
+    
+    # 4. SLEEVES, HANDS & PATIENT CHART CLIPBOARD PROP
+    for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+        parts.append(create_mesh_primitive(f"Doctor_Sleeve_Upper_{side}", lambda bm: make_cylinder(bm, radius=0.068, depth=0.28, segments=14),
+                                           location=(sign * 0.20, 0, 1.28), material="Mat_Doctor_LabCoat", parent_bone=f"UpperArm{suffix}"))
+        parts.append(create_mesh_primitive(f"Doctor_Sleeve_Forearm_{side}", lambda bm: make_cylinder(bm, radius=0.058, depth=0.28, segments=14),
+                                           location=(sign * 0.21, 0, 0.98), material="Mat_Doctor_LabCoat", parent_bone=f"Forearm{suffix}"))
+        parts.append(create_mesh_primitive(f"Doctor_Hand_{side}", lambda bm: make_box(bm, size=(0.045, 0.07, 0.09)),
+                                           location=(sign * 0.215, 0, 0.77), material="Mat_Skin_Caucasian", parent_bone=f"Hand{suffix}"))
+    
+    # Walter White's Diagnostic Patient Chart Clipboard in Hand
+    parts.append(create_mesh_primitive("Doctor_Clipboard_Board", lambda bm: make_box(bm, size=(0.18, 0.012, 0.25)),
+                                       location=(-0.06, 0.22, 1.15), rotation=(0.35, 0, -0.15),
+                                       material="Mat_Desk_Wood", parent_bone="Hand.L"))
+    parts.append(create_mesh_primitive("Doctor_Clipboard_Clip", lambda bm: make_box(bm, size=(0.07, 0.02, 0.025)),
+                                       location=(-0.06, 0.225, 1.26), rotation=(0.35, 0, -0.15),
+                                       material="Mat_Walt_Glasses_Wire", parent_bone="Hand.L"))
+    parts.append(create_mesh_primitive("Doctor_Clipboard_Paper", lambda bm: make_box(bm, size=(0.165, 0.004, 0.23)),
+                                       location=(-0.06, 0.227, 1.15), rotation=(0.35, 0, -0.15),
+                                       material="Mat_Hospital_Chart", parent_bone="Hand.L"))
+    
+    # 5. CHARCOAL SLACKS & BLACK SHOES
+    parts.append(create_mesh_primitive("Doctor_Slacks_Hips", lambda bm: make_box(bm, size=(0.34, 0.20, 0.14)),
+                                       location=(0, 0, 1.01), material="Mat_Doctor_Slacks", parent_bone="Root"))
+    for side, sign, suffix in [("L", -1, ".L"), ("R", 1, ".R")]:
+        parts.append(create_mesh_primitive(f"Doctor_Thigh_{side}", lambda bm: make_cylinder(bm, radius=0.08, depth=0.42, segments=14),
+                                           location=(sign * 0.12, 0, 0.72), material="Mat_Doctor_Slacks", parent_bone=f"Thigh{suffix}"))
+        parts.append(create_mesh_primitive(f"Doctor_Shin_{side}", lambda bm: make_cylinder(bm, radius=0.07, depth=0.38, segments=14),
+                                           location=(sign * 0.12, 0, 0.30), material="Mat_Doctor_Slacks", parent_bone=f"Shin{suffix}"))
+        parts.append(create_mesh_primitive(f"Doctor_Shoe_{side}", lambda bm: make_box(bm, size=(0.10, 0.22, 0.08)),
+                                           location=(sign * 0.12, 0.06, 0.06), material="Mat_Gus_Shoes", parent_bone=f"Foot{suffix}"))
+
+    # Armature and Animations
+    arm_obj = build_biped_armature("Dr_Delcavoli_Armature")
+    link_to_collection(arm_obj, col)
+    char_mesh = attach_parts_and_bind_to_armature("Dr_Delcavoli", parts, arm_obj, col)
+    
+    consult_act = create_consultation_action(arm_obj, "Consultation")
+    walk_act = create_walk_cycle_action(arm_obj, "Walk_Cycle",
+                                        stride_angle=0.42, knee_bend=0.52, arm_swing=0.30,
+                                        bounce_amp=0.024, sway_amp=0.012, forward_lean=0.04,
+                                        torso_twist=0.05, head_counter=0.95, elbow_bend=0.22,
+                                        foot_roll=0.28)
+    idle_act = create_idle_action(arm_obj, "Idle", breath_amp=0.022, weight_shift=0.010, head_quirk=(0.01, 0, 0.02))
+    
+    anim_data = arm_obj.animation_data
+    for tr in list(anim_data.nla_tracks):
+        anim_data.nla_tracks.remove(tr)
+    t1 = anim_data.nla_tracks.new()
+    t1.name = "Consultation"
+    t1.strips.new("Consultation", 0, consult_act)
+    t2 = anim_data.nla_tracks.new()
+    t2.name = "Walk_Cycle"
+    t2.strips.new("Walk_Cycle", 0, walk_act)
+    t3 = anim_data.nla_tracks.new()
+    t3.name = "Idle"
+    t3.strips.new("Idle", 0, idle_act)
+    anim_data.action = consult_act
+    
+    return arm_obj, char_mesh
+
+
 if __name__ == "__main__":
     init_all_materials()
     print("Testing character generation...")

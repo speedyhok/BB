@@ -891,6 +891,39 @@ def build_entire_albuquerque_city():
         pry = random.uniform(220, 360)
         build_prickly_pear(f"Suburban_PricklyPear_{int(abs(prx))}_{int(pry)}", (prx, pry, 0), collection=veg_col)
 
+    # 11. CHAPTER 1 STORY CHARACTERS
+    print("Populating Chapter 1 Story Characters in Sets...")
+    char_col = get_or_create_collection("09_Story_Characters", city_col)
+    from characters_gen import (
+        build_walter_white_pilot,
+        build_walter_white_patient,
+        build_skyler_white,
+        build_dr_delcavoli
+    )
+    # Walter White (Pilot Morning) in Master Bedroom at 308 Negra Arroyo Lane
+    # Bed is at (-150 + (-1.0), 300 + 6.8, 0.40) = (-151.0, 306.8, 0.40)
+    walt_pilot_arm, _ = build_walter_white_pilot(char_col, outfit="morning")
+    walt_pilot_arm.location = (-151.0, 306.8, 0.40)
+    walt_pilot_arm.rotation_euler = (0, 0, math.pi * 0.5)
+
+    # Walter White (Hospital Patient) on Examination Bed in Hospital Cabin
+    # Exam bed is at (40 + 2.2, -80 - 2.8, 0.78) = (42.2, -82.8, 0.78)
+    walt_pat_arm, _ = build_walter_white_patient(char_col)
+    walt_pat_arm.location = (42.2, -82.8, 0.78)
+    walt_pat_arm.rotation_euler = (0, 0, math.pi * 0.5)
+
+    # Skyler White (Seated Visitor) beside Hospital Bed
+    # Chair is at (40 + 1.0, -80 - 3.8, 0.0) = (41.0, -83.8, 0.0)
+    skyler_arm, _ = build_skyler_white(char_col)
+    skyler_arm.location = (41.0, -83.8, 0.0)
+    skyler_arm.rotation_euler = (0, 0, 0.35)
+
+    # Dr. Delcavoli (Consultation) standing with Mustard Lab Coat & Patient Chart
+    # Consultation spot is at (40 + 0.5, -80 - 2.5, 0.0) = (40.5, -82.5, 0.0)
+    doc_arm, _ = build_dr_delcavoli(char_col)
+    doc_arm.location = (40.5, -82.5, 0.0)
+    doc_arm.rotation_euler = (0, 0, -math.pi * 0.65)
+
     print("Breaking Bad Albuquerque City generation complete!")
     return city_col
 

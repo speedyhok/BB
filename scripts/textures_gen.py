@@ -540,6 +540,58 @@ def generate_textures(output_dir):
     draw.text((340, 190), "CLASS OF '09", fill=(180, 25, 25, 255))
     photo_frame.save(os.path.join(output_dir, "walt_family_photos.png"))
 
+    # 25. Hospital Patient Gown Pattern (512x512)
+    gown = Image.new("RGBA", (512, 512), (180, 215, 215, 255)) # Pale seafoam
+    draw = ImageDraw.Draw(gown)
+    # Geometric repeating diamond and cross motif
+    for y in range(0, 512, 32):
+        for x in range(0, 512, 32):
+            offset = 16 if (y // 32) % 2 == 1 else 0
+            px = (x + offset) % 512
+            draw.polygon([(px + 8, y + 2), (px + 14, y + 8), (px + 8, y + 14), (px + 2, y + 8)], fill=(130, 175, 180, 255))
+            draw.line([(px + 4, y + 8), (px + 12, y + 8)], fill=(100, 150, 160, 255), width=1)
+            draw.line([(px + 8, y + 4), (px + 8, y + 12)], fill=(100, 150, 160, 255), width=1)
+    gown.save(os.path.join(output_dir, "hospital_gown_pattern.png"))
+
+    # 26. Patient Barcode Wristband (512x128)
+    band = Image.new("RGBA", (512, 128), (250, 250, 252, 255))
+    draw = ImageDraw.Draw(band)
+    # Red allergy / fall risk indicator strip
+    draw.rectangle([0, 0, 36, 128], fill=(220, 35, 35, 255))
+    draw.rectangle([40, 8, 504, 120], outline=(180, 190, 200, 255), width=2)
+    draw.text((50, 16), "WHITE, WALTER H.", fill=(20, 20, 20, 255))
+    draw.text((50, 42), "DOB: 09/07/1958  MRN: 884-021  SEX: M", fill=(60, 60, 60, 255))
+    draw.text((50, 68), "ATTENDING: DR. DELCAVOLI, MD  ROOM: 304B", fill=(60, 60, 60, 255))
+    # Barcode lines
+    for i in range(360, 490, 6):
+        w = 2 if (i % 12 == 0) else 4 if (i % 18 == 0) else 1
+        draw.line([(i, 20), (i, 85)], fill=(10, 10, 10, 255), width=w)
+    draw.text((375, 92), "*884021009*", fill=(50, 50, 50, 255))
+    band.save(os.path.join(output_dir, "patient_wristband.png"))
+
+    # 27. Doctor ID Badge (256x384)
+    badge = Image.new("RGBA", (256, 384), (245, 248, 250, 255))
+    draw = ImageDraw.Draw(badge)
+    # Top clip slot
+    draw.ellipse([110, 10, 146, 25], fill=(70, 75, 80, 255))
+    # AMC Header bar
+    draw.rectangle([10, 35, 246, 95], fill=(20, 70, 130, 255))
+    draw.text((25, 45), "ALBUQUERQUE", fill=(255, 255, 255, 255))
+    draw.text((25, 68), "MEDICAL CENTER", fill=(230, 240, 255, 255))
+    # Photo box
+    draw.rectangle([68, 110, 188, 230], fill=(210, 220, 230, 255), outline=(100, 110, 120, 255), width=2)
+    # Doctor face portrait silhouette
+    draw.ellipse([100, 130, 156, 185], fill=(225, 185, 150, 255)) # face
+    draw.ellipse([98, 120, 158, 145], fill=(70, 70, 75, 255)) # hair
+    draw.polygon([(85, 225), (128, 190), (171, 225)], fill=(255, 255, 255, 255)) # coat collar
+    # Info
+    draw.text((25, 245), "K. DELCAVOLI, M.D.", fill=(15, 25, 40, 255))
+    draw.text((25, 275), "PULMONOLOGY & ONCOLOGY", fill=(70, 80, 95, 255))
+    draw.text((25, 302), "STAFF PHYSICIAN #0492", fill=(100, 110, 120, 255))
+    draw.rectangle([25, 335, 231, 365], fill=(20, 70, 130, 255))
+    draw.text((70, 342), "PHYSICIAN", fill=(255, 255, 255, 255))
+    badge.save(os.path.join(output_dir, "doctor_id_badge.png"))
+
     print("All enhanced textures generated successfully!")
 
 if __name__ == "__main__":
