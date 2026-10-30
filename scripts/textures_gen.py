@@ -282,6 +282,133 @@ def generate_textures(output_dir):
         draw.rectangle([sx, 30, sx + 45, 482], fill=(240, 240, 240, 255))
     cw_img.save(os.path.join(output_dir, "crosswalk_stripes.png"))
 
+    # 16. Fleetwood Bounder RV Side Body Stripes (1024x256)
+    rv_stripe = Image.new("RGBA", (1024, 256), (228, 220, 204, 255)) # RV Off-white Cream
+    draw = ImageDraw.Draw(rv_stripe)
+    # Upper tan/caramel stripe
+    draw.rectangle([0, 70, 1024, 125], fill=(195, 140, 75, 255))
+    # Chrome accent pinstripe
+    draw.rectangle([0, 128, 1024, 134], fill=(235, 235, 240, 255))
+    # Lower dark chocolate / burnt orange stripe
+    draw.rectangle([0, 137, 1024, 215], fill=(110, 50, 25, 255))
+    # Classic 80s BOUNDER script badge
+    draw.text((720, 155), "BOUNDER", fill=(240, 215, 160, 255))
+    draw.text((880, 175), "FLEETWOOD", fill=(210, 185, 130, 255))
+    rv_stripe.save(os.path.join(output_dir, "rv_stripe_bulletholes.png"))
+
+    # 17. Iconic RV Door with 5 Bullet Holes & Silver Duct Tape (512x1024)
+    rv_door = Image.new("RGBA", (512, 1024), (225, 218, 202, 255)) # Off-white camper door
+    draw = ImageDraw.Draw(rv_door)
+    # Dark rubber weatherstrip border
+    draw.rectangle([12, 12, 500, 1012], outline=(35, 35, 38, 255), width=16)
+    draw.rectangle([28, 28, 484, 996], outline=(160, 155, 142, 255), width=4)
+    
+    # Upper Camper Window with rounded corners and tinted glass
+    draw.rounded_rectangle([60, 60, 452, 360], radius=30, fill=(35, 55, 65, 255), outline=(50, 50, 55, 255), width=12)
+    draw.rounded_rectangle([80, 80, 432, 340], radius=20, fill=(20, 35, 45, 255))
+    # Glass glare highlight
+    draw.polygon([(100, 320), (140, 320), (320, 100), (280, 100)], fill=(80, 110, 130, 100))
+
+    # Exterior horizontal body stripe continuing across door
+    draw.rectangle([28, 440, 484, 495], fill=(195, 140, 75, 255))
+    draw.rectangle([28, 498, 484, 504], fill=(235, 235, 240, 255))
+    draw.rectangle([28, 507, 484, 580], fill=(110, 50, 25, 255))
+
+    # Chrome RV Door Paddle Handle & Deadbolt
+    draw.rectangle([40, 520, 110, 620], fill=(50, 50, 55, 255), outline=(30, 30, 30, 255), width=4)
+    draw.rectangle([55, 535, 95, 595], fill=(210, 212, 215, 255))
+    draw.ellipse([70, 600, 80, 610], fill=(20, 20, 20, 255)) # Keyhole
+
+    # The 5 Emilio & Krazy-8 Bullet Holes Sealed with Silver Duct Tape
+    bullet_hole_locs = [
+        (220, 420),
+        (330, 460),
+        (260, 530),
+        (380, 600),
+        (290, 670)
+    ]
+
+    for bx, by in bullet_hole_locs:
+        # Jagged charred bullet puncture underneath
+        draw.ellipse([bx-24, by-24, bx+24, by+24], fill=(20, 15, 12, 255))
+        draw.ellipse([bx-12, by-12, bx+12, by+12], fill=(5, 5, 5, 255))
+        # Spalling fiberglass cracks
+        for dx, dy in [(-30, -10), (32, 8), (-12, 28), (14, -26)]:
+            draw.line([(bx, by), (bx+dx, by+dy)], fill=(80, 75, 65, 255), width=2)
+        
+        # Heavy-duty silver duct tape crisscross patches
+        # Tape strip 1 (diagonal)
+        draw.polygon([(bx-45, by-18), (bx+45, by+18), (bx+40, by+35), (bx-50, by-0)], fill=(185, 190, 195, 240), outline=(140, 145, 150, 255))
+        # Tape strip 2 (cross diagonal)
+        draw.polygon([(bx-18, by+45), (bx+18, by-45), (bx+35, by-40), (bx-0, by+50)], fill=(195, 200, 205, 240), outline=(150, 155, 160, 255))
+        # Tape texture fiber lines
+        draw.line([(bx-40, by-8), (bx+40, by+24)], fill=(215, 220, 225, 180), width=1)
+        draw.line([(bx-10, by+40), (bx+24, by-40)], fill=(215, 220, 225, 180), width=1)
+
+    rv_door.save(os.path.join(output_dir, "rv_bullet_holes_door.png"))
+
+    # 18. Walter White's Chemistry Reaction Notebook (512x512)
+    lab_notes = Image.new("RGBA", (512, 512), (248, 246, 238, 255)) # Cream graph/ruled paper
+    draw = ImageDraw.Draw(lab_notes)
+    # Margin & blue ruled horizontal lines
+    draw.line([(60, 0), (60, 512)], fill=(225, 90, 90, 255), width=2) # Red margin line
+    for ny in range(40, 500, 24):
+        draw.line([(0, ny), (512, ny)], fill=(190, 215, 240, 160), width=1)
+
+    # Handwritten reaction notes in neat dark blue ink
+    draw.text((80, 18), "REDUCTION PATHWAY - EXPERIMENT 04", fill=(15, 25, 75, 255))
+    draw.text((80, 46), "Precursor: P-2-P + Methylamine -> Imine intermediate", fill=(25, 45, 95, 255))
+    draw.text((80, 70), "Catalyst: Aluminum-Mercury Amalgam (or HI / Red P)", fill=(25, 45, 95, 255))
+    
+    # Hand-drawn Chemical Structure: Benzene ring with ethylamine tail
+    cx, cy = 190, 175
+    # Hexagon benzene ring
+    hex_pts = [
+        (cx, cy - 40),
+        (cx + 35, cy - 20),
+        (cx + 35, cy + 20),
+        (cx, cy + 40),
+        (cx - 35, cy + 20),
+        (cx - 35, cy - 20)
+    ]
+    draw.polygon(hex_pts, outline=(20, 30, 80, 255), width=3)
+    draw.ellipse([cx-20, cy-20, cx+20, cy+20], outline=(20, 30, 80, 255), width=2) # Aromatic circle
+    # Side chain bonds
+    draw.line([(cx+35, cy), (cx+75, cy-15)], fill=(20, 30, 80, 255), width=3)
+    draw.line([(cx+75, cy-15), (cx+115, cy)], fill=(20, 30, 80, 255), width=3)
+    draw.line([(cx+115, cy), (cx+115, cy+35)], fill=(20, 30, 80, 255), width=3) # CH3
+    draw.text((cx+120, cy+20), "CH3", fill=(20, 30, 80, 255))
+    draw.line([(cx+115, cy), (cx+155, cy-15)], fill=(20, 30, 80, 255), width=3)
+    draw.text((cx+160, cy-25), "NH-CH3", fill=(20, 30, 80, 255))
+    
+    # Key reaction parameters
+    draw.text((80, 245), "PARAMETERS:", fill=(15, 25, 75, 255))
+    draw.text((80, 270), "- Reflux Temperature: 82.4 deg C (STRICT CONTROL)", fill=(160, 25, 25, 255))
+    draw.text((80, 294), "- Condenser water flow: steady, cold cycle", fill=(25, 45, 95, 255))
+    draw.text((80, 318), "- Crystallization: Acetone wash at -10 deg C", fill=(25, 45, 95, 255))
+    draw.text((80, 350), "TARGET PURITY: 99.1% (CHEMICALLY PURE)", fill=(15, 120, 45, 255))
+    draw.text((80, 380), "Formula: C10H15N . HCl   MW: 185.7 g/mol", fill=(25, 45, 95, 255))
+    draw.text((80, 420), "\"Respect the chemistry. The process is sacred.\"", fill=(15, 25, 75, 255))
+    draw.text((360, 450), "- W.W.", fill=(15, 25, 75, 255))
+
+    lab_notes.save(os.path.join(output_dir, "rv_lab_notes.png"))
+
+    # 19. Chemical Hazard & Precursor Warning Sign (512x512)
+    haz_sign = Image.new("RGBA", (512, 512), (255, 220, 30, 255)) # Vibrant safety yellow
+    draw = ImageDraw.Draw(haz_sign)
+    draw.rectangle([14, 14, 498, 498], outline=(20, 20, 20, 255), width=18)
+    draw.rectangle([34, 34, 478, 120], fill=(20, 20, 20, 255))
+    draw.text((105, 55), "DANGER / CAUTION", fill=(255, 220, 30, 255))
+    draw.text((65, 150), "HAZARDOUS CHEMICAL VAPORS", fill=(20, 20, 20, 255))
+    draw.text((70, 195), "PHOSPHINE & HYDROCHLORIC GAS", fill=(180, 20, 20, 255))
+    draw.text((50, 250), "FULL RESPIRATOR & TYVEK SUIT REQUIRED", fill=(20, 20, 20, 255))
+    # Gas mask icon circle
+    draw.ellipse([180, 300, 332, 452], fill=(20, 20, 20, 255))
+    draw.ellipse([200, 330, 240, 370], fill=(255, 220, 30, 255))
+    draw.ellipse([272, 330, 312, 370], fill=(255, 220, 30, 255))
+    draw.polygon([(240, 370), (272, 370), (256, 420)], fill=(255, 220, 30, 255))
+    haz_sign.save(os.path.join(output_dir, "rv_chemical_hazard.png"))
+
     print("All enhanced textures generated successfully!")
 
 if __name__ == "__main__":

@@ -261,6 +261,27 @@ def generate_master_city_and_renders():
             (1.48, 0, 0.0),
             24,
             "Hank & Marie's Interior - Royal Purple Carpet, Mineral Collection & Schraderbräu Brewery"
+        ),
+        (
+            "render_16_rv_exterior_door_duct_tape.png",
+            (-413.5, 414.2, 2.1),
+            (1.48, 0, -0.65),
+            26,
+            "1986 Fleetwood Bounder RV Exterior - Passenger Door with 5 Bullet Holes & Silver Duct Tape, Awning & Lawn Chairs"
+        ),
+        (
+            "render_17_rv_interior_meth_lab.png",
+            (-421.2, 420.0, 1.70),
+            (1.46, 0, -1.15),
+            20,
+            "Walter White's RV Cook Lab Interior - Stainless Bench, Boiling Flask, Liebig Condenser, Blue Meth Trays & Yellow Hazmat Suits"
+        ),
+        (
+            "render_18_rv_interior_cockpit_dinette.png",
+            (-419.5, 420.0, 1.70),
+            (1.46, 0, 2.20),
+            20,
+            "Crystal Ship Interior - Booth Dinette with Walter's Reaction Notebook, 0.01g Scale, Secret Trapdoor & Captain Seats"
         )
     ]
 

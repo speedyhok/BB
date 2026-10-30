@@ -117,9 +117,25 @@ def init_all_materials():
     materials["Mat_Car_MonteCarlo_Red"] = get_or_create_material("Mat_Car_MonteCarlo_Red", base_color=(0.75, 0.12, 0.15, 1.0), metallic=0.55, roughness=0.22)
     materials["Mat_RV_Cream"] = get_or_create_material("Mat_RV_Cream", base_color=(0.88, 0.85, 0.78, 1.0), roughness=0.4)
     materials["Mat_RV_Stripe"] = get_or_create_material("Mat_RV_Stripe", texture_path=tex("rv_stripe_bulletholes.png"), roughness=0.4)
+    materials["Mat_RV_Door_BulletHoles"] = get_or_create_material("Mat_RV_Door_BulletHoles", texture_path=tex("rv_bullet_holes_door.png"), roughness=0.42)
+    materials["Mat_RV_Lab_Notes"] = get_or_create_material("Mat_RV_Lab_Notes", texture_path=tex("rv_lab_notes.png"), roughness=0.7)
+    materials["Mat_RV_Chemical_Hazard"] = get_or_create_material("Mat_RV_Chemical_Hazard", texture_path=tex("rv_chemical_hazard.png"), roughness=0.35)
     materials["Mat_Tire_Rubber"] = get_or_create_material("Mat_Tire_Rubber", base_color=(0.1, 0.1, 0.1, 1.0), roughness=0.9)
     materials["Mat_Car_Chrome"] = get_or_create_material("Mat_Car_Chrome", base_color=(0.96, 0.96, 0.96, 1.0), metallic=0.98, roughness=0.08)
     materials["Mat_License_Plate_LWYRUP"] = get_or_create_material("Mat_License_Plate_LWYRUP", texture_path=tex("license_plate_lwyrup.png"), roughness=0.3)
+
+    # Fleetwood RV Lab & Interior Materials
+    materials["Mat_Hazmat_Yellow"] = get_or_create_material("Mat_Hazmat_Yellow", base_color=(0.96, 0.82, 0.04, 1.0), roughness=0.38)
+    materials["Mat_Respirator_Pink"] = get_or_create_material("Mat_Respirator_Pink", base_color=(0.92, 0.12, 0.48, 1.0), roughness=0.55)
+    materials["Mat_Respirator_Grey"] = get_or_create_material("Mat_Respirator_Grey", base_color=(0.20, 0.21, 0.24, 1.0), roughness=0.42)
+    materials["Mat_Chemical_Amber"] = get_or_create_material("Mat_Chemical_Amber", base_color=(0.85, 0.48, 0.05, 0.85), transmission=0.88, roughness=0.08, emission_color=(0.35, 0.18, 0.02, 1.0), emission_strength=1.8)
+    materials["Mat_Chemical_Glass"] = get_or_create_material("Mat_Chemical_Glass", base_color=(0.92, 0.96, 0.98, 0.22), transmission=0.96, roughness=0.02)
+    materials["Mat_Duct_Tape"] = get_or_create_material("Mat_Duct_Tape", base_color=(0.75, 0.76, 0.78, 1.0), metallic=0.78, roughness=0.38)
+    materials["Mat_RV_Interior_Wall"] = get_or_create_material("Mat_RV_Interior_Wall", base_color=(0.78, 0.70, 0.60, 1.0), roughness=0.82)
+    materials["Mat_RV_Dinette_Cushion"] = get_or_create_material("Mat_RV_Dinette_Cushion", base_color=(0.48, 0.32, 0.20, 1.0), roughness=0.9)
+    materials["Mat_Fire_Extinguisher"] = get_or_create_material("Mat_Fire_Extinguisher", base_color=(0.88, 0.08, 0.08, 1.0), roughness=0.25, metallic=0.2)
+    materials["Mat_Walt_Briefs"] = get_or_create_material("Mat_Walt_Briefs", base_color=(0.94, 0.94, 0.92, 1.0), roughness=0.95)
+    materials["Mat_Pine_Air_Freshener"] = get_or_create_material("Mat_Pine_Air_Freshener", base_color=(0.08, 0.55, 0.15, 1.0), roughness=0.8)
 
     # 7. Landmarks & Branded Textures
     materials["Mat_Pollos_Sign"] = get_or_create_material("Mat_Pollos_Sign", texture_path=tex("pollos_hermanos_logo.png"), roughness=0.35)

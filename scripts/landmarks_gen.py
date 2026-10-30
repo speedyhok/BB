@@ -1111,7 +1111,7 @@ def build_hank_marie_house(name="Hank_Marie_House", location=(0,0,0), rotation=(
 
 def build_desert_cook_site(name="Desert_RV_CookSite", location=(0,0,0), rotation=(0,0,0), collection=None):
     """To'hajiilee Indian Reservation Desert Mesa Cook Site with Fleetwood RV,
-    Folding Lawn Chairs, Propane Tanks & Buried Barrels of Cash"""
+    Folding Lawn Chairs, Propane Tanks, Power Cables & Buried Barrels of Cash"""
     root = bpy.data.objects.new(name, None)
     root.location = Vector(location)
     root.rotation_euler = Euler(rotation)
@@ -1120,27 +1120,52 @@ def build_desert_cook_site(name="Desert_RV_CookSite", location=(0,0,0), rotation
     mesa = create_cube(f"{name}_mesa_base", (0, 0, -0.4), (54, 46, 0.8), "Mat_Desert_Ground", collection)
     mesa.parent = root
 
-    # Fleetwood Bounder RV (The Crystal Ship)
+    # Fleetwood Bounder RV (The Crystal Ship) - Complete Interior & Exterior Lab
     rv = build_fleetwood_bounder_rv(f"{name}_RV", location=(0, 0, 0), rotation=(0, 0, -0.15), collection=collection)
     rv.parent = root
 
-    # Folding Aluminum Lawn Chairs
-    create_cube(f"{name}_chair1", (4.5, -2.5, 0.4), (0.7, 0.65, 0.75), "Mat_Cloth_White" if "Mat_Cloth_White" in bpy.data.materials else "Mat_Stucco_White", collection).parent = root
-    create_cube(f"{name}_chair2", (4.5, -4.0, 0.4), (0.7, 0.65, 0.75), "Mat_Cloth_White" if "Mat_Cloth_White" in bpy.data.materials else "Mat_Stucco_White", collection).parent = root
+    # Folding Aluminum Lawn Chairs with Blue Webbing (Walt & Jesse's desert thinking spot)
+    for cx, cy, rot_z in [(4.5, -2.8, 0.2), (4.5, -4.0, -0.15)]:
+        chair_seat = create_cube(f"{name}_chair_{cx}_{cy}", (cx, cy, 0.42), (0.65, 0.60, 0.08), "Mat_Car_Volvo_Blue", collection, rotation=(0, 0, rot_z))
+        chair_seat.parent = root
+        chair_back = create_cube(f"{name}_chair_back_{cx}_{cy}", (cx + 0.26, cy, 0.72), (0.08, 0.60, 0.55), "Mat_Car_Volvo_Blue", collection, rotation=(0, -0.25, rot_z))
+        chair_back.parent = root
+        # Aluminum tubular frame
+        chair_leg1 = create_cylinder(f"{name}_cleg1_{cx}_{cy}", (cx - 0.25, cy - 0.25, 0.22), radius=0.015, depth=0.42, material="Mat_Car_Chrome", collection=collection)
+        chair_leg1.parent = root
+        chair_leg2 = create_cylinder(f"{name}_cleg2_{cx}_{cy}", (cx + 0.25, cy + 0.25, 0.22), radius=0.015, depth=0.42, material="Mat_Car_Chrome", collection=collection)
+        chair_leg2.parent = root
 
-    # Portable Generator & Propane Tanks
-    gen = create_cube(f"{name}_generator", (7.0, 2.0, 0.45), (0.9, 0.65, 0.7), "Mat_Neon_Red", collection)
+    # Portable Red Honda Generator & Propane Tank
+    gen = create_cube(f"{name}_generator", (6.5, -1.5, 0.42), (0.85, 0.60, 0.65), "Mat_Neon_Red", collection)
     gen.parent = root
-    propane = create_cylinder(f"{name}_propane", (6.5, 0.5, 0.6), radius=0.25, depth=0.9, material="Mat_Stucco_White", collection=collection)
+    gen_handle = create_cylinder(f"{name}_gen_handle", (6.5, -1.5, 0.76), radius=0.02, depth=0.55, material="Mat_Car_Chrome", collection=collection, rotation=(0, math.pi/2, 0))
+    gen_handle.parent = root
+    # Heavy rubber power cable snaking from generator toward RV door
+    cable = create_cylinder(f"{name}_power_cable", (4.5, -1.4, 0.06), radius=0.025, depth=4.2, material="Mat_Power_Cable", collection=collection, rotation=(0, math.pi/2, -0.1))
+    cable.parent = root
+
+    propane = create_cylinder(f"{name}_propane", (5.8, -0.6, 0.55), radius=0.22, depth=0.85, material="Mat_Stucco_White", collection=collection)
     propane.parent = root
+    propane_valve = create_cylinder(f"{name}_propane_valve", (5.8, -0.6, 1.02), radius=0.04, depth=0.10, material="Mat_Car_Chrome", collection=collection)
+    propane_valve.parent = root
 
     # BURIED PLASTIC CASH BARRELS IN DIRT TRENCH!
-    trench = create_cube(f"{name}_trench", (-7.5, -3.5, -0.2), (3.5, 2.5, 0.4), "Mat_Desert_Gravel", collection)
+    # Walt's 7 buried barrels of $80 Million Cash in the desert
+    trench = create_cube(f"{name}_trench", (-7.5, -3.5, -0.15), (4.2, 3.2, 0.35), "Mat_Desert_Gravel", collection)
     trench.parent = root
-    for bx in [-8.0, -7.0]:
-        for by in [-4.0, -3.0]:
-            barrel = create_cylinder(f"{name}_cash_barrel_{bx}_{by}", (bx, by, -0.1), radius=0.38, depth=0.85, material="Mat_Metal_Black", collection=collection)
-            barrel.parent = root
+    for bx, by in [(-8.2, -4.2), (-8.2, -3.0), (-7.2, -4.2), (-7.2, -3.0), (-6.2, -3.6)]:
+        barrel = create_cylinder(f"{name}_cash_barrel_{bx}_{by}", (bx, by, 0.15), radius=0.36, depth=0.88, material="Mat_Metal_Black", collection=collection)
+        barrel.parent = root
+
+    # Saguaro Cacti on the Mesa
+    for cax, cay in [(12.0, -8.0), (-14.0, 10.0), (-16.0, -12.0), (15.0, 14.0)]:
+        cactus_trunk = create_cylinder(f"{name}_cactus_trunk_{cax}_{cay}", (cax, cay, 2.2), radius=0.28, depth=4.4, material="Mat_Cactus_Green", collection=collection)
+        cactus_trunk.parent = root
+        carm1 = create_cylinder(f"{name}_carm1_{cax}_{cay}", (cax + 0.6, cay, 2.6), radius=0.18, depth=1.6, material="Mat_Cactus_Green", collection=collection)
+        carm1.parent = root
+        carm2 = create_cylinder(f"{name}_carm2_{cax}_{cay}", (cax - 0.6, cay, 3.0), radius=0.18, depth=1.8, material="Mat_Cactus_Green", collection=collection)
+        carm2.parent = root
 
     create_box_collider(mesa, f"UCX_{name}_Mesa", collection)
     return root
