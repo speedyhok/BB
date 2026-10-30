@@ -648,6 +648,15 @@ def build_entire_albuquerque_city():
         collection=lm_col
     )
 
+    # 11. Albuquerque Medical Center & Dr. Delcavoli's Oncology Cabin
+    print(" - Albuquerque Medical Center & Oncology Cabin...")
+    landmarks_gen.build_hospital_clinic(
+        name="Hospital_Oncology_Clinic",
+        location=(40, -80, 0),
+        rotation=(0, 0, 0),
+        collection=lm_col
+    )
+
     # 5. EXPANDED DOWNTOWN SKYLINE DISTRICT
     print("Populating Downtown Skyline...")
     dt_col = get_or_create_collection("03_Downtown_Skyline", city_col)

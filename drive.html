@@ -411,12 +411,13 @@
 
   <!-- Ground Exploration Location Quick-Jump Bar -->
   <div id="ground-bar">
-    <button class="ground-btn" onclick="teleportGround('walt')">🏡 Walt's House</button>
+    <button class="ground-btn" onclick="teleportGround('walt')">🏡 Walt's House (Scene Start)</button>
+    <button class="ground-btn" onclick="teleportGround('hospital')">🏥 Hospital Cabin</button>
+    <button class="ground-btn" onclick="teleportGround('desert')">🚐 Desert RV</button>
     <button class="ground-btn" onclick="teleportGround('pollos')">🍗 Pollos Hermanos</button>
     <button class="ground-btn" onclick="teleportGround('saul')">⚖️ Saul Goodman</button>
     <button class="ground-btn" onclick="teleportGround('superlab')">🧺 Superlab</button>
     <button class="ground-btn" onclick="teleportGround('carwash')">🧼 A1A Carwash</button>
-    <button class="ground-btn" onclick="teleportGround('desert')">🚐 Desert RV</button>
     <button class="ground-btn" onclick="teleportGround('hank')">💎 Hank's House</button>
     <button class="ground-btn" onclick="teleportGround('jesse')">🏡 Jesse's House</button>
     <button class="ground-btn" onclick="teleportGround('downtown')">🏙️ Downtown</button>
@@ -451,11 +452,11 @@
     let scene, camera, renderer, clock, orbitControls;
     let cityModel = null;
 
-    // Ground Walk Navigation State
-    let groundPos = new THREE.Vector3(-150, 1.8, -282); // Eye level outside Walter's house
-    let groundYaw = 0;   // Radians horizontal angle
+    // Ground Walk Navigation State (Default Scene Starts Inside Walter's House Living Room!)
+    let groundPos = new THREE.Vector3(-150.2, 1.6, -298.5); // Inside Walter White's living room at 308 Negra Arroyo Lane
+    let groundYaw = 0.1; // Radians horizontal angle facing living room & kitchen
     let groundPitch = 0; // Radians vertical tilt
-    let groundTargetYaw = 0;
+    let groundTargetYaw = 0.1;
     let groundTargetPitch = 0;
     let walkSpeed = 16;  // m/s
     let sprintSpeed = 38;// m/s with Shift
@@ -466,12 +467,13 @@
 
     // Top View Landmark Locations (in Three.js Y-Up coordinate space)
     const LANDMARKS = [
-      { id: 'walt', name: "Walt's House", x: -150, y: 0, z: -300, groundX: -150, groundZ: -282, groundYaw: 0, groundY: 1.8 },
+      { id: 'walt', name: "Walt's House (Scene Start)", x: -150, y: 0, z: -300, groundX: -150.2, groundZ: -298.5, groundYaw: 0.1, groundY: 1.6 },
+      { id: 'hospital', name: "Hospital Oncology Cabin", x: 40, y: 0, z: 80, groundX: 39.5, groundZ: 85.5, groundYaw: Math.PI, groundY: 1.6 },
+      { id: 'desert', name: "To'hajiilee RV", x: -420, y: 3.5, z: -420, groundX: -416.2, groundZ: -415.8, groundYaw: 3.85, groundY: 1.8 },
       { id: 'pollos', name: "Los Pollos Hermanos", x: 140, y: 0, z: -40, groundX: 140, groundZ: -20, groundYaw: 0, groundY: 1.8 },
       { id: 'saul', name: "Saul Goodman", x: -60, y: 0, z: -40, groundX: -60, groundZ: -20, groundYaw: 0, groundY: 1.8 },
       { id: 'superlab', name: "Superlab Laundry", x: 90, y: 0, z: 220, groundX: 90, groundZ: 200, groundYaw: Math.PI, groundY: 1.8 },
       { id: 'carwash', name: "A1A Carwash", x: 220, y: 0, z: 40, groundX: 220, groundZ: 20, groundYaw: Math.PI, groundY: 1.8 },
-      { id: 'desert', name: "To'hajiilee RV", x: -420, y: 3.5, z: -420, groundX: -416.2, groundZ: -415.8, groundYaw: 3.85, groundY: 1.8 },
       { id: 'hank', name: "Hank's House", x: 270, y: 0, z: -260, groundX: 270, groundZ: -242, groundYaw: 0, groundY: 1.8 },
       { id: 'jesse', name: "Jesse's House", x: -260, y: 0, z: -220, groundX: -260, groundZ: -205, groundYaw: 0, groundY: 1.8 },
       { id: 'downtown', name: "Route 66 Plaza", x: -250, y: 0, z: 40, groundX: -250, groundZ: 25, groundYaw: Math.PI, groundY: 1.8 }

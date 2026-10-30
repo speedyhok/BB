@@ -409,6 +409,137 @@ def generate_textures(output_dir):
     draw.polygon([(240, 370), (272, 370), (256, 420)], fill=(255, 220, 30, 255))
     haz_sign.save(os.path.join(output_dir, "rv_chemical_hazard.png"))
 
+    # 20. Walter White's Lung Cancer Chest X-Ray & CT Scan Lightbox (512x512)
+    xray = Image.new("RGBA", (512, 512), (8, 14, 24, 255)) # Dark radiology film blue
+    draw = ImageDraw.Draw(xray)
+    # Metallic lightbox frame
+    draw.rectangle([8, 8, 504, 504], outline=(140, 150, 165, 255), width=10)
+    draw.line([(256, 8), (256, 504)], fill=(80, 90, 105, 255), width=4)
+    # Hospital header
+    draw.text((25, 20), "ALBUQUERQUE MEDICAL CENTER - RADIOLOGY", fill=(180, 215, 255, 255))
+    draw.text((25, 38), "PATIENT: WHITE, WALTER H.   AGE: 50   DOB: 09/07/1958", fill=(140, 180, 230, 255))
+    draw.text((25, 54), "STUDY: CHEST PA / LATERAL CT   DR. K. DELCAVOLI", fill=(140, 180, 230, 255))
+
+    # --- LEFT PHO-XRAY: Ribcage, Spine, Cardiac Shadow & Lungs ---
+    # Thoracic Spine
+    draw.rectangle([122, 110, 134, 460], fill=(160, 180, 200, 180))
+    # Clavicles
+    draw.line([(40, 135), (120, 125)], fill=(190, 210, 230, 200), width=8)
+    draw.line([(136, 125), (216, 135)], fill=(190, 210, 230, 200), width=8)
+    # Ribs arches
+    for ry in range(160, 440, 32):
+        draw.arc([40, ry - 20, 124, ry + 40], 120, 320, fill=(160, 190, 220, 180), width=6)
+        draw.arc([132, ry - 20, 216, ry + 40], 220, 60, fill=(160, 190, 220, 180), width=6)
+    # Cardiac Silhouette
+    draw.ellipse([90, 270, 165, 380], fill=(120, 150, 180, 150))
+    # Diaphragm Domes
+    draw.arc([35, 390, 125, 480], 180, 360, fill=(170, 200, 230, 220), width=10)
+    draw.arc([130, 400, 220, 480], 180, 360, fill=(170, 200, 230, 220), width=10)
+
+    # THE FATEFUL LUNG CANCER TUMOR (Upper Left Lobe)
+    # Dense irregular mass circled by oncologist in red grease pencil
+    draw.ellipse([160, 185, 200, 225], fill=(220, 235, 250, 230), outline=(230, 240, 255, 255), width=3)
+    # Dr. Delcavoli's red clinical marker circle
+    draw.ellipse([152, 177, 208, 233], outline=(255, 35, 35, 255), width=3)
+    draw.line([(208, 195), (242, 175)], fill=(255, 35, 35, 255), width=2)
+    draw.text((150, 240), "TUMOR: 4.8 cm", fill=(255, 60, 60, 255))
+    draw.text((140, 255), "STAGE IIIA", fill=(255, 60, 60, 255))
+
+    # --- RIGHT PANEL: Axial CT Cross-Section ---
+    draw.text((280, 20), "AXIAL CT SCAN - CARINIC LEVEL", fill=(180, 215, 255, 255))
+    # Body oval
+    draw.ellipse([275, 110, 485, 450], outline=(150, 175, 205, 180), width=6)
+    # Vertebral body
+    draw.rectangle([365, 380, 395, 420], fill=(180, 200, 225, 220))
+    # Lungs dark cavities
+    draw.ellipse([290, 160, 370, 360], fill=(15, 25, 40, 255), outline=(130, 160, 195, 160), width=4)
+    draw.ellipse([390, 160, 470, 360], fill=(15, 25, 40, 255), outline=(130, 160, 195, 160), width=4)
+    # CT primary mass in left anterior segment
+    draw.ellipse([420, 210, 455, 245], fill=(220, 235, 250, 240), outline=(255, 35, 35, 255), width=3)
+    draw.text((285, 465), "DIAGNOSIS: BRONCHOGENIC CARCINOMA", fill=(255, 80, 80, 255))
+    xray.save(os.path.join(output_dir, "hospital_xray_lung_scan.png"))
+
+    # 21. Hospital Oncology & Pulmonary Clinic Sign (512x256)
+    hosp_sign = Image.new("RGBA", (512, 256), (255, 255, 255, 255))
+    draw = ImageDraw.Draw(hosp_sign)
+    draw.rectangle([8, 8, 504, 248], outline=(20, 85, 155, 255), width=8)
+    draw.rectangle([18, 18, 494, 90], fill=(20, 85, 155, 255))
+    # Red Cross / Medical Caduceus
+    draw.rectangle([45, 32, 65, 78], fill=(235, 35, 35, 255))
+    draw.rectangle([34, 43, 76, 67], fill=(235, 35, 35, 255))
+    draw.text((90, 32), "ALBUQUERQUE MEDICAL CENTER", fill=(255, 255, 255, 255))
+    draw.text((90, 58), "PULMONOLOGY & CLINICAL ONCOLOGY", fill=(210, 235, 255, 255))
+    draw.text((65, 115), "DR. K. DELCAVOLI, M.D. - CHIEF OF ONCOLOGY", fill=(30, 30, 35, 255))
+    draw.text((65, 145), "SPECIALIZED INOPERABLE THORACIC ONCOLOGY", fill=(70, 80, 95, 255))
+    draw.text((65, 175), "CONSULTATION CABINS • CHEMOTHERAPY INFUSION", fill=(20, 85, 155, 255))
+    draw.rectangle([40, 210, 472, 235], fill=(235, 35, 35, 255))
+    draw.text((120, 215), "EMERGENCY & PATIENT ENTRANCE", fill=(255, 255, 255, 255))
+    hosp_sign.save(os.path.join(output_dir, "hospital_sign_oncology.png"))
+
+    # 22. Medical Patient Chart Clipboard (512x512)
+    chart = Image.new("RGBA", (512, 512), (245, 242, 235, 255)) # Medical intake paper
+    draw = ImageDraw.Draw(chart)
+    # Clipboard border & top silver clip
+    draw.rectangle([12, 12, 500, 500], outline=(160, 110, 50, 255), width=10) # Masonite board
+    draw.rectangle([170, 10, 342, 45], fill=(195, 200, 205, 255), outline=(90, 95, 100, 255), width=4)
+    # Hospital header
+    draw.text((40, 60), "PATIENT CLINICAL RECORD - ONCOLOGY SERVICE", fill=(20, 70, 130, 255))
+    draw.line([(40, 85), (472, 85)], fill=(20, 70, 130, 255), width=2)
+    draw.text((40, 98), "NAME: WHITE, WALTER HARTWELL", fill=(30, 30, 30, 255))
+    draw.text((320, 98), "DOB: 09/07/1958", fill=(30, 30, 30, 255))
+    draw.text((40, 126), "AGE: 50   SEX: M   OCCUPATION: HIGH SCHOOL CHEMISTRY TEACHER", fill=(50, 50, 50, 255))
+    draw.text((40, 154), "CHIEF COMPLAINT: Syncope at car wash, hemoptysis, chronic cough", fill=(50, 50, 50, 255))
+    
+    # Vital signs table
+    draw.rectangle([40, 185, 472, 255], outline=(140, 155, 175, 255), width=2)
+    draw.text((50, 195), "BP: 138/85 mmHg", fill=(30, 30, 30, 255))
+    draw.text((180, 195), "HR: 88 bpm (Reg)", fill=(30, 30, 30, 255))
+    draw.text((320, 195), "SpO2: 93% on RA", fill=(190, 30, 30, 255))
+    draw.text((50, 225), "Resp: 20/min", fill=(30, 30, 30, 255))
+    draw.text((180, 225), "Temp: 98.4 F", fill=(30, 30, 30, 255))
+    draw.text((320, 225), "Weight: 168 lbs", fill=(30, 30, 30, 255))
+
+    # Diagnostic Findings
+    draw.text((40, 275), "DIAGNOSTIC ASSESSMENT:", fill=(180, 25, 25, 255))
+    draw.text((40, 305), "1. Stage IIIA Bronchogenic Carcinoma (Non-Small Cell)", fill=(180, 25, 25, 255))
+    draw.text((40, 332), "2. Primary lesion: 4.8cm mass, left upper hilar region", fill=(40, 40, 40, 255))
+    draw.text((40, 358), "3. Ipsilateral mediastinal lymph node involvement", fill=(40, 40, 40, 255))
+    draw.text((40, 385), "4. SURGICAL ASSESSMENT: INOPERABLE / UNRESECTABLE", fill=(190, 20, 20, 255))
+    draw.text((40, 415), "PLAN: Palliative Chemotherapy (Carboplatin + Paclitaxel)", fill=(20, 50, 120, 255))
+    draw.text((40, 442), "PROGNOSIS: Best case with treatment: ~18 - 24 months.", fill=(180, 20, 20, 255))
+    draw.text((40, 470), "ATTENDING: Dr. K. Delcavoli, M.D.", fill=(40, 40, 40, 255))
+    chart.save(os.path.join(output_dir, "hospital_patient_chart.png"))
+
+    # 23. Walter Jr's Breakfast Cereal Box (256x256)
+    cereal = Image.new("RGBA", (256, 256), (145, 45, 125, 255)) # Purple box
+    draw = ImageDraw.Draw(cereal)
+    draw.rectangle([8, 8, 248, 248], outline=(245, 215, 65, 255), width=6)
+    draw.ellipse([20, 25, 236, 125], fill=(245, 205, 45, 255))
+    draw.text((35, 45), "RAISIN BRAN", fill=(125, 25, 105, 255))
+    draw.text((65, 80), "TWO SCOOPS!", fill=(200, 25, 25, 255))
+    # Sun graphic
+    draw.ellipse([95, 135, 160, 200], fill=(255, 185, 20, 255))
+    draw.text((45, 215), "FLYNN'S BREAKFAST", fill=(255, 255, 255, 255))
+    cereal.save(os.path.join(output_dir, "walt_breakfast_cereal.png"))
+
+    # 24. Framed Family Photos on Wall (512x256)
+    photo_frame = Image.new("RGBA", (512, 256), (80, 45, 20, 255)) # Walnut frame
+    draw = ImageDraw.Draw(photo_frame)
+    draw.rectangle([6, 6, 506, 250], outline=(195, 160, 60, 255), width=4)
+    # Photo 1: Walter & Skyler Wedding / Los Alamos (Left)
+    draw.rectangle([20, 20, 240, 236], fill=(235, 230, 215, 255), outline=(50, 30, 15, 255), width=3)
+    draw.ellipse([90, 40, 170, 130], fill=(210, 170, 140, 255)) # Walt face
+    draw.rectangle([95, 75, 165, 95], outline=(30, 30, 30, 255), width=2) # Walt wire glasses
+    draw.text((55, 150), "LOS ALAMOS NATL LAB", fill=(40, 50, 70, 255))
+    draw.text((70, 180), "WALT & SKYLER", fill=(30, 30, 30, 255))
+
+    # Photo 2: Walter Jr. / Flynn (Right)
+    draw.rectangle([272, 20, 492, 236], fill=(235, 230, 215, 255), outline=(50, 30, 15, 255), width=3)
+    draw.ellipse([345, 45, 420, 135], fill=(210, 170, 140, 255)) # Flynn face
+    draw.text((310, 160), "WALTER WHITE JR.", fill=(30, 30, 30, 255))
+    draw.text((340, 190), "CLASS OF '09", fill=(180, 25, 25, 255))
+    photo_frame.save(os.path.join(output_dir, "walt_family_photos.png"))
+
     print("All enhanced textures generated successfully!")
 
 if __name__ == "__main__":

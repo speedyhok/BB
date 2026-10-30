@@ -110,6 +110,7 @@ def generate_individual_assets():
         ("old_joe_junkyard", LANDMARKS_DIR, lambda col: landmarks_gen.build_old_joe_junkyard(collection=col)),
         ("jesse_pinkman_house", LANDMARKS_DIR, lambda col: landmarks_gen.build_jesse_pinkman_house(collection=col)),
         ("hank_marie_house", LANDMARKS_DIR, lambda col: landmarks_gen.build_hank_marie_house(collection=col)),
+        ("hospital_oncology_clinic", LANDMARKS_DIR, lambda col: landmarks_gen.build_hospital_clinic(collection=col)),
         ("fleetwood_bounder_rv", VEHICLES_DIR, lambda col: vehicles_gen.build_fleetwood_bounder_rv(collection=col)),
         ("pontiac_aztek", VEHICLES_DIR, lambda col: vehicles_gen.build_pontiac_aztek(collection=col)),
         ("cadillac_deville", VEHICLES_DIR, lambda col: vehicles_gen.build_cadillac_deville(collection=col)),
@@ -282,6 +283,20 @@ def generate_master_city_and_renders():
             (1.46, 0, 2.20),
             20,
             "Crystal Ship Interior - Booth Dinette with Walter's Reaction Notebook, 0.01g Scale, Secret Trapdoor & Captain Seats"
+        ),
+        (
+            "render_19_walter_house_interior_start.png",
+            (-149.5, 295.4, 1.62),
+            (1.46, 0, 0.45),
+            22,
+            "Walter White's Residence Scene Start - Foyer Entry into Living Room, Leaves of Grass, Family Photos & Breakfast Table"
+        ),
+        (
+            "render_20_hospital_cabin_xray_mustard.png",
+            (39.5, -85.5, 1.65),
+            (1.45, 0, 0.65),
+            20,
+            "Dr. Delcavoli's Oncology Cabin - Illuminated Lung Cancer X-Ray Lightbox, Doctor's Desk, Patient Chart & Mustard Stained Coat"
         )
     ]
 

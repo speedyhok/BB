@@ -108,11 +108,25 @@ def build_walter_white_house(name="Walt_House_308NegraArroyo", location=(0,0,0),
     pizza = create_cylinder(f"{name}_roof_pizza", (-6.0, -4.4, 4.25), radius=0.65, depth=0.06, material="Mat_Pizza_Roof", collection=collection, rotation=(0.42, 0, 0), segments=24)
     pizza.parent = root
 
-    # Front Entrance Door with Brass Knob
-    front_door = create_cube(f"{name}_front_door", (0.5, -4.95, 1.2), (1.1, 0.08, 2.3), "Mat_Cabinet_Wood", collection)
+    # Front Entrance Door with Brass Knob (Hinged Ajar for Walkable Scene Start)
+    door_w = 1.05
+    door_ang = 0.65 # ~37 degrees swing into foyer
+    front_door = create_cube(f"{name}_front_door", (0.5 + 0.45*math.cos(door_ang), -4.95 + 0.45*math.sin(door_ang), 1.2), (door_w, 0.06, 2.3), "Mat_Cabinet_Wood", collection, rotation=(0, 0, door_ang))
     front_door.parent = root
-    door_knob = create_cylinder(f"{name}_doorknob", (0.95, -5.02, 1.15), radius=0.035, depth=0.08, material="Mat_Car_Chrome", collection=collection, rotation=(math.pi/2, 0, 0))
-    door_knob.parent = root
+    door_frame_l = create_cube(f"{name}_door_frame_l", (-0.05, -4.98, 1.2), (0.08, 0.12, 2.3), "Mat_Cabinet_Wood", collection)
+    door_frame_l.parent = root
+    door_frame_r = create_cube(f"{name}_door_frame_r", (1.05, -4.98, 1.2), (0.08, 0.12, 2.3), "Mat_Cabinet_Wood", collection)
+    door_frame_r.parent = root
+
+    # Foyer Welcome Mat & Hallway Console Table
+    welcome_mat = create_cube(f"{name}_welcome_mat", (0.5, -4.4, 0.13), (1.1, 0.7, 0.02), "Mat_Carpet_Beige", collection)
+    welcome_mat.parent = root
+    foyer_table = create_cube(f"{name}_foyer_table", (-1.2, -4.5, 0.52), (1.0, 0.35, 0.8), "Mat_Cabinet_Wood", collection)
+    foyer_table.parent = root
+    keys_bowl = create_cylinder(f"{name}_keys_bowl", (-1.2, -4.5, 0.94), radius=0.08, depth=0.04, material="Mat_Car_Chrome", collection=collection)
+    keys_bowl.parent = root
+    coat_rack = create_cylinder(f"{name}_coat_rack", (-1.8, -4.5, 1.1), radius=0.04, depth=1.9, material="Mat_Cabinet_Wood", collection=collection)
+    coat_rack.parent = root
 
     # Windows with Translucent Glass & Trim
     for wx, wy in [(6.0, -5.06), (9.0, 0.0), (-4.8, 6.0)]:
@@ -157,6 +171,17 @@ def build_walter_white_house(name="Walt_House_308NegraArroyo", location=(0,0,0),
     book = create_cube(f"{name}_leaves_of_grass", (-1.0, -2.0, 0.48), (0.24, 0.34, 0.04), "Mat_Leaves_Of_Grass", collection)
     book.parent = root
 
+    # Framed Family Photos on Living Room Wall (Walt & Skyler Los Alamos, Walter Jr.)
+    family_pic = create_textured_sign_plane(f"{name}_family_photos", (-1.2, -4.85, 2.1), width=1.5, height=0.75, material="Mat_Walt_Family_Photos", collection=collection)
+    family_pic.parent = root
+
+    # Ceiling Fan with Warm Light
+    fan_center = create_cylinder(f"{name}_ceiling_fan", (-1.2, -1.5, 2.85), radius=0.14, depth=0.12, material="Mat_Car_Chrome", collection=collection)
+    fan_center.parent = root
+    for fr in range(4):
+        blade = create_cube(f"{name}_fan_blade_{fr}", (-1.2, -1.5, 2.88), (1.4, 0.16, 0.02), "Mat_Cabinet_Wood", collection, rotation=(0, 0, fr * math.pi/2))
+        blade.parent = root
+
     # CRT Television & Wooden Credenza
     tv_stand = create_cube(f"{name}_tv_stand", (-1.2, 1.4, 0.4), (1.8, 0.6, 0.6), "Mat_Cabinet_Wood", collection)
     tv_stand.parent = root
@@ -172,6 +197,17 @@ def build_walter_white_house(name="Walt_House_308NegraArroyo", location=(0,0,0),
     lamp_shade.parent = root
 
     # --- 2. KITCHEN & DINING FURNITURE ---
+    # Kitchen Island Bar Counter & Stools
+    island = create_cube(f"{name}_k_island", (5.8, -3.8, 0.55), (2.2, 0.8, 0.9), "Mat_Cabinet_Wood", collection)
+    island.parent = root
+    island_top = create_cube(f"{name}_k_island_top", (5.8, -3.8, 1.02), (2.3, 0.9, 0.06), "Mat_Countertop_Granite", collection)
+    island_top.parent = root
+    for sx in [5.2, 6.4]:
+        stool_ped = create_cylinder(f"{name}_stool_ped_{sx}", (sx, -4.5, 0.35), radius=0.03, depth=0.68, material="Mat_Car_Chrome", collection=collection)
+        stool_ped.parent = root
+        stool_top = create_cylinder(f"{name}_stool_top_{sx}", (sx, -4.5, 0.72), radius=0.18, depth=0.06, material="Mat_Leather_Dark", collection=collection)
+        stool_top.parent = root
+
     # L-shaped kitchen counters with dark granite top
     counter_1 = create_cube(f"{name}_k_counter1", (8.5, -4.2, 0.55), (2.8, 1.2, 0.9), "Mat_Cabinet_Wood", collection)
     counter_1.parent = root
@@ -195,16 +231,31 @@ def build_walter_white_house(name="Walt_House_308NegraArroyo", location=(0,0,0),
     hood = create_cube(f"{name}_range_hood", (9.2, -0.4, 1.8), (0.95, 0.9, 0.4), "Mat_Stainless_Steel", collection)
     hood.parent = root
 
-    # Refrigerator
+    # Refrigerator with baby sonogram photos & notes
     fridge = create_cube(f"{name}_fridge", (9.2, 1.1, 1.0), (0.95, 0.95, 1.85), "Mat_Stucco_White", collection)
     fridge.parent = root
 
-    # Dining Table & 4 Chairs
+    # Dining Table & 4 Chairs - SET FOR BREAKFAST
     d_table = create_cube(f"{name}_dining_table", (5.8, -1.5, 0.45), (1.8, 1.1, 0.75), "Mat_Cabinet_Wood", collection)
     d_table.parent = root
     for cx, cy in [(4.8, -1.5), (6.8, -1.5), (5.8, -0.7), (5.8, -2.3)]:
         chair = create_cube(f"{name}_chair_{cx}_{cy}", (cx, cy, 0.42), (0.45, 0.45, 0.8), "Mat_Cabinet_Wood", collection)
         chair.parent = root
+
+    # FLYNN'S ICONIC RAISIN BRAN CEREAL BOX ON DINING TABLE!
+    cereal_box = create_cube(f"{name}_cereal_box", (5.4, -1.6, 0.95), (0.10, 0.22, 0.28), "Mat_Walt_Cereal", collection)
+    cereal_box.parent = root
+    # Milk Carton
+    milk_carton = create_cube(f"{name}_milk_carton", (5.7, -1.75, 0.94), (0.11, 0.11, 0.25), "Mat_Stucco_White", collection)
+    milk_carton.parent = root
+    # Ceramic cereal bowl with spoon
+    cereal_bowl = create_cylinder(f"{name}_cereal_bowl", (5.8, -1.35, 0.86), radius=0.12, depth=0.08, material="Mat_Stucco_White", collection=collection)
+    cereal_bowl.parent = root
+    spoon = create_cube(f"{name}_spoon", (5.8, -1.35, 0.91), (0.02, 0.18, 0.01), "Mat_Car_Chrome", collection, rotation=(0.1, 0, 0.4))
+    spoon.parent = root
+    # Glass of orange juice
+    oj_glass = create_cylinder(f"{name}_oj_glass", (6.2, -1.5, 0.90), radius=0.045, depth=0.14, material="Mat_Chemical_Amber", collection=collection)
+    oj_glass.parent = root
 
     # --- 3. THE INFAMOUS UTILITY CLOSET, WATER HEATER & SECRET CRAWL SPACE CASH ---
     # Utility closet enclosure (X: -4.8 to -2.6, Y: 2.1 to 4.2)
@@ -257,6 +308,44 @@ def build_walter_white_house(name="Walt_House_308NegraArroyo", location=(0,0,0),
     bed_pillow2.parent = root
     nightstand = create_cube(f"{name}_nightstand", (-2.4, 7.5, 0.4), (0.55, 0.55, 0.6), "Mat_Cabinet_Wood", collection)
     nightstand.parent = root
+
+    # Walter's Bedside Props: 5:07 AM Alarm Clock, Inhaler, Medicine & Glasses
+    alarm_clock = create_cube(f"{name}_alarm_clock", (-2.4, 7.5, 0.73), (0.16, 0.22, 0.07), "Mat_Metal_Black", collection)
+    alarm_clock.parent = root
+    clock_face = create_cube(f"{name}_clock_face", (-2.4, 7.38, 0.73), (0.14, 0.01, 0.05), "Mat_Neon_Red", collection)
+    clock_face.parent = root
+    # Albuterol Inhaler
+    inhaler = create_cylinder(f"{name}_inhaler", (-2.22, 7.42, 0.74), radius=0.02, depth=0.08, material="Mat_Car_Volvo_Blue", collection=collection)
+    inhaler.parent = root
+    # Prescription Medicine Amber Bottle
+    pill_bottle = create_cylinder(f"{name}_pill_bottle", (-2.55, 7.42, 0.74), radius=0.025, depth=0.07, material="Mat_Beer_Bottle_Amber", collection=collection)
+    pill_bottle.parent = root
+    # Wire-rim Eyeglasses
+    glasses = create_cube(f"{name}_walt_glasses", (-2.38, 7.62, 0.72), (0.12, 0.06, 0.02), "Mat_Car_Chrome", collection)
+    glasses.parent = root
+
+    # --- 4b. MASTER BATHROOM (Hank's Fateful Discovery Spot!) ---
+    # Partition wall separating master bathroom (X: 1.2 to 2.8, Y: 4.5 to 8.8)
+    bath_wall = create_cube(f"{name}_bath_wall", (1.2, 6.6, 1.6), (0.12, 4.4, 3.0), "Mat_Interior_Wall_Beige", collection)
+    bath_wall.parent = root
+    bath_floor = create_cube(f"{name}_bath_floor", (2.0, 6.6, 0.12), (1.5, 4.4, 0.04), "Mat_Tile_Kitchen", collection)
+    bath_floor.parent = root
+
+    # Master Bathroom Vanity Sink & Mirror
+    vanity = create_cube(f"{name}_vanity", (2.0, 8.4, 0.45), (1.2, 0.6, 0.8), "Mat_Cabinet_Wood", collection)
+    vanity.parent = root
+    vanity_top = create_cube(f"{name}_vanity_top", (2.0, 8.4, 0.86), (1.25, 0.65, 0.04), "Mat_Countertop_Granite", collection)
+    vanity_top.parent = root
+    vanity_mirror = create_cube(f"{name}_vanity_mirror", (2.0, 8.7, 1.6), (1.0, 0.04, 0.9), "Mat_Car_Chrome", collection)
+    vanity_mirror.parent = root
+
+    # THE MASTER TOILET (Where Hank sits and reads Leaves of Grass!)
+    toilet_tank = create_cube(f"{name}_toilet_tank", (2.0, 5.0, 0.75), (0.5, 0.25, 0.45), "Mat_Stucco_White", collection)
+    toilet_tank.parent = root
+    toilet_bowl = create_cylinder(f"{name}_toilet_bowl", (2.0, 5.25, 0.42), radius=0.22, depth=0.45, material="Mat_Stucco_White", collection=collection)
+    toilet_bowl.parent = root
+    toilet_seat = create_cylinder(f"{name}_toilet_seat", (2.0, 5.25, 0.66), radius=0.24, depth=0.04, material="Mat_Stucco_White", collection=collection)
+    toilet_seat.parent = root
 
     # --- 5. WALTER JR'S BEDROOM (Right Wing: X: 3.2 to 9.8, Y: 2.2 to 8.8) ---
     jr_bed = create_cube(f"{name}_jr_bed", (6.5, 7.0, 0.4), (1.2, 2.1, 0.5), "Mat_Car_Volvo_Blue", collection)
@@ -1242,4 +1331,223 @@ def build_old_joe_junkyard(name="Old_Joe_Junkyard", location=(0,0,0), rotation=(
         create_cube(f"{name}_car_pile_{px}_{py}_{pz}", (px, py, pz), (4.4, 1.9, 1.05), "Mat_Metal_Rusted", collection, rotation=(0, 0, rz)).parent = root
 
     create_box_collider(shack, f"UCX_{name}_Shack", collection)
+    return root
+
+# ==============================================================================
+# 11. ALBUQUERQUE MEDICAL CENTER - ONCOLOGY & PULMONOLOGY CLINIC
+# (DR. DELCAVOLI'S EXAMINATION & DIAGNOSIS CABIN)
+# ==============================================================================
+
+def build_hospital_clinic(name="Hospital_Oncology_Clinic", location=(0,0,0), rotation=(0,0,0), collection=None):
+    """Albuquerque Medical Center & Oncology Clinic where Walter White receives
+    his fateful Stage IIIA inoperable lung cancer diagnosis from Dr. Delcavoli.
+    Features:
+    - Exterior Medical Pavilion with Emergency Ambulance Bay & Sign
+    - Fully Walkable Interior Examination & Consultation Cabin
+    - Wall-Mounted Illuminated Chest X-Ray / CT Lightbox with Lung Tumor
+    - Doctor's Desk with Walter's Patient Chart & Prognosis
+    - Dr. Delcavoli's White Lab Coat with the Iconic Yellow Mustard Stain
+    - Medical Examination Table with White Paper Roll & Step Stool
+    - Rolling IV Drip Stand, EKG Vital Signs Monitor & Mayo Instrument Tray
+    """
+    root = bpy.data.objects.new(name, None)
+    root.location = Vector(location)
+    root.rotation_euler = Euler(rotation)
+    link_to_collection(root, collection)
+
+    # Base Lot (Asphalt parking lot & concrete entrance plaza)
+    lot = create_cube(f"{name}_lot", (0, 0, -0.05), (52, 44, 0.1), "Mat_Asphalt", collection)
+    lot.parent = root
+    plaza = create_cube(f"{name}_plaza", (0, -12, 0.05), (28, 12, 0.1), "Mat_Sidewalk", collection)
+    plaza.parent = root
+
+    # =========================================================================
+    # 1. EXTERIOR MEDICAL PAVILION ARCHITECTURE
+    # =========================================================================
+    # Main Hospital Building Shell (2 Stories, width 26m, depth 22m, height 8.2m)
+    bldg_main = create_cube(f"{name}_bldg_main", (0, 3.0, 4.1), (26.0, 22.0, 8.2), "Mat_Stucco_White", collection)
+    bldg_main.parent = root
+    roof_fascia = create_cube(f"{name}_roof_fascia", (0, 3.0, 8.25), (26.6, 22.6, 0.3), "Mat_Metal_Black", collection)
+    roof_fascia.parent = root
+
+    # Second Floor Ribbon Windows (Modern Tinted Cyan Curtain Glass)
+    ribbon_f = create_cube(f"{name}_ribbon_f", (0, -8.05, 6.0), (24.0, 0.1, 1.8), "Mat_Glass_Tinted", collection)
+    ribbon_f.parent = root
+    ribbon_l = create_cube(f"{name}_ribbon_l", (-13.05, 3.0, 6.0), (0.1, 20.0, 1.8), "Mat_Glass_Tinted", collection)
+    ribbon_l.parent = root
+    ribbon_r = create_cube(f"{name}_ribbon_r", (13.05, 3.0, 6.0), (0.1, 20.0, 1.8), "Mat_Glass_Tinted", collection)
+    ribbon_r.parent = root
+
+    # Cantilevered Emergency Canopy over Front Driveway
+    canopy = create_cube(f"{name}_canopy", (0, -12.5, 3.8), (16.0, 8.5, 0.4), "Mat_Car_Chrome", collection)
+    canopy.parent = root
+    canopy_pillar_l = create_cylinder(f"{name}_can_pill_l", (-7.5, -16.0, 1.8), radius=0.18, depth=3.6, material="Mat_Car_Chrome", collection=collection)
+    canopy_pillar_l.parent = root
+    canopy_pillar_r = create_cylinder(f"{name}_can_pill_r", (7.5, -16.0, 1.8), radius=0.18, depth=3.6, material="Mat_Car_Chrome", collection=collection)
+    canopy_pillar_r.parent = root
+
+    # Red Cross Medical Emblems on Canopy
+    cross_v = create_cube(f"{name}_cross_v", (0, -16.8, 3.8), (0.45, 0.1, 1.6), "Mat_Neon_Red", collection)
+    cross_v.parent = root
+    cross_h = create_cube(f"{name}_cross_h", (0, -16.8, 3.8), (1.6, 0.1, 0.45), "Mat_Neon_Red", collection)
+    cross_h.parent = root
+
+    # Hospital Signboard: ALBUQUERQUE MEDICAL CENTER - ONCOLOGY CLINIC
+    sign = create_textured_sign_plane(f"{name}_hosp_sign", (0, -16.82, 4.9), width=9.5, height=1.8, material="Mat_Hospital_Sign", collection=collection)
+    sign.parent = root
+
+    # Parked Emergency Ambulance / Medical Vehicle outside clinic
+    amb_body = create_cube(f"{name}_amb_body", (7.0, -9.5, 1.4), (5.8, 2.2, 2.1), "Mat_Stucco_White", collection)
+    amb_body.parent = root
+    amb_stripe = create_cube(f"{name}_amb_stripe", (7.0, -9.5, 1.3), (5.85, 2.22, 0.35), "Mat_Neon_Red", collection)
+    amb_stripe.parent = root
+    amb_lightbar = create_cube(f"{name}_amb_lightbar", (7.0, -9.5, 2.55), (1.6, 0.4, 0.15), "Mat_Neon_Red", collection)
+    amb_lightbar.parent = root
+
+    # =========================================================================
+    # 2. WALKABLE CLINIC INTERIOR: DR. DELCAVOLI'S ONCOLOGY CABIN
+    # =========================================================================
+    # Cabin Room Dimensions: 9.0m wide (X: -4.5 to +4.5), 8.0m deep (Y: -7.8 to +0.2), Z: 0.1 to 3.4
+    # Sterile Seamless Medical Vinyl Floor
+    cabin_floor = create_cube(f"{name}_cabin_floor", (0, -3.8, 0.12), (9.0, 8.0, 0.04), "Mat_Hospital_Floor_Vinyl", collection)
+    cabin_floor.parent = root
+
+    # Cabin Interior Walls (Pale Seafoam Aqua Hospital Drywall)
+    # North interior back wall
+    wall_n = create_cube(f"{name}_wall_n", (0, 0.2, 1.75), (9.0, 0.15, 3.3), "Mat_Hospital_Wall_Aqua", collection)
+    wall_n.parent = root
+    # West interior wall
+    wall_w = create_cube(f"{name}_wall_w", (-4.5, -3.8, 1.75), (0.15, 8.0, 3.3), "Mat_Hospital_Wall_Aqua", collection)
+    wall_w.parent = root
+    # East interior wall
+    wall_e = create_cube(f"{name}_wall_e", (4.5, -3.8, 1.75), (0.15, 8.0, 3.3), "Mat_Hospital_Wall_Aqua", collection)
+    wall_e.parent = root
+    # South entrance wall with open glass sliding clinic doorway
+    wall_s_l = create_cube(f"{name}_wall_s_l", (-3.0, -7.8, 1.75), (3.0, 0.15, 3.3), "Mat_Hospital_Wall_Aqua", collection)
+    wall_s_l.parent = root
+    wall_s_r = create_cube(f"{name}_wall_s_r", (3.0, -7.8, 1.75), (3.0, 0.15, 3.3), "Mat_Hospital_Wall_Aqua", collection)
+    wall_s_r.parent = root
+    wall_s_lint = create_cube(f"{name}_wall_s_lint", (0, -7.8, 2.85), (3.0, 0.15, 0.9), "Mat_Hospital_Wall_Aqua", collection)
+    wall_s_lint.parent = root
+
+    # Automatic Sliding Glass Entrance Doors (Standing Open for Walkable Access)
+    door_glass_l = create_cube(f"{name}_door_gl_l", (-1.1, -7.78, 1.2), (1.1, 0.05, 2.3), "Mat_Glass_Clear", collection)
+    door_glass_l.parent = root
+    door_glass_r = create_cube(f"{name}_door_gl_r", (1.1, -7.78, 1.2), (1.1, 0.05, 2.3), "Mat_Glass_Clear", collection)
+    door_glass_r.parent = root
+
+    # --- 2A. DOCTOR'S CONSULTATION AREA (Where Walt receives the diagnosis) ---
+    # Executive Consultation Desk (Dark Walnut Top with Chrome Steel Frame)
+    doc_desk = create_cube(f"{name}_doc_desk", (-1.5, -2.8, 0.52), (2.4, 1.2, 0.76), "Mat_Cabinet_Wood", collection)
+    doc_desk.parent = root
+    doc_desk_trim = create_cube(f"{name}_doc_desk_trim", (-1.5, -2.8, 0.92), (2.45, 1.25, 0.04), "Mat_Car_Chrome", collection)
+    doc_desk_trim.parent = root
+
+    # Doctor's Swivel Ergonomic Chair (Behind desk)
+    doc_chair = create_cube(f"{name}_doc_chair", (-1.5, -1.8, 0.65), (0.65, 0.65, 0.85), "Mat_Leather_Dark", collection)
+    doc_chair.parent = root
+    # Patient Visitor Chair (Where Walter sits in stunned silence)
+    patient_chair = create_cube(f"{name}_patient_chair", (-1.5, -3.9, 0.52), (0.58, 0.58, 0.78), "Mat_Car_Volvo_Blue", collection)
+    patient_chair.parent = root
+
+    # WALTER WHITE'S CLINICAL CHART CLIPBOARD ON DESK
+    # Shows Stage IIIA inoperable bronchogenic carcinoma diagnosis and vitals
+    chart = create_textured_sign_plane(f"{name}_chart_clipboard", (-1.2, -2.8, 0.95), width=0.42, height=0.34, material="Mat_Hospital_Chart", collection=collection, rotation=(math.pi/2, 0, 0))
+    chart.parent = root
+
+    # Desktop PC Monitor & Peripherals on Desk
+    pc_mon = create_cube(f"{name}_pc_mon", (-2.2, -2.6, 1.25), (0.45, 0.15, 0.35), "Mat_CRT_Screen", collection)
+    pc_mon.parent = root
+    telephone = create_cube(f"{name}_phone", (-0.65, -2.6, 0.98), (0.22, 0.22, 0.08), "Mat_Metal_Black", collection)
+    telephone.parent = root
+
+    # --- 2B. THE ICONIC CHEST CT / LUNG X-RAY LIGHTBOX VIEWBOX ---
+    # Wall-mounted illuminated medical radiograph lightbox on West wall
+    # Emitting radiograph blue glow directly beside the doctor's desk
+    lightbox_housing = create_cube(f"{name}_lightbox_frame", (-4.42, -2.8, 1.85), (0.08, 1.85, 1.45), "Mat_Car_Chrome", collection)
+    lightbox_housing.parent = root
+    xray_view = create_textured_sign_plane(f"{name}_xray_screen", (-4.37, -2.8, 1.85), width=1.75, height=1.35, material="Mat_Hospital_XRay", collection=collection, rotation=(0, 0, math.pi/2))
+    xray_view.parent = root
+
+    # --- 2C. DR. DELCAVOLI'S WHITE LAB COAT WITH THE MUSTARD STAIN! ---
+    # Coat rack stand beside consultation desk
+    coat_rack = create_cylinder(f"{name}_coat_stand", (-3.8, -4.8, 1.05), radius=0.03, depth=1.9, material="Mat_Car_Chrome", collection=collection)
+    coat_rack.parent = root
+    coat_hanger = create_cube(f"{name}_hanger", (-3.8, -4.8, 1.85), (0.42, 0.08, 0.05), "Mat_Cabinet_Wood", collection)
+    coat_hanger.parent = root
+    # Doctor's White Medical Coat
+    lab_coat = create_cube(f"{name}_lab_coat", (-3.8, -4.8, 1.35), (0.38, 0.24, 0.95), "Mat_Stucco_White", collection)
+    lab_coat.parent = root
+    # THE FAMOUS YELLOW MUSTARD STAIN ON THE RIGHT LAPEL!
+    mustard = create_cube(f"{name}_mustard_stain", (-3.8, -4.93, 1.55), (0.05, 0.02, 0.05), "Mat_Mustard_Yellow", collection)
+    mustard.parent = root
+
+    # --- 2D. EXAMINATION TABLE & TREATMENT CABIN (Where Walt lies for exam & chemo) ---
+    # Chrome Medical Exam Table with Adjustable Headrest
+    exam_base = create_cube(f"{name}_exam_base", (2.2, -2.8, 0.45), (2.10, 0.95, 0.55), "Mat_Car_Chrome", collection)
+    exam_base.parent = root
+    exam_cushion = create_cube(f"{name}_exam_cush", (2.2, -2.8, 0.78), (2.12, 0.98, 0.16), "Mat_Hospital_Bed_Cushion", collection)
+    exam_cushion.parent = root
+    # Sanitary White Examination Paper Roll running down the table
+    paper_roll = create_cube(f"{name}_paper_sheet", (2.2, -2.8, 0.88), (1.95, 0.65, 0.015), "Mat_Medical_Paper", collection)
+    paper_roll.parent = root
+    paper_dispenser = create_cylinder(f"{name}_paper_roller", (3.25, -2.8, 0.85), radius=0.065, depth=0.75, material="Mat_Medical_Paper", collection=collection, rotation=(math.pi/2, 0, 0))
+    paper_dispenser.parent = root
+    # Step Stool with Non-Slip Rubber Tread beside table
+    step_stool = create_cube(f"{name}_step_stool", (2.2, -3.6, 0.22), (0.55, 0.42, 0.24), "Mat_Metal_Black", collection)
+    step_stool.parent = root
+
+    # Rolling Stainless Steel IV Drip Stand with Saline Infusion Bag
+    iv_pole = create_cylinder(f"{name}_iv_pole", (1.0, -1.5, 1.25), radius=0.018, depth=2.1, material="Mat_Stainless_Steel", collection=collection)
+    iv_pole.parent = root
+    iv_bag = create_cube(f"{name}_iv_bag", (1.0, -1.5, 1.95), (0.16, 0.22, 0.06), "Mat_IV_Saline", collection)
+    iv_bag.parent = root
+    iv_line = create_cylinder(f"{name}_iv_line", (1.0, -1.5, 1.45), radius=0.005, depth=0.85, material="Mat_IV_Saline", collection=collection)
+    iv_line.parent = root
+
+    # Mobile Digital EKG & Vital Signs Monitor Cart on Wheels
+    ekg_cart = create_cube(f"{name}_ekg_cart", (3.4, -1.5, 0.65), (0.55, 0.55, 0.95), "Mat_Stainless_Steel", collection)
+    ekg_cart.parent = root
+    ekg_screen = create_cube(f"{name}_ekg_screen", (3.4, -1.5, 1.25), (0.42, 0.12, 0.32), "Mat_CRT_Screen", collection)
+    ekg_screen.parent = root
+    ekg_trace = create_cube(f"{name}_ekg_trace", (3.4, -1.56, 1.25), (0.36, 0.01, 0.12), "Mat_Neon_Cyan", collection)
+    ekg_trace.parent = root
+
+    # Stainless Steel Mayo Instrument Stand Tray (Stethoscope & Instruments)
+    mayo_stand = create_cylinder(f"{name}_mayo_pole", (3.4, -3.8, 0.65), radius=0.02, depth=1.0, material="Mat_Stainless_Steel", collection=collection)
+    mayo_stand.parent = root
+    mayo_tray = create_cube(f"{name}_mayo_tray", (3.4, -3.8, 1.15), (0.45, 0.35, 0.03), "Mat_Stainless_Steel", collection)
+    mayo_tray.parent = root
+    stethoscope = create_cylinder(f"{name}_steth", (3.4, -3.8, 1.18), radius=0.03, depth=0.015, material="Mat_Car_Chrome", collection=collection)
+    stethoscope.parent = root
+
+    # Wall-Mounted Sphygmomanometer (Blood Pressure Cuff) & Diagnostic Otoscope Dock
+    bp_cuff = create_cube(f"{name}_bp_gauge", (4.42, -2.8, 1.65), (0.05, 0.18, 0.24), "Mat_Metal_Black", collection)
+    bp_cuff.parent = root
+    bp_dial = create_cylinder(f"{name}_bp_dial", (4.38, -2.8, 1.65), radius=0.065, depth=0.02, material="Mat_Stucco_White", collection=collection, rotation=(0, math.pi/2, 0))
+    bp_dial.parent = root
+
+    # Red Wall-Mounted Biohazard Sharps Container
+    sharps_box = create_cube(f"{name}_sharps", (4.42, -4.2, 1.55), (0.08, 0.22, 0.30), "Mat_Neon_Red", collection)
+    sharps_box.parent = root
+    # Stainless Steel Foot-Pedal Medical Waste Can
+    waste_can = create_cylinder(f"{name}_waste_can", (3.8, -4.8, 0.35), radius=0.15, depth=0.55, material="Mat_Stainless_Steel", collection=collection)
+    waste_can.parent = root
+
+    # Ceiling Privacy Cubicle Curtain Track & Light Blue Curtain
+    curtain_track = create_cube(f"{name}_curtain_track", (0.5, -3.8, 3.15), (0.05, 5.5, 0.04), "Mat_Car_Chrome", collection)
+    curtain_track.parent = root
+    curtain = create_cube(f"{name}_curtain", (0.5, -3.8, 1.95), (0.04, 3.8, 2.35), "Mat_Hospital_Curtain", collection)
+    curtain.parent = root
+
+    # =========================================================================
+    # 3. INTERIOR HOSPITAL LIGHTING
+    # =========================================================================
+    # High-CRI Cool White Daylight Fluorescent Ceiling Lighting
+    add_interior_light(f"{name}_light_consult", (-1.5, -3.0, 3.1), energy=650.0, color=(0.95, 0.98, 1.0), collection=collection).parent = root
+    add_interior_light(f"{name}_light_exam", (2.2, -3.0, 3.1), energy=700.0, color=(0.95, 0.98, 1.0), collection=collection).parent = root
+    # Diagnostic X-Ray Lightbox Point Light
+    add_interior_light(f"{name}_light_xray", (-4.0, -2.8, 1.85), energy=350.0, color=(0.78, 0.88, 1.0), collection=collection).parent = root
+
+    create_box_collider(bldg_main, f"UCX_{name}_Main", collection)
     return root

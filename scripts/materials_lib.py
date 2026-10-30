@@ -137,6 +137,20 @@ def init_all_materials():
     materials["Mat_Walt_Briefs"] = get_or_create_material("Mat_Walt_Briefs", base_color=(0.94, 0.94, 0.92, 1.0), roughness=0.95)
     materials["Mat_Pine_Air_Freshener"] = get_or_create_material("Mat_Pine_Air_Freshener", base_color=(0.08, 0.55, 0.15, 1.0), roughness=0.8)
 
+    # Hospital & Oncology Cabin Materials
+    materials["Mat_Hospital_XRay"] = get_or_create_material("Mat_Hospital_XRay", texture_path=tex("hospital_xray_lung_scan.png"), emission_color=(0.75, 0.88, 1.0, 1.0), emission_strength=2.8, roughness=0.1)
+    materials["Mat_Hospital_Sign"] = get_or_create_material("Mat_Hospital_Sign", texture_path=tex("hospital_sign_oncology.png"), roughness=0.35)
+    materials["Mat_Hospital_Chart"] = get_or_create_material("Mat_Hospital_Chart", texture_path=tex("hospital_patient_chart.png"), roughness=0.6)
+    materials["Mat_Walt_Cereal"] = get_or_create_material("Mat_Walt_Cereal", texture_path=tex("walt_breakfast_cereal.png"), roughness=0.55)
+    materials["Mat_Walt_Family_Photos"] = get_or_create_material("Mat_Walt_Family_Photos", texture_path=tex("walt_family_photos.png"), roughness=0.45)
+    materials["Mat_Hospital_Wall_Aqua"] = get_or_create_material("Mat_Hospital_Wall_Aqua", base_color=(0.82, 0.90, 0.88, 1.0), roughness=0.75)
+    materials["Mat_Hospital_Floor_Vinyl"] = get_or_create_material("Mat_Hospital_Floor_Vinyl", base_color=(0.78, 0.82, 0.85, 1.0), roughness=0.35)
+    materials["Mat_Hospital_Curtain"] = get_or_create_material("Mat_Hospital_Curtain", base_color=(0.62, 0.78, 0.88, 1.0), roughness=0.9)
+    materials["Mat_Mustard_Yellow"] = get_or_create_material("Mat_Mustard_Yellow", base_color=(0.92, 0.72, 0.05, 1.0), roughness=0.65)
+    materials["Mat_Hospital_Bed_Cushion"] = get_or_create_material("Mat_Hospital_Bed_Cushion", base_color=(0.25, 0.45, 0.55, 1.0), roughness=0.45)
+    materials["Mat_IV_Saline"] = get_or_create_material("Mat_IV_Saline", base_color=(0.85, 0.95, 1.0, 0.4), transmission=0.85, alpha=0.5, roughness=0.1)
+    materials["Mat_Medical_Paper"] = get_or_create_material("Mat_Medical_Paper", base_color=(0.96, 0.96, 0.96, 1.0), roughness=0.95)
+
     # 7. Landmarks & Branded Textures
     materials["Mat_Pollos_Sign"] = get_or_create_material("Mat_Pollos_Sign", texture_path=tex("pollos_hermanos_logo.png"), roughness=0.35)
     materials["Mat_Saul_Billboard"] = get_or_create_material("Mat_Saul_Billboard", texture_path=tex("saul_goodman_billboard.png"), roughness=0.4)
